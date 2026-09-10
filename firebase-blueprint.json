@@ -1,0 +1,72 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the platform. Used to identify admins.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "isAdmin": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["email", "isAdmin", "createdAt"]
+    },
+    "InvitationRequest": {
+      "title": "InvitationRequest",
+      "description": "A request made by a user to customize a design.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "ID of the user who requested."
+        },
+        "userName": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "whatsappNumber": {
+          "type": "string"
+        },
+        "templateId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "userName", "userEmail", "whatsappNumber", "templateId", "status", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/User"
+      },
+      "description": "Store user roles and info."
+    },
+    "/requests/{requestId}": {
+      "schema": {
+        "$ref": "#/entities/InvitationRequest"
+      },
+      "description": "Store invitation edit requests from users."
+    }
+  }
+}

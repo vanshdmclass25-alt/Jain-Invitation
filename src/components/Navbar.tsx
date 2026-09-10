@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles } from 'lucide-react';
+import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck } from 'lucide-react';
 import { spiritualAudio } from '../utils/audio';
 import { TattvaLogo } from './TattvaLogo';
+import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
-  currentView: 'landing' | 'templates' | 'door' | 'editor' | 'invitation';
-  onNavigate: (view: 'landing' | 'templates' | 'editor' | 'invitation' | 'door') => void;
+  currentView: 'landing' | 'templates' | 'door' | 'editor' | 'invitation' | 'admin';
+  onNavigate: (view: 'landing' | 'templates' | 'editor' | 'invitation' | 'door' | 'admin') => void;
   onOpenShare?: () => void;
   onOpenPrint?: () => void;
   onOpenDoorCeremony?: () => void;
@@ -21,6 +22,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   selectedTemplateName,
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const { isAdmin } = useAuth();
+
 
   const toggleSound = () => {
     const active = spiritualAudio.toggle();
@@ -57,6 +60,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a href="#faq" className="hover:text-[#C98A3E] transition">
             FAQ
           </a>
+          {isAdmin && (
+            <button 
+              onClick={() => onNavigate('admin')} 
+              className={`hover:text-[#C98A3E] transition flex items-center gap-1 ${currentView === 'admin' ? 'text-[#C98A3E]' : ''}`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Admin
+            </button>
+          )}
         </nav>
 
         {/* Right Navigation Actions */}

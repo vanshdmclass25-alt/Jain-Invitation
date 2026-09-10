@@ -8,6 +8,8 @@ import { InvitationCard } from './components/InvitationCard';
 import { ShareModal } from './components/ShareModal';
 import { PhotoLightbox } from './components/PhotoLightbox';
 import { PrintableInvitationModal } from './components/PrintableInvitationModal';
+import { CustomizationGate } from './components/CustomizationGate';
+import { AdminDashboard } from './components/AdminDashboard';
 import { InvitationData, TemplateId } from './types';
 import { TEMPLATES } from './config/templates';
 import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
@@ -29,7 +31,7 @@ import confetti from 'canvas-confetti';
 export function App() {
   // Centralized State
   const [data, setData] = useState<InvitationData>(() => loadSavedInvitation());
-  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'admin'>('landing');
   const [isDoorRevealing, setIsDoorRevealing] = useState<boolean>(false);
   const [pendingTemplateId, setPendingTemplateId] = useState<TemplateId | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -209,12 +211,20 @@ export function App() {
         </main>
       )}
 
+      {/* ADMIN DASHBOARD VIEW */}
+      {currentView === 'admin' && (
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <AdminDashboard />
+        </main>
+      )}
+
       {/* VIEW 3: INVITATION CUSTOMIZATION & LIVE PREVIEW STUDIO */}
       {currentView === 'editor' && (
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          
-          {/* Top Bar for Editor */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-200">
+        <CustomizationGate templateId={data.selectedTemplate}>
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            
+            {/* Top Bar for Editor */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-200">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs uppercase font-cinzel tracking-widest text-[#8B6E28] font-semibold">
@@ -363,6 +373,7 @@ export function App() {
 
           </div>
         </main>
+        </CustomizationGate>
       )}
 
       {/* VIEW 4: DEDICATED FULL INVITATION VIEW */}
