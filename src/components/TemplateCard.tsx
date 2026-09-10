@@ -38,7 +38,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
         {/* Idol Image Placeholder */}
         <div className="w-36 h-40 mt-4 mb-4 relative drop-shadow-2xl flex justify-center items-center overflow-hidden rounded-md border border-[#D4AF37]/20 shadow-inner">
           <img 
-            src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80" 
+            src="/bhagwan-mahavir-pic.png" 
             className="w-full h-full object-cover" 
             alt="Mahavir Swami" 
           />

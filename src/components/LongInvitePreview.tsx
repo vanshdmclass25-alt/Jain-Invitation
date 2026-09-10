@@ -224,7 +224,7 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
               <div className="relative flex justify-center z-10 mb-8">
                 <div className="relative">
                   <img
-                    src={data.mahavirSwamiImage || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=400&q=80'}
+                    src={data.mahavirSwamiImage || '/bhagwan-mahavir-pic.png'}
                     alt="Mahavir Swami"
                     className="w-36 h-40 object-cover drop-shadow-2xl rounded-t-full border border-[#D4AF37]/30"
                   />
