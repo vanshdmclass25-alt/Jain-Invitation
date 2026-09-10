@@ -60,15 +60,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a href="#faq" className="hover:text-[#C98A3E] transition">
             FAQ
           </a>
-          {isAdmin && (
-            <button 
-              onClick={() => onNavigate('admin')} 
-              className={`hover:text-[#C98A3E] transition flex items-center gap-1 ${currentView === 'admin' ? 'text-[#C98A3E]' : ''}`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Admin
-            </button>
-          )}
+          <button 
+            onClick={() => onNavigate('admin')} 
+            className={`transition flex items-center gap-1 ${currentView === 'admin' ? 'text-[#C98A3E]' : 'text-stone-300 hover:text-[#C98A3E]'}`}
+            title="Admin Access"
+          >
+            <ShieldCheck className="w-4 h-4" />
+          </button>
         </nav>
 
         {/* Right Navigation Actions */}

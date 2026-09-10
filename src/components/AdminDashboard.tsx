@@ -15,12 +15,16 @@ interface Request {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { user, isAdmin } = useAuth();
+  const { isAdmin, loginAdmin, authError } = useAuth();
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pin, setPin] = useState('');
 
   useEffect(() => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      setLoading(false);
+      return;
+    }
 
     const fetchRequests = async () => {
       try {
@@ -52,8 +56,32 @@ export const AdminDashboard: React.FC = () => {
 
   if (!isAdmin) {
     return (
-      <div className="flex items-center justify-center p-12 text-stone-600">
-        Access Denied. Admin privileges required.
+      <div className="max-w-md mx-auto mt-12 p-8 bg-white rounded-2xl shadow-xl text-center border border-amber-200">
+        <h2 className="text-2xl font-cinzel font-bold text-stone-800 mb-4">Admin Access</h2>
+        <p className="text-stone-600 mb-6">Enter the master passcode to access the dashboard.</p>
+        
+        {authError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm mb-6 text-left break-words">
+            {authError}
+          </div>
+        )}
+        
+        <form onSubmit={(e) => { e.preventDefault(); loginAdmin(pin); }} className="space-y-4 text-left">
+          <div>
+            <label className="block text-xs font-semibold text-stone-600 uppercase mb-1">Master PIN</label>
+            <input 
+              type="password" 
+              required 
+              value={pin} 
+              onChange={e => setPin(e.target.value)} 
+              className="w-full px-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-center tracking-widest text-lg" 
+              placeholder="••••••••" 
+            />
+          </div>
+          <button type="submit" className="bg-stone-800 hover:bg-stone-900 text-white px-6 py-3 rounded-xl font-semibold shadow-md transition w-full mt-4">
+            Unlock Dashboard
+          </button>
+        </form>
       </div>
     );
   }

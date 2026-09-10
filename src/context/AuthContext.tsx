@@ -58,8 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const loginAdmin = (pin: string) => {
-    // A simple secure PIN bypass to avoid Firebase Auth billing prompts
-    if (pin === '12345') { 
+    if (pin === 'TATTVA2026') { 
       setIsAdmin(true);
       localStorage.setItem('tattva_admin', 'true');
       setAuthError(null);
