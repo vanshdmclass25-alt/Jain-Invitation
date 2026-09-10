@@ -1,0 +1,472 @@
+import React, { useState, useEffect } from 'react';
+import { Navbar } from './components/Navbar';
+import { LandingPage } from './components/LandingPage';
+import { TemplateGallery } from './components/TemplateGallery';
+import { DoorReveal } from './components/DoorReveal';
+import { InvitationForm } from './components/InvitationForm';
+import { InvitationCard } from './components/InvitationCard';
+import { ShareModal } from './components/ShareModal';
+import { PhotoLightbox } from './components/PhotoLightbox';
+import { PrintableInvitationModal } from './components/PrintableInvitationModal';
+import { InvitationData, TemplateId } from './types';
+import { TEMPLATES } from './config/templates';
+import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
+import { downloadInvitationCard } from './utils/download';
+import { 
+  Eye, 
+  Edit3, 
+  Sparkles, 
+  Share2, 
+  Smartphone, 
+  Monitor, 
+  Check, 
+  ArrowLeft,
+  RotateCcw,
+  Printer
+} from 'lucide-react';
+import confetti from 'canvas-confetti';
+
+export function App() {
+  // Centralized State
+  const [data, setData] = useState<InvitationData>(() => loadSavedInvitation());
+  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('landing');
+  const [isDoorRevealing, setIsDoorRevealing] = useState<boolean>(false);
+  const [pendingTemplateId, setPendingTemplateId] = useState<TemplateId | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
+  const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
+  const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('invitation');
+
+  // Auto-detect if someone opened an existing invitation via URL
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('invitation') || params.get('name')) {
+        // Direct invitation view mode for guests
+        setCurrentView('invitation');
+        setDoorDestinationView('invitation');
+        setIsDoorRevealing(true);
+      }
+    }
+  }, []);
+
+  // Save changes to localStorage
+  const handleDataChange = (newData: InvitationData) => {
+    setData(newData);
+    saveInvitation(newData);
+  };
+
+  // When user selects a template from Gallery
+  const handleSelectTemplate = (templateId: TemplateId) => {
+    setPendingTemplateId(templateId);
+    handleDataChange({
+      ...data,
+      selectedTemplate: templateId,
+    });
+    setCurrentView('editor');
+  };
+
+  // When door animation completes
+  const handleDoorOpened = () => {
+    setIsDoorRevealing(false);
+    setCurrentView(doorDestinationView);
+    // Soft celebratory confetti
+    try {
+      confetti({
+        particleCount: 50,
+        spread: 80,
+        origin: { y: 0.5 },
+        colors: ['#D4AF37', '#E5C07B', '#FFFFFF', '#C29B38'],
+      });
+    } catch {
+      // noop
+    }
+  };
+
+  const handleDownload = async () => {
+    await downloadInvitationCard(
+      'invitation-card-container',
+      `jain-parna-invitation-${(data.name || 'tapasvi').toLowerCase().replace(/\s+/g, '-') || 'tapasvi'}.png`
+    );
+  };
+
+  const handleShareWhatsApp = () => {
+    const shareUrl = generateShareableUrl(data);
+    const text = encodeURIComponent(
+      `✨ You are warmly invited to the sacred Pārna of ${data.name || 'our Tapasvi'}.\n\n` +
+      `Tap the link to view the complete invitation:\n${shareUrl}`
+    );
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  };
+
+  const handleWebShare = async () => {
+    const shareUrl = generateShareableUrl(data);
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Jain Tapasya Pārna Invitation - ${data.name}`,
+          text: `You are warmly invited to the Pārna of ${data.name}.`,
+          url: shareUrl,
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      setIsShareModalOpen(true);
+    }
+  };
+
+  const currentTemplate = TEMPLATES[data.selectedTemplate] || TEMPLATES.sukoon || {};
+  if (!currentTemplate) 
+  console.log("TEMPLATES", TEMPLATES);
+  console.log("currentTemplate", currentTemplate);
+
+  return (
+    <div 
+      className="min-h-screen flex flex-col transition-colors duration-500"
+      style={{
+        background: currentView === 'invitation' ? currentTemplate?.colors.outerBgGradient : '#FAF8F5',
+        color: currentView === 'invitation' && currentTemplate.id === 'divya' ? '#E8ECEF' : '#2C241E',
+      }}
+    >
+      {/* Top Navigation */}
+      <Navbar
+        currentView={currentView}
+        onNavigate={(view) => {
+          if (view === 'door') {
+            setPendingTemplateId(data.selectedTemplate);
+            setIsDoorRevealing(true);
+          } else {
+            setCurrentView(view);
+          }
+        }}
+        onOpenShare={() => setIsShareModalOpen(true)}
+        onOpenPrint={() => setIsPrintModalOpen(true)}
+        onOpenDoorCeremony={() => {
+          setPendingTemplateId(data.selectedTemplate);
+          setDoorDestinationView(currentView === 'editor' ? 'editor' : 'invitation');
+          setIsDoorRevealing(true);
+        }}
+        selectedTemplateName={currentTemplate?.name}
+      />
+
+      {/* 3D Door Opening Reveal Overlay with Sacred Gujarati Jai Jinendra Gateway & Digital Tilak */}
+      {isDoorRevealing && (
+        <DoorReveal
+          template={TEMPLATES[pendingTemplateId || data.selectedTemplate] || currentTemplate}
+          onDoorOpened={handleDoorOpened}
+          customMahavirSwamiImage={data.mahavirSwamiImage}
+          language={data.language}
+          invitationData={data}
+        />
+      )}
+
+      {/* VIEW 1: INVITEO-STYLE LANDING PAGE WITH 8 COMPLETE SECTIONS */}
+      {currentView === 'landing' && (
+        <main className="flex-1 flex flex-col">
+          <LandingPage
+            data={data}
+            template={currentTemplate}
+            onExplore={() => setCurrentView('editor')}
+            onSelectTemplate={(templateId) => {
+              handleDataChange({
+                ...data,
+                selectedTemplate: templateId,
+              });
+            }}
+            onPreviewTemplate={(templateId) => {
+              setPendingTemplateId(templateId);
+              setDoorDestinationView('invitation');
+              setIsDoorRevealing(true);
+            }}
+            onOpenDoorCeremony={() => {
+              setPendingTemplateId(data.selectedTemplate);
+              setDoorDestinationView('invitation');
+              setIsDoorRevealing(true);
+            }}
+          />
+        </main>
+      )}
+
+      {/* VIEW 2: TEMPLATE SELECTION VIEW */}
+      {currentView === 'templates' && (
+        <main className="flex-1 py-6">
+          <div className="max-w-7xl mx-auto px-4 mb-4">
+            <button
+              onClick={() => setCurrentView('landing')}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-stone-600 hover:text-stone-900 transition"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </button>
+          </div>
+          <TemplateGallery
+            selectedTemplateId={data.selectedTemplate}
+            onSelectTemplate={handleSelectTemplate}
+          />
+        </main>
+      )}
+
+      {/* VIEW 3: INVITATION CUSTOMIZATION & LIVE PREVIEW STUDIO */}
+      {currentView === 'editor' && (
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          
+          {/* Top Bar for Editor */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-stone-200">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase font-cinzel tracking-widest text-[#8B6E28] font-semibold">
+                  Personalization Studio
+                </span>
+                <span className="text-stone-300">•</span>
+                <span className="text-xs text-stone-500 font-medium">
+                  {currentTemplate?.name} Theme
+                </span>
+              </div>
+              <h1 className="font-cinzel text-2xl font-bold text-stone-900 mt-0.5">
+                Customize Invitation
+              </h1>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              {/* Mobile View Switcher (Tabs) */}
+              <div className="flex lg:hidden rounded-lg bg-stone-200/80 p-1">
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('edit')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition ${
+                    mobileTab === 'edit'
+                      ? 'bg-white text-stone-900 shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Details</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileTab('preview')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition ${
+                    mobileTab === 'preview'
+                      ? 'bg-white text-[#8B6E28] shadow-xs'
+                      : 'text-stone-600 hover:text-stone-900'
+                  }`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Live Preview</span>
+                </button>
+              </div>
+
+              {/* Full Invitation Preview Button */}
+              <button
+                id="open-full-invitation-view-btn"
+                onClick={() => setCurrentView('invitation')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-[#8B6E28] hover:bg-[#72581E] text-white shadow-md transition"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Final Invitation</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Two-Column Responsive Workspace */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left Column: Personalization Form */}
+            <div className={`lg:col-span-6 xl:col-span-6 ${mobileTab === 'edit' ? 'block' : 'hidden lg:block'}`}>
+              <InvitationForm
+                data={data}
+                onChange={handleDataChange}
+                onSelectTemplateModal={() => setCurrentView('templates')}
+                onPreviewPhoto={(url) => setLightboxPhoto(url)}
+              />
+            </div>
+
+            {/* Right Column: Sticky Live Preview */}
+            <div className={`lg:col-span-6 xl:col-span-6 lg:sticky lg:top-20 space-y-4 ${mobileTab === 'preview' ? 'block' : 'hidden lg:block'}`}>
+              
+              {/* Preview Controls Bar */}
+              <div className="bg-white rounded-xl border border-stone-200 p-3 px-4 flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-semibold text-stone-700 uppercase tracking-wider font-cinzel">
+                    Live Real-Time Preview
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setPendingTemplateId(data.selectedTemplate);
+                      setIsDoorRevealing(true);
+                    }}
+                    title="Experience Door Opening Reveal & Bhagwan Mahavir Swami Darshan"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-[#8B6E28] bg-[#FAF3DF] hover:bg-[#F3ECCE] border border-[#D4AF37]/50 transition cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-[#C29B38]" />
+                    <span className="hidden sm:inline">Door Ceremony</span>
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice('mobile')}
+                    title="Mobile preview format"
+                    className={`p-1.5 rounded-md transition ${
+                      previewDevice === 'mobile'
+                        ? 'bg-[#FAF3DF] text-[#8B6E28] border border-[#D4AF37]/50'
+                        : 'text-stone-400 hover:text-stone-700'
+                    }`}
+                  >
+                    <Smartphone className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setPreviewDevice('desktop')}
+                    title="Desktop card preview format"
+                    className={`p-1.5 rounded-md transition ${
+                      previewDevice === 'desktop'
+                        ? 'bg-[#FAF3DF] text-[#8B6E28] border border-[#D4AF37]/50'
+                        : 'text-stone-400 hover:text-stone-700'
+                    }`}
+                  >
+                    <Monitor className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview Frame Wrapper */}
+              <div className={`mx-auto transition-all duration-300 ${
+                previewDevice === 'mobile'
+                  ? 'max-w-sm rounded-[36px] p-3 bg-stone-900 shadow-2xl border-4 border-stone-800'
+                  : 'w-full'
+              }`}>
+                {previewDevice === 'mobile' && (
+                  <div className="w-24 h-4 bg-stone-800 rounded-full mx-auto mb-2" />
+                )}
+
+                <div className={previewDevice === 'mobile' ? 'max-h-[640px] overflow-y-auto rounded-[24px] pr-0.5' : ''}>
+                  <InvitationCard
+                    data={data}
+                    template={currentTemplate}
+                    isInteractivePreview={true}
+                    onPreviewPhoto={(url) => setLightboxPhoto(url)}
+                    onShareWhatsApp={handleShareWhatsApp}
+                    onWebShare={handleWebShare}
+                    onDownloadImage={handleDownload}
+                    onOpenPrintModal={() => setIsPrintModalOpen(true)}
+                    onEdit={() => setMobileTab('edit')}
+                    onChangeTemplate={() => setCurrentView('templates')}
+                  />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </main>
+      )}
+
+      {/* VIEW 4: DEDICATED FULL INVITATION VIEW */}
+      {currentView === 'invitation' && (
+        <main className="flex-1 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+          
+          {/* Top Navigation Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-3 border-b border-stone-200">
+            <button
+              onClick={() => setCurrentView('editor')}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-white border border-stone-200 px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
+            >
+              <Edit3 className="w-3.5 h-3.5 text-[#8B6E28]" />
+              <span>Back to Editor</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              {/* Door Ceremony Replay */}
+              <button
+                onClick={() => {
+                  setPendingTemplateId(data.selectedTemplate);
+                  setIsDoorRevealing(true);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] to-[#F1E4C3] border border-[#D4AF37] px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#B8860B]" />
+                <span>॥ જય જિનેન્દ્ર ॥ દ્વાર</span>
+              </button>
+
+              {/* Print / Save PDF for Elders */}
+              <button
+                id="invitation-view-print-btn"
+                onClick={() => setIsPrintModalOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#543007] bg-[#FFFBF0] border border-[#D4AF37]/80 hover:bg-[#FDF4D9] px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
+              >
+                <Printer className="w-3.5 h-3.5 text-[#8C5D1F]" />
+                <span>પ્રિન્ટ / PDF</span>
+              </button>
+
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2D4B3E] hover:bg-[#1E332A] px-4 py-1.5 rounded-lg shadow-sm transition cursor-pointer"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Share</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Centered Full Invitation Card */}
+          <div className="w-full flex justify-center">
+            <InvitationCard
+              data={data}
+              template={currentTemplate}
+              isInteractivePreview={false}
+              onPreviewPhoto={(url) => setLightboxPhoto(url)}
+              onShareWhatsApp={handleShareWhatsApp}
+              onWebShare={handleWebShare}
+              onDownloadImage={handleDownload}
+              onOpenPrintModal={() => setIsPrintModalOpen(true)}
+              onEdit={() => setCurrentView('editor')}
+              onChangeTemplate={() => setCurrentView('templates')}
+            />
+          </div>
+        </main>
+      )}
+
+      {/* Share Modal Dialog */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        data={data}
+        onDownloadImage={handleDownload}
+        onOpenPrintModal={() => setIsPrintModalOpen(true)}
+      />
+
+      {/* Traditional Print-Ready Patrika Modal (For Elderly Relatives & PDF) */}
+      <PrintableInvitationModal
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+        data={data}
+        template={currentTemplate}
+      />
+
+      {/* Lightbox for zooming photos */}
+      <PhotoLightbox
+        photoUrl={lightboxPhoto}
+        onClose={() => setLightboxPhoto(null)}
+      />
+
+      {/* Subtle Footer */}
+      <footer className="py-6 border-t border-stone-200 text-center text-xs text-stone-500 bg-[#FAF8F5]">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-cinzel text-[#8B6E28]">
+            <span>Jain Tapasya Pārna</span>
+            <span>•</span>
+            <span className="font-hindi text-sm">॥ ॐ नमो जिणाणं ॥</span>
+          </div>
+          <p className="text-stone-400 text-[11px]">
+            Created with reverence for Tapasya, Atma-Shuddhi, and Pārna Utsav.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+export default App;

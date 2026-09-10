@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-cinzel: 'Cinzel', serif;
+    --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+    --font-marcellus: 'Marcellus', serif;
+    --font-hindi: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+    --font-script: 'MonteCarlo', cursive;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: var(--font-cinzel);
+  }
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-marcellus {
+  font-family: 'Marcellus', serif;
+}
+
+.font-hindi {
+  font-family: 'Tiro Devanagari Hindi', 'Noto Serif Devanagari', serif;
+}
+
+.font-script {
+  font-family: 'MonteCarlo', cursive;
+}
+
+/* 3D Door Perspective */
+.perspective-1200 {
+  perspective: 1400px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Luxury gold shimmer & subtle animations */
+@keyframes shimmerGold {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #B38728 0%, #FBF5B7 40%, #DAA520 60%, #AA771C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-border-gradient {
+  border-image: linear-gradient(to bottom right, #D4AF37, #F3E5AB, #AA771C) 1;
+}
+
+/* Subtle luxury grain */
+.bg-grain {
+  background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Indian arch clip paths for royal arches */
+.clip-arch-top {
+  clip-path: polygon(0% 100%, 0% 15%, 5% 10%, 15% 5%, 30% 2%, 50% 0%, 70% 2%, 85% 5%, 95% 10%, 100% 15%, 100% 100%);
+}
+
+.clip-indian-arch {
+  clip-path: polygon(
+    0% 100%, 
+    0% 25%, 
+    8% 22%, 
+    16% 16%, 
+    26% 9%, 
+    38% 3%, 
+    50% 0%, 
+    62% 3%, 
+    74% 9%, 
+    84% 16%, 
+    92% 22%, 
+    100% 25%, 
+    100% 100%
+  );
+}
+
+/* =========================================================
+   Print & PDF High-Resolution Stylesheet
+   Formats traditional physical invitations for elderly family
+   ========================================================= */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+
+  body {
+    background: #FFFDF9 !important;
+    color: #2C1810 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide everything on the page except the printable patrika root */
+  body * {
+    visibility: hidden;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  #printable-invitation-root,
+  #printable-invitation-root * {
+    visibility: visible;
+  }
+
+  #printable-invitation-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 10mm !important;
+    border: 3px solid #C29B38 !important;
+    box-shadow: none !important;
+    background-color: #FFFDF9 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}

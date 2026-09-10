@@ -1,0 +1,8 @@
+{
+  "name": "Tattva — Paarna Invitations",
+  "description": "A premium, responsive interactive invitation platform for Jain Tapasya Pārna celebrations by Tattva, featuring luxury templates, Bhagwan Mahavir Swami darshan, high-resolution physical print and PDF generation, and live WhatsApp sharing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
