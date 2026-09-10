@@ -11,13 +11,13 @@ import React from 'react';
 
 export const ASSET_PATHS = {
   doors: {
-    rajwada: '/assets/doors/door-rajwada.svg',
+    parnaUtsav: '/assets/doors/door-rajwada.svg',
     shwet: '/assets/doors/door-shwet.svg',
     sukoon: '/assets/doors/door-sukoon.svg',
     divya: '/assets/doors/door-divya.svg',
   },
   templates: {
-    rajwada: {
+    parnaUtsav: {
       heroBg: '/assets/template-1/bg-rajwada.svg',
       archBorder: '/assets/template-1/arch-rajwada.svg',
       divider: '/assets/template-1/divider-gold.svg',

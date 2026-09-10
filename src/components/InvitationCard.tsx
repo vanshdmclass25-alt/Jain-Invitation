@@ -125,7 +125,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
           color={colors.border}
           accentColor={colors.accentGold}
         />
-        {currentTemplate.id === 'rajwada' && (
+        {currentTemplate.id === 'parnaUtsav' && (
           <>
             <div className="absolute inset-0 pointer-events-none opacity-20 bg-grain" />
             <FestiveTemplePavilionArtwork variant="top-drapes" className="w-full absolute top-0 inset-x-0 z-0 opacity-85" />
@@ -494,13 +494,13 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
               </div>
             )}
 
-            {currentTemplate.id === 'rajwada' && (
+            {currentTemplate.id === 'parnaUtsav' && (
               <div className="w-full my-2 flex justify-center">
                 <FestiveTemplePavilionArtwork variant="bottom-palace" className="w-full max-w-sm" />
               </div>
             )}
 
-            {currentTemplate.id !== 'sukoon' && currentTemplate.id !== 'rajwada' && (
+            {currentTemplate.id !== 'sukoon' && currentTemplate.id !== 'parnaUtsav' && (
               <div className="w-full my-2 flex justify-center opacity-80">
                 <JainLotusPrayer className="w-32 h-6" color={colors.accentGold} />
               </div>

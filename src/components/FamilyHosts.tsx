@@ -21,7 +21,7 @@ export const FamilyHosts: React.FC<FamilyHostsProps> = ({
   if (!photos || photos.length === 0) return null;
   const colors = template?.colors || ({} as any);
   const appliedTextColor = textColor || colors.text;
-  const isDarkBg = ['rajwada', 'divya', 'param', 'mangalam'].includes(template.id);
+  const isDarkBg = ['parnaUtsav', 'divya', 'param', 'mangalam'].includes(template.id);
   
   // Try to parse names from hostNames if it's a comma separated string, otherwise fallback.
   const names = hostNames ? hostNames.split(',').map(n => n.trim()) : ['राजेश पाटीदार', 'मीरा पाटीदार', 'आरव पाटीदार', 'अनन्या पाटीदार'];

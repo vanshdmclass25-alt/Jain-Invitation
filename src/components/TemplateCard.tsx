@@ -2,6 +2,7 @@ import React from 'react';
 import { Eye } from 'lucide-react';
 import { TemplateDefinition } from '../types';
 import { JainLotusPrayer, OrnateArchBorder, JainDhyanaSymbol } from '../config/assets';
+import { MahavirSwamiImage } from './MahavirSwamiImage';
 
 interface TemplateCardProps {
   template: TemplateDefinition;
@@ -9,7 +10,6 @@ interface TemplateCardProps {
   onSelect: (templateId: TemplateDefinition['id']) => void;
   onPreview?: (templateId: TemplateDefinition['id']) => void;
 }
-
 
 export const TemplateCard: React.FC<TemplateCardProps> = ({
   template,
@@ -37,13 +37,14 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
 
         {/* Idol Image Placeholder */}
         <div className="w-36 h-40 mt-4 mb-4 relative drop-shadow-2xl flex justify-center items-center overflow-hidden rounded-md border border-[#D4AF37]/20 shadow-inner">
-          <img 
-            src="/bhagwan-mahavir-pic.png" 
-            className="w-full h-full object-cover" 
-            alt="Mahavir Swami" 
+          <MahavirSwamiImage 
+            customImageUrl="/bhagwan-mahavir-pic.png"
+            className="w-full h-full"
+            showAura={true}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-80 pointer-events-none" />
         </div>
+
 
         <span className="font-hindi text-[11px] font-bold text-[#C08B46] tracking-wide mb-1 z-10">
           ॥ श्री महावीराय नमः ॥
@@ -55,7 +56,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
 
       {/* Bottom Details Section */}
       <div className="p-5 bg-white flex flex-col flex-1 border-t border-stone-100">
-        <div className="flex justify-between items-center mb-5 mt-auto">
+        <div className="flex justify-between items-center mb-5">
           <h3 className="font-cormorant text-[1.35rem] font-bold text-[#352516]">{template?.name}</h3>
           <span className="text-[#C08B46] font-bold text-sm">₹899</span>
         </div>
@@ -65,7 +66,7 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
             e.stopPropagation();
             if (onPreview) onPreview(template.id);
           }}
-          className="w-full mb-3 py-2.5 rounded-xl border border-[#D4AF37]/40 text-[#C08B46] bg-[#FAF6EB] hover:bg-[#F3ECCE] text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-2xs"
+          className="w-full mb-3 mt-auto py-2.5 rounded-xl border border-[#D4AF37]/40 text-[#C08B46] bg-[#FAF6EB] hover:bg-[#F3ECCE] text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-2xs"
         >
           <Eye className="w-3.5 h-3.5" /> Preview Live Website
         </button>

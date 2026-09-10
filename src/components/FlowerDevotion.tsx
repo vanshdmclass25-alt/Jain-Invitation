@@ -144,7 +144,7 @@ export const FlowerDevotion: React.FC<FlowerDevotionProps> = ({
             ? 'radial-gradient(circle at 50% 30%, #152744 0%, #0D1B2A 70%, #070E18 100%)' 
             : template.id === 'sukoon'
             ? 'radial-gradient(circle at 50% 30%, #F5FAF6 0%, #EAF3EC 70%, #D8E8DC 100%)'
-            : template.id === 'rajwada'
+            : template.id === 'parnaUtsav'
             ? 'radial-gradient(circle at 50% 30%, #FFFDF8 0%, #FAF0DE 60%, #F0DFBF 100%)'
             : 'radial-gradient(circle at 50% 30%, #FFFFFF 0%, #FAF8F5 60%, #F0EDE5 100%)',
           borderColor: template?.colors.sectionBorder || `${colors.accentGold}80`,

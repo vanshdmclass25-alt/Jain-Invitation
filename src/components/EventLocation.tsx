@@ -22,7 +22,7 @@ export const EventLocation: React.FC<EventLocationProps> = ({
   if (!location) return null;
   const colors = template?.colors || ({} as any);
   const appliedTextColor = textColor || colors.text;
-  const isDarkBg = ['rajwada', 'divya', 'param', 'mangalam'].includes(template.id);
+  const isDarkBg = ['parnaUtsav', 'divya', 'param', 'mangalam'].includes(template.id);
   const isDark = template.id === 'divya' || template.id === 'param';
 
   return (

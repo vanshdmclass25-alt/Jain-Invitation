@@ -106,7 +106,7 @@ export const LongPreviewModal: React.FC<LongPreviewModalProps> = ({
                 Theme:
               </span>
               <div className="flex items-center gap-1.5">
-                {(['aura', 'param', 'mangalam', 'sukoon', 'rajwada', 'shwet', 'divya'] as TemplateId[]).map((tmplId) => {
+                {(['aura', 'param', 'mangalam', 'sukoon', 'parnaUtsav', 'shwet', 'divya'] as TemplateId[]).map((tmplId) => {
                   const tmpl = TEMPLATES[tmplId];
                   const isCurrent = selectedTemplateId === tmplId;
                   return (

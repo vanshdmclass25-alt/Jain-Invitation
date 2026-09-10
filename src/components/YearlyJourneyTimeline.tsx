@@ -23,7 +23,7 @@ export const YearlyJourneyTimeline: React.FC<YearlyJourneyTimelineProps> = ({
   if (!milestones || milestones.length === 0) return null;
   const colors = template?.colors || ({} as any);
   const appliedTextColor = textColor || colors.text;
-  const isDarkBg = ['rajwada', 'divya', 'param', 'mangalam'].includes(template.id);
+  const isDarkBg = ['parnaUtsav', 'divya', 'param', 'mangalam'].includes(template.id);
 
   return (
     <div className={`w-full py-10 px-4 text-center ${className}`}>

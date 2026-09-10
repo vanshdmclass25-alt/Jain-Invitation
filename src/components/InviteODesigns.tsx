@@ -90,11 +90,11 @@ export const InviteODesigns: React.FC<InviteODesignsProps> = ({
                   
                   {/* Idol Image based on template */}
                   <div className="relative z-10 flex flex-col items-center mt-6">
-                    <div className="w-32 sm:w-40 h-36 sm:h-44 shadow-2xl border border-[#D4AF37]/30 bg-white">
+                    <div className="w-32 sm:w-40 h-36 sm:h-44 shadow-2xl border border-[#D4AF37]/30 bg-white flex items-center justify-center p-2">
                       <img 
                         src="/bhagwan-mahavir-pic.png" 
                         alt="Mahavir Swami" 
-                        className="w-full h-full object-cover mix-blend-multiply"
+                        className="w-full h-full object-contain mix-blend-multiply"
                       />
                     </div>
                     <div className="mt-4 text-center">

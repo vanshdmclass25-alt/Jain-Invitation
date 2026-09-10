@@ -20,7 +20,7 @@ export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = ({
   if (!events || events.length === 0) return null;
   const colors = template?.colors || ({} as any);
   const appliedTextColor = textColor || colors.text;
-  const isDarkBg = ['rajwada', 'divya', 'param', 'mangalam'].includes(template.id);
+  const isDarkBg = ['parnaUtsav', 'divya', 'param', 'mangalam'].includes(template.id);
   const isDark = template.id === 'divya' || template.id === 'param';
 
   return (

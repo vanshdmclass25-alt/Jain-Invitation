@@ -90,7 +90,7 @@ export const JainTempleAccents: React.FC<JainTempleAccentsProps> = ({
   color,
   accentColor,
 }) => {
-  if (templateId === 'rajwada') {
+  if (templateId === 'parnaUtsav') {
     // 1. RAJWADA: Jaipur Haveli & Royal Patan Sandstone, Vermilion Kumkum Accents, Grand Scalloped Jharokha
     return (
       <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl sm:rounded-3xl">
