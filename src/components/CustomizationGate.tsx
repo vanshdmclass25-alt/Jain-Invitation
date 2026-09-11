@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, query, where, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, addDoc, onSnapshot, serverTimestamp, doc, updateDoc } from 'firebase/firestore';
 import { TemplateId, InvitationRequest } from '../types';
 import { Lock, Clock, CheckCircle2, AlertCircle, MessageCircle } from 'lucide-react';
 
@@ -58,16 +58,37 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
   const handleRequestAccess = async () => {
     if (!user) return;
     try {
-      await addDoc(collection(db, 'requests'), {
-        userId: user.uid,
-        userName: user.name || 'Tapasvi Devotee',
-        userEmail: user.email || 'No email',
-        whatsappNumber: '+91 88509 18792',
-        templateId: templateId,
-        status: 'pending',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      // Find the most recent existing request for this template
+      const existingReqs = userRequests
+        .filter(r => r.templateId === templateId)
+        .sort((a, b) => {
+          const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+          const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+          return timeB - timeA;
+        });
+        
+      const existingReq = existingReqs[0];
+
+      if (existingReq) {
+        // Update existing document instead of creating a duplicate
+        await updateDoc(doc(db, 'requests', existingReq.id), {
+          status: 'pending',
+          updatedAt: serverTimestamp(),
+          createdAt: serverTimestamp(), // Bump to top of admin dashboard
+        });
+      } else {
+        // Create new document
+        await addDoc(collection(db, 'requests'), {
+          userId: user.uid,
+          userName: user.name || 'Tapasvi Devotee',
+          userEmail: user.email || 'No email',
+          whatsappNumber: '+91 88509 18792',
+          templateId: templateId,
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
       
       const whatsappText = encodeURIComponent(
         `Hello Tattva Team, I requested 24h customization access for Template "${templateId}".\nName: ${user.name}\nEmail: ${user.email}`
@@ -162,7 +183,13 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
   }
 
   // Check requests specifically for current templateId
-  const matchingReq = userRequests.find(r => r.templateId === templateId);
+  const matchingReq = userRequests
+    .filter(r => r.templateId === templateId)
+    .sort((a, b) => {
+      const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+      const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+      return timeB - timeA;
+    })[0];
 
   // Check if user has an active 24h pass for ANY other template
   const activeOtherReq = userRequests.find(r => {
