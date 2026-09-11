@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, query, where, addDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, addDoc, onSnapshot, Timestamp } from 'firebase/firestore';
 import { TemplateId, InvitationRequest } from '../types';
 import { Lock, Clock, CheckCircle2, AlertCircle, MessageCircle } from 'lucide-react';
 
@@ -65,8 +65,8 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
         whatsappNumber: '+91 88509 18792',
         templateId: templateId,
         status: 'pending',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
       });
       
       const whatsappText = encodeURIComponent(

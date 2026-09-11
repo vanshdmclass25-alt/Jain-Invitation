@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, query, getDocs, doc, updateDoc, orderBy, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, orderBy, Timestamp, onSnapshot } from 'firebase/firestore';
 import { ShieldCheck, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Lock } from 'lucide-react';
 
 interface Request {
@@ -67,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
         status: 'approved',
         approvedAt: startTime,
         expiresAt: expiresAt,
-        updatedAt: serverTimestamp()
+        updatedAt: Timestamp.now()
       });
 
       setRequests(requests.map(req => req.id === id ? {
@@ -93,7 +93,7 @@ export const AdminDashboard: React.FC = () => {
       await updateDoc(doc(db, 'requests', id), {
         status: 'approved',
         expiresAt: newExpiresAt,
-        updatedAt: serverTimestamp()
+        updatedAt: Timestamp.now()
       });
 
       setRequests(requests.map(req => req.id === id ? {
@@ -110,7 +110,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       await updateDoc(doc(db, 'requests', id), {
         status: 'expired',
-        updatedAt: serverTimestamp()
+        updatedAt: Timestamp.now()
       });
       setRequests(requests.map(req => req.id === id ? { ...req, status: 'expired' } : req));
     } catch (e) {
@@ -122,7 +122,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       await updateDoc(doc(db, 'requests', id), {
         status: 'rejected',
-        updatedAt: serverTimestamp()
+        updatedAt: Timestamp.now()
       });
       setRequests(requests.map(req => req.id === id ? { ...req, status: 'rejected' } : req));
     } catch (e) {
