@@ -31,7 +31,15 @@ import confetti from 'canvas-confetti';
 export function App() {
   // Centralized State
   const [data, setData] = useState<InvitationData>(() => loadSavedInvitation());
-  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'admin'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'admin'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('id') || params.get('i') || params.get('invitation') || params.get('name') || params.get('guest')) {
+        return 'invitation';
+      }
+    }
+    return 'landing';
+  });
   const [isDoorRevealing, setIsDoorRevealing] = useState<boolean>(false);
   const [pendingTemplateId, setPendingTemplateId] = useState<TemplateId | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -39,8 +47,20 @@ export function App() {
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
   const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('invitation');
-  const [isLoadingShortLink, setIsLoadingShortLink] = useState<boolean>(false);
-  const [isGuestView, setIsGuestView] = useState<boolean>(false);
+  const [isLoadingShortLink, setIsLoadingShortLink] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return !!(params.get('id') || params.get('i'));
+    }
+    return false;
+  });
+  const [isGuestView, setIsGuestView] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return !!(params.get('id') || params.get('i') || params.get('invitation') || params.get('name') || params.get('guest'));
+    }
+    return false;
+  });
 
   // Auto-detect if someone opened an existing invitation via URL or short link
   useEffect(() => {
