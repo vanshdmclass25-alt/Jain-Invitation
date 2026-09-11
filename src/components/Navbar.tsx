@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck, Music } from 'lucide-react';
-import { spiritualAudio, TAPASYA_SONGS } from '../utils/audio';
+import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck, Music, CheckCircle2 } from 'lucide-react';
+import { TAPASYA_SONGS } from '../utils/audio';
+import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { TattvaLogo } from './TattvaLogo';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,30 +30,22 @@ export const Navbar: React.FC<NavbarProps> = ({
   songAudioUrls = {},
   onSelectSong,
 }) => {
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [showSongDropdown, setShowSongDropdown] = useState(false);
   const { isAdmin } = useAuth();
 
-  const currentSong = TAPASYA_SONGS.find((s) => s.id === selectedSongId) || TAPASYA_SONGS[0];
-
-  const toggleSound = () => {
-    spiritualAudio.selectSong(selectedSongId, customAudioUrl);
-    const active = spiritualAudio.toggle();
-    setIsPlayingAudio(active);
-  };
+  const {
+    isPlaying,
+    currentSong,
+    validationInfo,
+    toggleSound,
+    selectSong,
+  } = useAudioPlayback(selectedSongId, customAudioUrl, songAudioUrls);
 
   const handlePickSong = (songId: string) => {
     if (onSelectSong) {
       onSelectSong(songId);
     }
-    spiritualAudio.selectSong(songId, customAudioUrl);
-    if (!spiritualAudio.getStatus() && songId !== 'none') {
-      spiritualAudio.start();
-      setIsPlayingAudio(true);
-    } else if (songId === 'none') {
-      spiritualAudio.stop();
-      setIsPlayingAudio(false);
-    }
+    selectSong(songId);
     setShowSongDropdown(false);
   };
 
@@ -130,17 +123,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="audio-toggle-btn"
               onClick={toggleSound}
-              title={isPlayingAudio ? `Mute ${currentSong.titleEn}` : `Play ${currentSong.titleEn}`}
+              title={isPlaying ? `Mute ${currentSong.titleEn}` : `Play ${currentSong.titleEn}`}
               className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 whitespace-nowrap ${
-                isPlayingAudio
+                isPlaying
                   ? 'bg-[#E0A458]/20 text-[#8C5D1F] border border-[#E0A458] shadow-xs'
                   : 'bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200'
               }`}
             >
-              {isPlayingAudio ? (
+              {isPlaying ? (
                 <>
                   <Volume2 className="w-3 sm:w-3.5 h-3 sm:h-3.5 animate-pulse text-[#C98A3E] shrink-0" />
                   <span className="hidden md:inline font-semibold">{currentSong.titleGu}</span>
+                  {validationInfo?.isFullLength && (
+                    <span className="hidden lg:inline text-[9.5px] bg-green-100 text-green-800 px-1.5 py-0.5 rounded-full font-bold ml-1">
+                      ✓ Verified
+                    </span>
+                  )}
                   <span className="md:hidden">Song</span>
                 </>
               ) : (

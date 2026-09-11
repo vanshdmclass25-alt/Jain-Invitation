@@ -313,8 +313,19 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
       <SongSelector
         selectedSongId={data.selectedSongId || 'reAavyaTapashvi'}
         customAudioUrl={data.customAudioUrl || ''}
+        songAudioUrls={data.songAudioUrls || {}}
         onSelectSong={(songId) => updateField('selectedSongId', songId)}
         onUpdateCustomAudioUrl={(url) => updateField('customAudioUrl', url || '')}
+        onUpdateSongAudioUrl={(songId, url) => {
+          const currentUrls = data.songAudioUrls || {};
+          if (url) {
+            updateField('songAudioUrls', { ...currentUrls, [songId]: url });
+          } else {
+            const copy = { ...currentUrls };
+            delete copy[songId];
+            updateField('songAudioUrls', copy);
+          }
+        }}
       />
 
       {/* SECTION C: BHAGWAN MAHAVIR SWAMI IMAGE */}

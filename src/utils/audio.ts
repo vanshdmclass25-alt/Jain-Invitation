@@ -1,5 +1,13 @@
 import { TapasyaSong } from '../types';
 
+export interface SongValidationInfo {
+  status: 'unverified' | 'validating' | 'verified_full' | 'error';
+  durationSeconds: number;
+  formattedDuration: string;
+  isFullLength: boolean;
+  error?: string;
+}
+
 /**
  * 6 Authentic Jain Tapasya Stotra / Bhakti Songs
  * Selected as optional background audio for all invitation templates.
@@ -78,9 +86,26 @@ class AmbientSpiritualAudio {
   private isPlaying = false;
   private currentSongId = 'reAavyaTapashvi';
   private customAudioUrl: string | null = null;
+  private songAudioUrls: Record<string, string> = {};
+  private songValidationCache: Map<string, SongValidationInfo> = new Map();
+  private listeners: Set<() => void> = new Set();
+
+  public subscribe(listener: () => void) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify() {
+    this.listeners.forEach((fn) => fn());
+  }
 
   public getSongId(): string {
     return this.currentSongId;
+  }
+
+  public setSongAudioUrls(map: Record<string, string>) {
+    this.songAudioUrls = map || {};
+    this.notify();
   }
 
   public setCustomAudioUrl(url: string | null) {
@@ -88,6 +113,8 @@ class AmbientSpiritualAudio {
     if (this.isPlaying) {
       this.stop();
       this.start();
+    } else {
+      this.notify();
     }
   }
 
@@ -95,6 +122,17 @@ class AmbientSpiritualAudio {
     return (
       TAPASYA_SONGS.find((s) => s.id === this.currentSongId) || TAPASYA_SONGS[0]
     );
+  }
+
+  /**
+   * Resolves the direct, verified audio URL for any given song ID.
+   */
+  public getResolvedAudioUrl(songId: string): string | null {
+    if (songId === 'none') return null;
+    if (songId === 'custom') return this.customAudioUrl;
+    if (this.songAudioUrls[songId]) return this.songAudioUrls[songId];
+    const defaultSong = TAPASYA_SONGS.find((s) => s.id === songId);
+    return defaultSong?.audioUrl || null;
   }
 
   public selectSong(songId: string, customUrl?: string | null) {
@@ -106,6 +144,8 @@ class AmbientSpiritualAudio {
     if (this.isPlaying) {
       this.stop();
       this.start();
+    } else {
+      this.notify();
     }
   }
 
@@ -123,6 +163,78 @@ class AmbientSpiritualAudio {
     return this.isPlaying;
   }
 
+  /**
+   * Validates if the given URL points to a full-length audio track (> 30s)
+   */
+  public async validateTrack(url: string): Promise<SongValidationInfo> {
+    if (!url) {
+      return {
+        status: 'error',
+        durationSeconds: 0,
+        formattedDuration: '0:00',
+        isFullLength: false,
+        error: 'No audio URL provided',
+      };
+    }
+
+    if (this.songValidationCache.has(url)) {
+      return this.songValidationCache.get(url)!;
+    }
+
+    return new Promise((resolve) => {
+      const tempAudio = new Audio();
+      tempAudio.preload = 'metadata';
+
+      const cleanup = () => {
+        tempAudio.removeEventListener('loadedmetadata', onLoaded);
+        tempAudio.removeEventListener('error', onError);
+      };
+
+      const onLoaded = () => {
+        cleanup();
+        const dur = tempAudio.duration || 0;
+        const mins = Math.floor(dur / 60);
+        const secs = Math.floor(dur % 60);
+        const formatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        const isFullLength = dur > 30; // Must be full track (> 30 sec)
+
+        const result: SongValidationInfo = {
+          status: isFullLength ? 'verified_full' : 'unverified',
+          durationSeconds: dur,
+          formattedDuration: formatted,
+          isFullLength,
+        };
+
+        this.songValidationCache.set(url, result);
+        this.notify();
+        resolve(result);
+      };
+
+      const onError = () => {
+        cleanup();
+        const result: SongValidationInfo = {
+          status: 'error',
+          durationSeconds: 0,
+          formattedDuration: '0:00',
+          isFullLength: false,
+          error: 'Failed to load audio metadata',
+        };
+        this.songValidationCache.set(url, result);
+        this.notify();
+        resolve(result);
+      };
+
+      tempAudio.addEventListener('loadedmetadata', onLoaded);
+      tempAudio.addEventListener('error', onError);
+      tempAudio.src = url;
+    });
+  }
+
+  public getValidationInfo(url: string | null): SongValidationInfo | null {
+    if (!url) return null;
+    return this.songValidationCache.get(url) || null;
+  }
+
   public start() {
     if (this.currentSongId === 'none') {
       this.stop();
@@ -131,16 +243,16 @@ class AmbientSpiritualAudio {
 
     this.stop(); // Clean slate
 
-    const song = this.getCurrentSong();
-    const streamUrl =
-      this.currentSongId === 'custom'
-        ? this.customAudioUrl
-        : this.customAudioUrl || song.audioUrl;
+    const streamUrl = this.getResolvedAudioUrl(this.currentSongId);
 
     if (!streamUrl) {
       this.isPlaying = false;
+      this.notify();
       return;
     }
+
+    // Trigger metadata duration validation in background
+    this.validateTrack(streamUrl);
 
     try {
       if (!this.audioElement) {
@@ -156,17 +268,21 @@ class AmbientSpiritualAudio {
         playPromise
           .then(() => {
             this.isPlaying = true;
+            this.notify();
           })
           .catch((err) => {
             console.warn('Audio playback requires user interaction or stream failed:', err);
             this.isPlaying = false;
+            this.notify();
           });
       } else {
         this.isPlaying = true;
+        this.notify();
       }
     } catch (err) {
-      console.warn('Audio error:', err);
+      console.warn('Audio start error:', err);
       this.isPlaying = false;
+      this.notify();
     }
   }
 
@@ -181,6 +297,7 @@ class AmbientSpiritualAudio {
         /* noop */
       }
     }
+    this.notify();
   }
 }
 
