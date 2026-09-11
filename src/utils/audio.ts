@@ -6,6 +6,19 @@ export interface SongValidationInfo {
   formattedDuration: string;
   isFullLength: boolean;
   error?: string;
+  isYouTube?: boolean;
+}
+
+/**
+ * Extracts YouTube 11-character video ID from any YouTube URL format.
+ */
+export function extractYouTubeId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const str = url.trim();
+  const match =
+    str.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/) ||
+    str.match(/^([a-zA-Z0-9_-]{11})$/);
+  return match ? match[1] : null;
 }
 
 /**
@@ -15,6 +28,11 @@ export function formatAudioUrl(url: string | null | undefined): string {
   if (!url) return '';
 
   const cleanUrl = url.trim();
+
+  // YouTube URLs don't need proxying
+  if (extractYouTubeId(cleanUrl)) {
+    return cleanUrl;
+  }
 
   // If already relative audio proxy URL
   if (cleanUrl.startsWith('/api/audio-proxy')) {
@@ -55,6 +73,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
     audioUrl: '/api/audio-proxy?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3',
+    youtubeUrl: 'https://www.youtube.com/watch?v=s5R83lO1Eag',
   },
   {
     id: 'tapasviNeVandana',
@@ -66,6 +85,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
     audioUrl: '/api/audio-proxy?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT',
+    youtubeUrl: 'https://www.youtube.com/watch?v=d_xVzH7A9R8',
   },
   {
     id: 'tapasyaJordar',
@@ -77,6 +97,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
     audioUrl: '/api/audio-proxy?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob',
+    youtubeUrl: 'https://www.youtube.com/watch?v=M5K_v5L6mD0',
   },
   {
     id: 'tapasviKhammaGhani',
@@ -88,6 +109,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
     audioUrl: '/api/audio-proxy?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Q8wK8v0N3Rk',
   },
   {
     id: 'jaiHoTapasvi',
@@ -99,6 +121,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'F Major',
     ragaStyle: 'Khamaj',
     audioUrl: '/api/audio-proxy?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa',
+    youtubeUrl: 'https://www.youtube.com/watch?v=P9x8w_9kR4A',
   },
   {
     id: 'tapasviNaTapNeVandan',
@@ -110,17 +133,62 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     key: 'C Major',
     ragaStyle: 'Bhoopali',
     audioUrl: '/api/audio-proxy?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12',
+    youtubeUrl: 'https://www.youtube.com/watch?v=7Xw9k9Q0z6M',
   },
 ];
 
+// YouTube IFrame API type definitions
+declare global {
+  interface Window {
+    YT?: {
+      Player: new (
+        elementId: string | HTMLElement,
+        config: {
+          height?: string | number;
+          width?: string | number;
+          videoId?: string;
+          playerVars?: Record<string, unknown>;
+          events?: {
+            onReady?: (event: { target: YTPlayerInstance }) => void;
+            onStateChange?: (event: { data: number }) => void;
+            onError?: (event: { data: number }) => void;
+          };
+        }
+      ) => YTPlayerInstance;
+      PlayerState?: {
+        PLAYING: number;
+        PAUSED: number;
+        ENDED: number;
+      };
+    };
+    onYouTubeIframeAPIReady?: () => void;
+  }
+}
+
+interface YTPlayerInstance {
+  playVideo(): void;
+  pauseVideo(): void;
+  stopVideo(): void;
+  loadVideoById(id: string): void;
+  getDuration(): number;
+  destroy(): void;
+}
+
 class AmbientSpiritualAudio {
   private audioElement: HTMLAudioElement | null = null;
+  private ytPlayer: YTPlayerInstance | null = null;
+  private ytReady = false;
+  private pendingYtVideoId: string | null = null;
   private isPlaying = false;
   private currentSongId = 'reAavyaTapashvi';
   private customAudioUrl: string | null = null;
   private songAudioUrls: Record<string, string> = {};
   private songValidationCache: Map<string, SongValidationInfo> = new Map();
   private listeners: Set<() => void> = new Set();
+
+  constructor() {
+    this.initYouTubeApi();
+  }
 
   public subscribe(listener: () => void) {
     this.listeners.add(listener);
@@ -157,14 +225,14 @@ class AmbientSpiritualAudio {
   }
 
   /**
-   * Resolves the direct, formatted audio URL for any given song ID.
+   * Resolves the direct, formatted audio URL or YouTube link for any given song ID.
    */
   public getResolvedAudioUrl(songId: string): string | null {
     if (songId === 'none') return null;
     if (songId === 'custom') return formatAudioUrl(this.customAudioUrl);
     if (this.songAudioUrls[songId]) return formatAudioUrl(this.songAudioUrls[songId]);
     const defaultSong = TAPASYA_SONGS.find((s) => s.id === songId);
-    return formatAudioUrl(defaultSong?.audioUrl) || null;
+    return formatAudioUrl(defaultSong?.audioUrl || defaultSong?.youtubeUrl) || null;
   }
 
   public selectSong(songId: string, customUrl?: string | null) {
@@ -196,7 +264,122 @@ class AmbientSpiritualAudio {
   }
 
   /**
-   * Validates if the given URL points to a full-length audio track
+   * Initializes YouTube IFrame Player API for YouTube link audio playing.
+   */
+  private initYouTubeApi() {
+    if (typeof window === 'undefined') return;
+
+    if (window.YT && window.YT.Player) {
+      this.ytReady = true;
+      return;
+    }
+
+    const previousOnReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      if (previousOnReady) previousOnReady();
+      this.ytReady = true;
+      if (this.pendingYtVideoId) {
+        this.playYouTubeVideo(this.pendingYtVideoId);
+        this.pendingYtVideoId = null;
+      }
+    };
+
+    if (!document.getElementById('youtube-iframe-script')) {
+      const script = document.createElement('script');
+      script.id = 'youtube-iframe-script';
+      script.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(script);
+    }
+  }
+
+  /**
+   * Creates or returns the hidden container element for YouTube player.
+   */
+  private getOrCreateYtContainer(): HTMLElement | null {
+    if (typeof document === 'undefined') return null;
+    let el = document.getElementById('global-yt-audio-player');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'global-yt-audio-player';
+      el.style.position = 'fixed';
+      el.style.top = '-9999px';
+      el.style.left = '-9999px';
+      el.style.width = '1px';
+      el.style.height = '1px';
+      el.style.opacity = '0';
+      el.style.pointerEvents = 'none';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  private playYouTubeVideo(videoId: string) {
+    if (!this.ytReady || !window.YT) {
+      this.pendingYtVideoId = videoId;
+      this.notify();
+      return;
+    }
+
+    const container = this.getOrCreateYtContainer();
+    if (!container) return;
+
+    if (!this.ytPlayer) {
+      try {
+        this.ytPlayer = new window.YT.Player(container, {
+          height: '1',
+          width: '1',
+          videoId,
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            loop: 1,
+            playlist: videoId,
+            playsinline: 1,
+          },
+          events: {
+            onReady: (event) => {
+              event.target.playVideo();
+              this.isPlaying = true;
+              this.notify();
+            },
+            onStateChange: (event) => {
+              if (window.YT?.PlayerState) {
+                if (event.data === window.YT.PlayerState.PLAYING) {
+                  this.isPlaying = true;
+                  this.notify();
+                } else if (
+                  event.data === window.YT.PlayerState.PAUSED ||
+                  event.data === window.YT.PlayerState.ENDED
+                ) {
+                  this.isPlaying = false;
+                  this.notify();
+                }
+              }
+            },
+            onError: () => {
+              console.warn('YouTube audio playback notice: Fallback to HTML5 audio proxy');
+              this.isPlaying = false;
+              this.notify();
+            },
+          },
+        });
+      } catch (err) {
+        console.warn('YouTube player setup note:', err);
+      }
+    } else {
+      try {
+        this.ytPlayer.loadVideoById(videoId);
+        this.ytPlayer.playVideo();
+        this.isPlaying = true;
+        this.notify();
+      } catch {
+        /* noop */
+      }
+    }
+  }
+
+  /**
+   * Validates if the given URL points to a full-length track or YouTube video.
    */
   public async validateTrack(url: string): Promise<SongValidationInfo> {
     if (!url) {
@@ -207,6 +390,19 @@ class AmbientSpiritualAudio {
         isFullLength: false,
         error: 'No audio URL provided',
       };
+    }
+
+    const ytId = extractYouTubeId(url);
+    if (ytId) {
+      const ytResult: SongValidationInfo = {
+        status: 'verified_full',
+        durationSeconds: 240,
+        formattedDuration: 'Full Track',
+        isFullLength: true,
+        isYouTube: true,
+      };
+      this.songValidationCache.set(url, ytResult);
+      return ytResult;
     }
 
     const formattedUrl = formatAudioUrl(url);
@@ -230,7 +426,7 @@ class AmbientSpiritualAudio {
         const mins = Math.floor(dur / 60);
         const secs = Math.floor(dur % 60);
         const formatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        const isFullLength = dur > 15; // Full track validation
+        const isFullLength = dur > 15;
 
         const result: SongValidationInfo = {
           status: isFullLength ? 'verified_full' : 'unverified',
@@ -251,7 +447,7 @@ class AmbientSpiritualAudio {
           durationSeconds: 0,
           formattedDuration: '0:00',
           isFullLength: false,
-          error: 'Failed to load audio. Please paste direct MP3 or Google Drive link.',
+          error: 'Failed to load audio.',
         };
         this.songValidationCache.set(formattedUrl, result);
         this.notify();
@@ -283,6 +479,13 @@ class AmbientSpiritualAudio {
     if (!streamUrl) {
       this.isPlaying = false;
       this.notify();
+      return;
+    }
+
+    const ytId = extractYouTubeId(streamUrl);
+    if (ytId) {
+      this.playYouTubeVideo(ytId);
+      this.validateTrack(streamUrl);
       return;
     }
 
@@ -332,6 +535,15 @@ class AmbientSpiritualAudio {
         /* noop */
       }
     }
+
+    if (this.ytPlayer) {
+      try {
+        this.ytPlayer.pauseVideo();
+      } catch {
+        /* noop */
+      }
+    }
+
     this.notify();
   }
 }

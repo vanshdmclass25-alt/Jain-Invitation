@@ -12,6 +12,7 @@ export interface TapasyaSong {
   key: string;
   ragaStyle: string;
   audioUrl?: string;
+  youtubeUrl?: string;
 }
 
 export interface YearlyPhotoMilestone {
