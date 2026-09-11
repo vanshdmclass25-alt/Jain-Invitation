@@ -775,11 +775,8 @@ class AmbientSpiritualAudio {
     const ytId = extractYouTubeId(streamUrl);
     if (ytId) {
       this.playYouTubeVideo(ytId);
-      this.validateTrack(streamUrl);
       return;
     }
-
-    this.validateTrack(streamUrl);
 
     try {
       const audio = this.initAudioElement();
