@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Music, Play, Pause, Check, Volume2, Sparkles, VolumeX } from 'lucide-react';
+import { Music, Play, Pause, Check, Volume2, Sparkles, VolumeX, Link, RotateCcw } from 'lucide-react';
 import { TAPASYA_SONGS, spiritualAudio } from '../utils/audio';
 
 interface SongSelectorProps {
@@ -12,6 +12,8 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
   onSelectSong,
 }) => {
   const [previewingSongId, setPreviewingSongId] = useState<string | null>(null);
+  const [customAudioUrl, setCustomAudioUrl] = useState<string>('');
+  const [showCustomInput, setShowCustomInput] = useState<boolean>(false);
 
   const handlePreviewSong = (e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
@@ -32,6 +34,20 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
       spiritualAudio.start();
       setPreviewingSongId(songId);
     }
+  };
+
+  const handleApplyCustomUrl = () => {
+    if (customAudioUrl.trim()) {
+      spiritualAudio.setCustomAudioUrl(customAudioUrl.trim());
+      spiritualAudio.start();
+      setPreviewingSongId(selectedSongId);
+    }
+  };
+
+  const handleResetCustomUrl = () => {
+    setCustomAudioUrl('');
+    spiritualAudio.setCustomAudioUrl(null);
+    spiritualAudio.start();
   };
 
   return (
@@ -168,6 +184,55 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
           </div>
           <VolumeX className="w-4 h-4 text-stone-400 shrink-0" />
         </div>
+      </div>
+
+      {/* Optional Custom Audio URL Section */}
+      <div className="pt-2 border-t border-[#D4AF37]/30">
+        <button
+          type="button"
+          onClick={() => setShowCustomInput(!showCustomInput)}
+          className="text-xs font-semibold text-[#8B6E28] hover:underline flex items-center gap-1.5 cursor-pointer"
+        >
+          <Link className="w-3.5 h-3.5" />
+          <span>{showCustomInput ? 'Hide Custom Audio URL Input' : 'Have your own song MP3 link? (Optional)'}</span>
+        </button>
+
+        {showCustomInput && (
+          <div className="mt-2.5 p-3 rounded-xl bg-white border border-[#D4AF37]/40 space-y-2">
+            <label className="block text-xs font-bold text-stone-800">
+              Paste Direct Audio / MP3 Stream URL:
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="url"
+                value={customAudioUrl}
+                onChange={(e) => setCustomAudioUrl(e.target.value)}
+                placeholder="https://domain.com/my-tapasya-song.mp3"
+                className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#8B6E28]"
+              />
+              <button
+                type="button"
+                onClick={handleApplyCustomUrl}
+                className="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#8B6E28] text-white hover:bg-[#6E551E] transition cursor-pointer"
+              >
+                Test & Play
+              </button>
+              {customAudioUrl && (
+                <button
+                  type="button"
+                  onClick={handleResetCustomUrl}
+                  title="Reset to default song"
+                  className="p-1.5 text-stone-500 hover:text-stone-800 transition cursor-pointer"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-stone-500">
+              Supports any direct `.mp3` or audio link from Google Drive, Dropbox, Archive.org, or your server.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

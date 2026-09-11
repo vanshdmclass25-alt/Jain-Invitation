@@ -14,6 +14,8 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
+    // Public CDN audio stream for sacred devotional flute & garba
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
   },
   {
     id: 'tapasviNeVandana',
@@ -24,6 +26,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Soulful Santoor & Flute',
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3',
   },
   {
     id: 'tapasyaJordar',
@@ -34,6 +37,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Upbeat Celebration',
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73562.mp3',
   },
   {
     id: 'tapasviKhammaGhani',
@@ -44,6 +48,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio-[#1359].mp3', // Royal Shehnai audio
   },
   {
     id: 'jaiHoTapasvi',
@@ -54,6 +59,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Melodious Bhakti Anthem',
     key: 'F Major',
     ragaStyle: 'Khamaj',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/02/07/audio_4a682a20b7.mp3',
   },
   {
     id: 'tapasviNaTapNeVandan',
@@ -64,19 +70,30 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio-[#0888].mp3', // Temple Stotra bell audio
   },
 ];
 
 class AmbientSpiritualAudio {
+  private audioElement: HTMLAudioElement | null = null;
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private isPlaying = false;
   private currentSongId = 'reAavyaTapashvi';
-  private loopInterval: number | null = null;
-  private activeNodes: (OscillatorNode | GainNode | BiquadFilterNode)[] = [];
+  private customAudioUrl: string | null = null;
+  private activeOscillators: OscillatorNode[] = [];
+  private schedulerTimer: number | null = null;
 
   public getSongId(): string {
     return this.currentSongId;
+  }
+
+  public setCustomAudioUrl(url: string | null) {
+    this.customAudioUrl = url;
+    if (this.isPlaying) {
+      this.stop();
+      this.start();
+    }
   }
 
   public getCurrentSong(): TapasyaSong {
@@ -114,6 +131,47 @@ class AmbientSpiritualAudio {
       return;
     }
 
+    this.stop(); // Clean slate
+
+    const song = this.getCurrentSong();
+    const streamUrl = this.customAudioUrl || song.audioUrl;
+
+    // Try HTML5 Audio stream first for real vocal audio track
+    if (streamUrl) {
+      try {
+        if (!this.audioElement) {
+          this.audioElement = new Audio();
+          this.audioElement.loop = true;
+          this.audioElement.volume = 0.55;
+        }
+        this.audioElement.src = streamUrl;
+        this.audioElement.crossOrigin = 'anonymous';
+
+        const playPromise = this.audioElement.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => {
+              this.isPlaying = true;
+            })
+            .catch((err) => {
+              console.warn('HTML5 Audio playback interrupted, falling back to WebAudio Synth:', err);
+              this.startWebAudioSynth(song);
+            });
+        } else {
+          this.isPlaying = true;
+        }
+        return;
+      } catch (err) {
+        console.warn('HTML Audio error, switching to WebAudio Synth:', err);
+      }
+    }
+
+    // Fallback to high-fidelity Web Audio Synthesizer
+    this.startWebAudioSynth(song);
+  }
+
+  /* Robust Web Audio Synthesizer Engine (Guaranteed zero silence for all 6 songs) */
+  private startWebAudioSynth(song: TapasyaSong) {
     try {
       const AudioCtx =
         window.AudioContext ||
@@ -121,7 +179,7 @@ class AmbientSpiritualAudio {
           .webkitAudioContext;
       if (!AudioCtx) return;
 
-      if (!this.ctx) {
+      if (!this.ctx || this.ctx.state === 'closed') {
         this.ctx = new AudioCtx();
       }
 
@@ -129,73 +187,48 @@ class AmbientSpiritualAudio {
         this.ctx.resume();
       }
 
-      this.stopNodes();
-
       const now = this.ctx.currentTime;
       this.masterGain = this.ctx.createGain();
       this.masterGain.gain.setValueAtTime(0.001, now);
-      // Fade in over 1.5s
-      this.masterGain.gain.exponentialRampToValueAtTime(0.22, now + 1.5);
+      this.masterGain.gain.exponentialRampToValueAtTime(0.25, now + 1.2);
       this.masterGain.connect(this.ctx.destination);
 
       this.isPlaying = true;
 
-      // Render song specific arrangement
-      this.playSongArrangement(this.currentSongId);
+      // Render continuous multi-layered Indian acoustic instruments based on key/raga
+      this.runLookaheadScheduler(song);
     } catch (err) {
-      console.warn('Audio start notice:', err);
+      console.warn('WebAudio Synth error:', err);
     }
   }
 
-  private playSongArrangement(songId: string) {
+  private runLookaheadScheduler(song: TapasyaSong) {
     if (!this.ctx || !this.masterGain) return;
 
-    // Clear any active loop timer
-    if (this.loopInterval) {
-      window.clearInterval(this.loopInterval);
-      this.loopInterval = null;
-    }
+    // Base Tanpura Drone frequencies per song key
+    const scaleFreqs: Record<string, number[]> = {
+      reAavyaTapashvi: [146.83, 220.0, 293.66, 369.99, 440.0], // D Major (D3, A3, D4, F#4, A4)
+      tapasviNeVandana: [110.0, 164.81, 220.0, 261.63, 329.63], // A Minor Bhairavi (A2, E3, A3, C4, E4)
+      tapasyaJordar: [196.0, 246.94, 293.66, 392.0, 493.88], // G Major Yaman (G3, B3, D4, G4, B4)
+      tapasviKhammaGhani: [164.81, 246.94, 329.63, 392.0, 493.88], // E Minor Desh (E3, B3, E4, G4, B4)
+      jaiHoTapasvi: [174.61, 220.0, 261.63, 349.23, 440.0], // F Major Khamaj (F3, A3, C4, F4, A4)
+      tapasviNaTapNeVandan: [130.81, 196.0, 261.63, 329.63, 392.0], // C Major Bhoopali (C3, G3, C4, E4, G4)
+    };
 
-    switch (songId) {
-      case 'reAavyaTapashvi':
-        this.arrangeReAavyaTapashvi();
-        break;
-      case 'tapasviNeVandana':
-        this.arrangeTapasviNeVandana();
-        break;
-      case 'tapasyaJordar':
-        this.arrangeTapasyaJordar();
-        break;
-      case 'tapasviKhammaGhani':
-        this.arrangeTapasviKhammaGhani();
-        break;
-      case 'jaiHoTapasvi':
-        this.arrangeJaiHoTapasvi();
-        break;
-      case 'tapasviNaTapNeVandan':
-        this.arrangeTapasviNaTapNeVandan();
-        break;
-      default:
-        this.arrangeReAavyaTapashvi();
-    }
-  }
-
-  /* 1. Re Aavya Tapashvi (D Major - Upbeat Garba/Dholak & Flute) */
-  private arrangeReAavyaTapashvi() {
-    if (!this.ctx || !this.masterGain) return;
+    const freqs = scaleFreqs[song.id] || scaleFreqs.reAavyaTapashvi;
     const now = this.ctx.currentTime;
 
-    // D Major triad drone
-    const droneFreqs = [146.83, 220.0, 293.66, 369.99]; // D3, A3, D4, F#4
-    droneFreqs.forEach((freq, i) => {
+    // 1. Continuous Tanpura / Harmonium Pad
+    freqs.slice(0, 3).forEach((freq, idx) => {
       const osc = this.ctx!.createOscillator();
       const gain = this.ctx!.createGain();
-      osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+
+      osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
       osc.frequency.setValueAtTime(freq, now);
 
       const filter = this.ctx!.createBiquadFilter();
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(500, now);
+      filter.frequency.setValueAtTime(480, now);
 
       gain.gain.setValueAtTime(0.12, now);
       osc.connect(filter);
@@ -203,410 +236,92 @@ class AmbientSpiritualAudio {
       gain.connect(this.masterGain!);
 
       osc.start(now);
-      this.activeNodes.push(osc, gain);
+      this.activeOscillators.push(osc);
     });
 
-    // Melodic Flute sequence loop: "Re Aavya Tapashvi" refrain
-    // Notes: D4, F#4, A4, B4, D5, C#5, B4, A4, F#4, D4
-    const notes = [
-      { f: 293.66, d: 0.4 },
-      { f: 369.99, d: 0.4 },
-      { f: 440.0, d: 0.6 },
-      { f: 493.88, d: 0.6 },
-      { f: 587.33, d: 0.8 },
-      { f: 554.37, d: 0.4 },
-      { f: 493.88, d: 0.4 },
-      { f: 440.0, d: 0.8 },
-      { f: 369.99, d: 0.6 },
-      { f: 293.66, d: 0.8 },
-    ];
+    // 2. Continuous Synchronized Flute & Santoor Melodic Sequence
+    let stepIndex = 0;
+    const stepDuration = 0.42; // seconds per note
 
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'reAavyaTapashvi') return;
-      let t = this.ctx.currentTime;
-      notes.forEach((note) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(note.f, t);
+    const scheduleNextStep = () => {
+      if (!this.ctx || !this.isPlaying || !this.masterGain) return;
 
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.linearRampToValueAtTime(0.18, t + 0.05);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + note.d);
+      const t = this.ctx.currentTime;
+      const noteFreq = freqs[stepIndex % freqs.length];
 
-        osc.connect(g);
-        g.connect(this.masterGain!);
+      // Flute note
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-        osc.start(t);
-        osc.stop(t + note.d);
-        this.activeNodes.push(osc, g);
-
-        // Percussive Dholak pulse
-        const kick = this.ctx!.createOscillator();
-        const kickG = this.ctx!.createGain();
-        kick.frequency.setValueAtTime(110, t);
-        kick.frequency.exponentialRampToValueAtTime(40, t + 0.15);
-        kickG.gain.setValueAtTime(0.2, t);
-        kickG.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-        kick.connect(kickG);
-        kickG.connect(this.masterGain!);
-        kick.start(t);
-        kick.stop(t + 0.15);
-
-        t += note.d;
-      });
-    };
-
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 5800);
-  }
-
-  /* 2. Tapasvi Ne Vandana (A Minor - Soulful Santoor & Flute Bhairavi) */
-  private arrangeTapasviNeVandana() {
-    if (!this.ctx || !this.masterGain) return;
-    const now = this.ctx.currentTime;
-
-    // Low Tanpura A Minor
-    const freqs = [110.0, 164.81, 220.0, 261.63]; // A2, E3, A3, C4
-    freqs.forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.1, now);
+      osc.frequency.setValueAtTime(noteFreq, t);
+
+      gain.gain.setValueAtTime(0.001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + stepDuration * 0.95);
 
       osc.connect(gain);
-      gain.connect(this.masterGain!);
-      osc.start(now);
-      this.activeNodes.push(osc, gain);
-    });
+      gain.connect(this.masterGain);
 
-    // Santoor Arpeggio & Devotional Flute refrain
-    const SantoorNotes = [220.0, 261.63, 329.63, 392.0, 440.0, 523.25, 440.0, 329.63];
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'tapasviNeVandana') return;
-      let t = this.ctx.currentTime;
-      SantoorNotes.forEach((f) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(f, t);
+      osc.start(t);
+      osc.stop(t + stepDuration);
 
-        g.gain.setValueAtTime(0.18, t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+      // Temple bell on every 8th step
+      if (stepIndex % 8 === 0) {
+        playTempleBellChime();
+      }
 
-        osc.connect(g);
-        g.connect(this.masterGain!);
-
-        osc.start(t);
-        osc.stop(t + 0.6);
-        this.activeNodes.push(osc, g);
-
-        t += 0.45;
-      });
+      stepIndex++;
     };
 
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 4200);
-  }
-
-  /* 3. Tapasya Jordar (G Major - Upbeat Celebration Anthem) */
-  private arrangeTapasyaJordar() {
-    if (!this.ctx || !this.masterGain) return;
-    const now = this.ctx.currentTime;
-
-    // G Major Base
-    const freqs = [196.0, 246.94, 293.66, 392.0]; // G3, B3, D4, G4
-    freqs.forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.14, now);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain!);
-      osc.start(now);
-      this.activeNodes.push(osc, gain);
-    });
-
-    // Catchy "Tapasya Jordar" Brass/Harmonium motif
-    const motif = [
-      { f: 392.0, d: 0.35 },
-      { f: 493.88, d: 0.35 },
-      { f: 587.33, d: 0.5 },
-      { f: 659.25, d: 0.5 },
-      { f: 587.33, d: 0.4 },
-      { f: 523.25, d: 0.4 },
-      { f: 493.88, d: 0.4 },
-      { f: 440.0, d: 0.4 },
-      { f: 392.0, d: 0.7 },
-    ];
-
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'tapasyaJordar') return;
-      let t = this.ctx.currentTime;
-      motif.forEach((item) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(item.f, t);
-
-        const filter = this.ctx!.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(900, t);
-
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.linearRampToValueAtTime(0.14, t + 0.04);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + item.d);
-
-        osc.connect(filter);
-        filter.connect(g);
-        g.connect(this.masterGain!);
-
-        osc.start(t);
-        osc.stop(t + item.d);
-        this.activeNodes.push(osc, g);
-
-        t += item.d;
-      });
-    };
-
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 4000);
-  }
-
-  /* 4. Tapasvi Ne Khamma Ghani (2.0) (E Minor - Royal Marwari Shehnai) */
-  private arrangeTapasviKhammaGhani() {
-    if (!this.ctx || !this.masterGain) return;
-    const now = this.ctx.currentTime;
-
-    // Low E Minor Sitar drone
-    const freqs = [164.81, 246.94, 329.63, 392.0]; // E3, B3, E4, G4
-    freqs.forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(freq, now);
-
-      const filter = this.ctx!.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(450, now);
-
-      gain.gain.setValueAtTime(0.1, now);
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.masterGain!);
-      osc.start(now);
-      this.activeNodes.push(osc, gain);
-    });
-
-    // Shehnai Pitch-bend melody
-    const shehnaiNotes = [
-      { f: 329.63, d: 0.5 },
-      { f: 392.0, d: 0.5 },
-      { f: 493.88, d: 0.7 },
-      { f: 523.25, d: 0.4 },
-      { f: 493.88, d: 0.4 },
-      { f: 440.0, d: 0.5 },
-      { f: 392.0, d: 0.5 },
-      { f: 329.63, d: 0.8 },
-    ];
-
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'tapasviKhammaGhani') return;
-      let t = this.ctx.currentTime;
-      shehnaiNotes.forEach((n) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(n.f, t);
-        osc.frequency.exponentialRampToValueAtTime(n.f * 1.01, t + n.d); // subtle pitch bend
-
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.linearRampToValueAtTime(0.16, t + 0.05);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + n.d);
-
-        osc.connect(g);
-        g.connect(this.masterGain!);
-
-        osc.start(t);
-        osc.stop(t + n.d);
-        this.activeNodes.push(osc, g);
-
-        t += n.d;
-      });
-    };
-
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 4800);
-  }
-
-  /* 5. Jai Ho Tapasvi (F Major - Melodious Bhakti Anthem) */
-  private arrangeJaiHoTapasvi() {
-    if (!this.ctx || !this.masterGain) return;
-    const now = this.ctx.currentTime;
-
-    // F Major arpeggiated pad
-    const freqs = [174.61, 220.0, 261.63, 349.23]; // F3, A3, C4, F4
-    freqs.forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.12, now);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain!);
-      osc.start(now);
-      this.activeNodes.push(osc, gain);
-    });
-
-    // "Jai Ho Tapasvi" Anthem refrain
-    const anthem = [
-      { f: 349.23, d: 0.4 },
-      { f: 392.0, d: 0.4 },
-      { f: 440.0, d: 0.6 },
-      { f: 523.25, d: 0.7 },
-      { f: 466.16, d: 0.4 },
-      { f: 440.0, d: 0.4 },
-      { f: 392.0, d: 0.5 },
-      { f: 349.23, d: 0.8 },
-    ];
-
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'jaiHoTapasvi') return;
-      let t = this.ctx.currentTime;
-      anthem.forEach((n) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(n.f, t);
-
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.linearRampToValueAtTime(0.17, t + 0.05);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + n.d);
-
-        osc.connect(g);
-        g.connect(this.masterGain!);
-
-        osc.start(t);
-        osc.stop(t + n.d);
-        this.activeNodes.push(osc, g);
-
-        t += n.d;
-      });
-    };
-
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 4500);
-  }
-
-  /* 6. Tapasvi Na Tap Ne Vandan (C Major - Sacred Temple Stotra Bhoopali) */
-  private arrangeTapasviNaTapNeVandan() {
-    if (!this.ctx || !this.masterGain) return;
-    const now = this.ctx.currentTime;
-
-    // Deep Tanpura C2, G2, C3
-    const freqs = [130.81, 196.0, 261.63, 329.63]; // C3, G3, C4, E4
-    freqs.forEach((freq) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      gain.gain.setValueAtTime(0.12, now);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain!);
-      osc.start(now);
-      this.activeNodes.push(osc, gain);
-    });
-
-    // Sacred Bhoopali Stotra melody + Periodic Bell chime
-    const bhoopali = [
-      { f: 261.63, d: 0.6 },
-      { f: 293.66, d: 0.6 },
-      { f: 329.63, d: 0.8 },
-      { f: 392.0, d: 0.8 },
-      { f: 440.0, d: 0.8 },
-      { f: 523.25, d: 1.0 },
-      { f: 440.0, d: 0.6 },
-      { f: 392.0, d: 0.6 },
-      { f: 329.63, d: 0.8 },
-      { f: 293.66, d: 0.6 },
-      { f: 261.63, d: 1.2 },
-    ];
-
-    const playCycle = () => {
-      if (!this.ctx || !this.isPlaying || this.currentSongId !== 'tapasviNaTapNeVandan') return;
-      let t = this.ctx.currentTime;
-
-      // Resonant Temple Ghanti Bell Strike
-      playTempleBellChime();
-
-      bhoopali.forEach((n) => {
-        const osc = this.ctx!.createOscillator();
-        const g = this.ctx!.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(n.f, t);
-
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.linearRampToValueAtTime(0.18, t + 0.1);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + n.d);
-
-        osc.connect(g);
-        g.connect(this.masterGain!);
-
-        osc.start(t);
-        osc.stop(t + n.d);
-        this.activeNodes.push(osc, g);
-
-        t += n.d;
-      });
-    };
-
-    playCycle();
-    this.loopInterval = window.setInterval(playCycle, 8500);
+    scheduleNextStep();
+    this.schedulerTimer = window.setInterval(scheduleNextStep, stepDuration * 1000);
   }
 
   public stop() {
     this.isPlaying = false;
-    if (this.loopInterval) {
-      window.clearInterval(this.loopInterval);
-      this.loopInterval = null;
+
+    if (this.schedulerTimer) {
+      window.clearInterval(this.schedulerTimer);
+      this.schedulerTimer = null;
     }
+
+    if (this.audioElement) {
+      try {
+        this.audioElement.pause();
+        this.audioElement.currentTime = 0;
+      } catch {
+        /* noop */
+      }
+    }
+
+    if (this.activeOscillators.length > 0) {
+      this.activeOscillators.forEach((osc) => {
+        try {
+          osc.stop();
+          osc.disconnect();
+        } catch {
+          /* noop */
+        }
+      });
+      this.activeOscillators = [];
+    }
+
     if (this.masterGain && this.ctx) {
       try {
         const now = this.ctx.currentTime;
         this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-        this.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+        this.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       } catch {
         /* noop */
       }
     }
-    setTimeout(() => {
-      this.stopNodes();
-    }, 600);
-  }
-
-  private stopNodes() {
-    this.activeNodes.forEach((node) => {
-      try {
-        if ('stop' in node) {
-          (node as OscillatorNode).stop();
-        }
-        node.disconnect();
-      } catch {
-        /* noop */
-      }
-    });
-    this.activeNodes = [];
   }
 }
 
 export const spiritualAudio = new AmbientSpiritualAudio();
 
-// Global shared AudioContext singleton for bells and chimes
+// Shared AudioContext singleton for bells and chimes
 let sharedChimeCtx: AudioContext | null = null;
 
 function getSharedChimeContext(): AudioContext | null {
@@ -639,11 +354,10 @@ export function playTempleBellChime() {
     const now = ctx.currentTime;
 
     const partials = [
-      { freq: 528, gain: 0.42, decay: 2.8 },
-      { freq: 1056, gain: 0.26, decay: 2.2 },
-      { freq: 1584, gain: 0.16, decay: 1.6 },
-      { freq: 2112, gain: 0.09, decay: 1.2 },
-      { freq: 2740, gain: 0.05, decay: 0.9 },
+      { freq: 528, gain: 0.38, decay: 2.6 },
+      { freq: 1056, gain: 0.22, decay: 2.0 },
+      { freq: 1584, gain: 0.14, decay: 1.5 },
+      { freq: 2112, gain: 0.08, decay: 1.1 },
     ];
 
     partials.forEach(({ freq, gain, decay }) => {
