@@ -17,7 +17,7 @@ import {
   Languages,
   Image as ImageIcon
 } from 'lucide-react';
-import { InvitationData, TemplateId, YearlyPhotoMilestone } from '../types';
+import { InvitationData, TemplateId, YearlyPhotoMilestone, EventSchedule } from '../types';
 import { TEMPLATES, DEFAULT_INVITATION_DATA } from '../config/templates';
 import { ImageUploader } from './ImageUploader';
 import { FamilyPhotosUploader } from './FamilyPhotosUploader';
@@ -134,6 +134,42 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
   const handleRemoveYearlyMilestone = (index: number) => {
     const list = (data.yearlyPhotos || []).filter((_, i) => i !== index);
     updateField('yearlyPhotos', list);
+  };
+
+  // Event Schedule handlers
+  const handleAddEvent = (title = '', date = '', time = '') => {
+    const newEvent: EventSchedule = {
+      id: String(Date.now() + Math.random()),
+      title: title || 'મંગલ પ્રવાહ વિધિ',
+      date: date || '18 ઓક્ટોબર 2026',
+      time: time || 'સવારે ૯:૦૦ કલાકે',
+    };
+    const updated = [...(data.events || []), newEvent];
+    updateField('events', updated);
+  };
+
+  const handleUpdateEvent = (index: number, key: keyof EventSchedule, value: string) => {
+    const list = [...(data.events || [])];
+    if (list[index]) {
+      list[index] = { ...list[index], [key]: value };
+      updateField('events', list);
+    }
+  };
+
+  const handleRemoveEvent = (index: number) => {
+    const list = (data.events || []).filter((_, i) => i !== index);
+    updateField('events', list);
+  };
+
+  const handleMoveEvent = (index: number, direction: 'up' | 'down') => {
+    const list = [...(data.events || [])];
+    const targetIdx = direction === 'up' ? index - 1 : index + 1;
+    if (targetIdx >= 0 && targetIdx < list.length) {
+      const temp = list[index];
+      list[index] = list[targetIdx];
+      list[targetIdx] = temp;
+      updateField('events', list);
+    }
   };
 
   return (
@@ -529,6 +565,150 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
           <p className="text-[11px] text-stone-400">
             When reader taps the venue, direct Google Maps opens to that exact location.
           </p>
+        </div>
+      </div>
+
+      {/* SECTION: EVENT SCHEDULE TIMELINE (ઉત્સવનો મંગલ પ્રવાસ - 100% EDITABLE) */}
+      <div className="p-4 rounded-xl bg-[#FFFDF7] border border-[#E0A458]/40 space-y-4 shadow-2xs">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-[#C98A3E]" />
+            <span className="text-sm font-semibold text-stone-900">
+              ઉત્સવનો મંગલ પ્રવાસ (Event Schedule Timeline)
+            </span>
+          </div>
+          <span className="text-[10px] font-semibold uppercase tracking-wider bg-[#F9F3EA] text-[#8B6E28] px-2 py-0.5 rounded-full border border-[#E5C07B]/40">
+            100% Editable
+          </span>
+        </div>
+
+        <p className="text-xs text-stone-500">
+          Customize the section header title and edit every event item (Title, Date, Time) shown in the card timeline.
+        </p>
+
+        {/* Section Header Title Input */}
+        <div className="space-y-1">
+          <label className="block text-xs font-semibold text-stone-700">
+            Section Header Title (ઉત્સવનો મંગલ પ્રવાસ / Event Schedule Heading)
+          </label>
+          <input
+            type="text"
+            value={data.eventScheduleTitle !== undefined ? data.eventScheduleTitle : 'ઉત્સવનો મંગલ પ્રવાસ'}
+            onChange={(e) => updateField('eventScheduleTitle', e.target.value)}
+            placeholder="e.g. ઉત્સવનો મંગલ પ્રવાસ / મંગલ કાર્યક્રમ"
+            className="w-full px-3 py-2 rounded-lg border border-stone-300 focus:border-[#8B6E28] text-xs font-semibold text-stone-800"
+          />
+        </div>
+
+        {/* Quick Add Presets */}
+        <div className="space-y-1 pt-1">
+          <span className="block text-[11px] font-semibold text-stone-600">Quick-Add Jain Event Presets:</span>
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { title: 'વરઘોડા (Varghoda)', date: '17 ઓક્ટોબર 2026', time: 'સાંજે ૪:૦૦ કલાકે' },
+              { title: 'આરતી & મંગલ દીવો', date: '17 ઓક્ટોબર 2026', time: 'સાંજે ૭:૩૦ કલાકે' },
+              { title: 'પારણા પાવન વિધિ', date: '18 ઓક્ટોબર 2026', time: 'સવારે ૮:૩૦ કલાકે' },
+              { title: 'સ્વામિવાત્સલ્ય (Sadharmik Bhakti)', date: '18 ઓક્ટોબર 2026', time: 'સવારે ૧૧:૩૦ કલાકે' },
+              { title: 'સંઘ પૂજન & બહુમાન', date: '18 ઓક્ટોબર 2026', time: 'બપોરે ૧:૦૦ કલાકે' },
+            ].map((preset, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => handleAddEvent(preset.title, preset.date, preset.time)}
+                className="px-2.5 py-1 rounded-md bg-stone-100 hover:bg-[#F9F3EA] text-stone-700 hover:text-[#8B6E28] text-[11px] font-medium border border-stone-200 transition cursor-pointer flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3 text-[#8B6E28]" />
+                <span>{preset.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* List of Events */}
+        <div className="space-y-3 pt-2">
+          {(data.events || []).length === 0 ? (
+            <div className="text-center py-4 text-xs text-stone-400 bg-white rounded-lg border border-dashed border-stone-200">
+              No schedule items added yet. Click "+ Add Event Schedule Item" below.
+            </div>
+          ) : (
+            (data.events || []).map((eventItem, idx) => (
+              <div key={eventItem.id || idx} className="p-3 bg-white rounded-xl border border-stone-200 shadow-2xs space-y-2 relative group">
+                <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-2">
+                  <span className="text-xs font-bold text-[#8B6E28]">Event #{idx + 1}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => handleMoveEvent(idx, 'up')}
+                      className="p-1 rounded text-stone-400 hover:text-stone-700 disabled:opacity-30 cursor-pointer"
+                      title="Move Up"
+                    >
+                      ▲
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === (data.events || []).length - 1}
+                      onClick={() => handleMoveEvent(idx, 'down')}
+                      className="p-1 rounded text-stone-400 hover:text-stone-700 disabled:opacity-30 cursor-pointer"
+                      title="Move Down"
+                    >
+                      ▼
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveEvent(idx)}
+                      className="p-1 rounded text-red-500 hover:bg-red-50 cursor-pointer"
+                      title="Delete Event"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Event Name</label>
+                    <input
+                      type="text"
+                      value={eventItem.title}
+                      onChange={(e) => handleUpdateEvent(idx, 'title', e.target.value)}
+                      placeholder="e.g. પારણા વિધિ"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 text-xs font-semibold text-stone-800 focus:border-[#8B6E28]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Date</label>
+                    <input
+                      type="text"
+                      value={eventItem.date}
+                      onChange={(e) => handleUpdateEvent(idx, 'date', e.target.value)}
+                      placeholder="e.g. 18 ઓક્ટોબર 2026"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 text-xs font-medium text-stone-800 focus:border-[#8B6E28]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Time</label>
+                    <input
+                      type="text"
+                      value={eventItem.time}
+                      onChange={(e) => handleUpdateEvent(idx, 'time', e.target.value)}
+                      placeholder="e.g. સવારે ૮:૩૦ કલાકે"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-stone-200 text-xs font-medium text-stone-800 focus:border-[#8B6E28]"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+          <button
+            type="button"
+            onClick={() => handleAddEvent()}
+            className="w-full py-2.5 rounded-xl border-2 border-dashed border-[#E0A458]/50 hover:border-[#8B6E28] text-xs font-semibold text-[#8B6E28] flex items-center justify-center gap-1.5 transition cursor-pointer bg-white"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Event Schedule Item (+ મંગલ પ્રસંગ ઉમેરો)</span>
+          </button>
         </div>
       </div>
 

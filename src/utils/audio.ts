@@ -34,19 +34,30 @@ export function formatAudioUrl(url: string | null | undefined): string {
     return cleanUrl;
   }
 
+  // Blob and Data URLs play natively
+  if (cleanUrl.startsWith('blob:') || cleanUrl.startsWith('data:')) {
+    return cleanUrl;
+  }
+
   // Handle Google Drive links or legacy /api/audio-proxy links
-  if (cleanUrl.includes('drive.google.com') || cleanUrl.includes('docs.google.com') || cleanUrl.includes('/api/audio-proxy')) {
+  if (
+    cleanUrl.includes('drive.google.com') ||
+    cleanUrl.includes('docs.google.com') ||
+    cleanUrl.includes('/api/audio-proxy') ||
+    cleanUrl.includes('drive.usercontent.google.com')
+  ) {
     const fileIdMatch =
       cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
       cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
     if (fileIdMatch && fileIdMatch[1]) {
-      return `https://drive.usercontent.google.com/download?id=${fileIdMatch[1]}&export=download`;
+      return `/api/audio-proxy?id=${fileIdMatch[1]}`;
     }
   }
 
   // Handle Dropbox share links
   if (cleanUrl.includes('dropbox.com')) {
-    return cleanUrl.replace('?dl=0', '?raw=1').replace('&dl=0', '&raw=1');
+    const rawUrl = cleanUrl.replace('?dl=0', '?raw=1').replace('&dl=0', '&raw=1');
+    return `/api/audio-proxy?url=${encodeURIComponent(rawUrl)}`;
   }
 
   return cleanUrl;
@@ -66,7 +77,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3&export=download',
+    audioUrl: '/api/audio-proxy?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3',
     youtubeUrl: 'https://www.youtube.com/watch?v=s5R83lO1Eag',
   },
   {
@@ -78,7 +89,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Soulful Santoor & Flute',
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT&export=download',
+    audioUrl: '/api/audio-proxy?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT',
     youtubeUrl: 'https://www.youtube.com/watch?v=d_xVzH7A9R8',
   },
   {
@@ -90,7 +101,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Upbeat Celebration',
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob&export=download',
+    audioUrl: '/api/audio-proxy?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob',
     youtubeUrl: 'https://www.youtube.com/watch?v=M5K_v5L6mD0',
   },
   {
@@ -102,7 +113,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3&export=download',
+    audioUrl: '/api/audio-proxy?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3',
     youtubeUrl: 'https://www.youtube.com/watch?v=Q8wK8v0N3Rk',
   },
   {
@@ -114,7 +125,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Melodious Bhakti Anthem',
     key: 'F Major',
     ragaStyle: 'Khamaj',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa&export=download',
+    audioUrl: '/api/audio-proxy?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa',
     youtubeUrl: 'https://www.youtube.com/watch?v=P9x8w_9kR4A',
   },
   {
@@ -126,7 +137,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
-    audioUrl: 'https://drive.usercontent.google.com/download?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12&export=download',
+    audioUrl: '/api/audio-proxy?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12',
     youtubeUrl: 'https://www.youtube.com/watch?v=7Xw9k9Q0z6M',
   },
 ];

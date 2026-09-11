@@ -400,6 +400,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
           {/* NEW SECTIONS TO MATCH VIDEO STRUCTURE */}
           <EventScheduleTimeline
             events={data.events}
+            eventScheduleTitle={data.eventScheduleTitle}
             template={currentTemplate}
             language={activeLang}
           />

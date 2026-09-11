@@ -16,7 +16,7 @@ async function startServer() {
 
     let targetUrl = '';
     if (fileId) {
-      targetUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+      targetUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download`;
     } else if (directUrl) {
       targetUrl = directUrl;
     } else {
@@ -26,38 +26,52 @@ async function startServer() {
 
     const cacheKey = fileId || targetUrl;
 
-    // Serve from in-memory cache if available
-    if (audioCache.has(cacheKey)) {
-      const cached = audioCache.get(cacheKey)!;
-      res.setHeader('Content-Type', cached.contentType);
-      res.setHeader('Content-Length', cached.buffer.length.toString());
-      res.setHeader('Accept-Ranges', 'bytes');
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      res.send(cached.buffer);
-      return;
-    }
-
     try {
-      const response = await fetch(targetUrl);
-      if (!response.ok) {
-        res.status(response.status).send(`Failed to fetch audio from source: ${response.statusText}`);
-        return;
+      let buffer: Buffer;
+      let contentType = 'audio/mpeg';
+
+      if (audioCache.has(cacheKey)) {
+        buffer = audioCache.get(cacheKey)!.buffer;
+      } else {
+        let response = await fetch(targetUrl);
+        if (!response.ok && fileId) {
+          const fallbackUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+          response = await fetch(fallbackUrl);
+        }
+
+        if (!response.ok) {
+          res.status(response.status).send(`Failed to fetch audio from source: ${response.statusText}`);
+          return;
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        buffer = Buffer.from(arrayBuffer);
+        audioCache.set(cacheKey, { buffer, contentType });
       }
 
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const contentType = 'audio/mpeg';
+      const totalSize = buffer.length;
+      const range = req.headers.range;
 
-      // Store in memory cache for subsequent instant playback
-      audioCache.set(cacheKey, { buffer, contentType });
-
-      res.setHeader('Content-Type', contentType);
-      res.setHeader('Content-Length', buffer.length.toString());
       res.setHeader('Accept-Ranges', 'bytes');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-      res.send(buffer);
+
+      if (range) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
+        const chunksize = end - start + 1;
+
+        res.status(206);
+        res.setHeader('Content-Range', `bytes ${start}-${end}/${totalSize}`);
+        res.setHeader('Content-Length', chunksize.toString());
+        res.setHeader('Content-Type', contentType);
+        res.send(buffer.subarray(start, end + 1));
+      } else {
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Length', totalSize.toString());
+        res.send(buffer);
+      }
     } catch (err) {
       console.error('Audio proxy error:', err);
       res.status(500).send('Failed to proxy audio file');

@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 
 interface EventScheduleTimelineProps {
   events?: EventSchedule[];
+  eventScheduleTitle?: string;
   template: TemplateDefinition;
   textColor?: string;
   language?: SupportedLanguage;
@@ -13,6 +14,7 @@ interface EventScheduleTimelineProps {
 
 export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = ({
   events = [],
+  eventScheduleTitle,
   template,
   language = 'hi',
   textColor
@@ -20,14 +22,13 @@ export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = ({
   if (!events || events.length === 0) return null;
   const colors = template?.colors || ({} as any);
   const appliedTextColor = textColor || colors.text;
-  const isDarkBg = ['parnaUtsav', 'divya', 'param', 'mangalam'].includes(template.id);
-  const isDark = template.id === 'divya' || template.id === 'param';
+  const displayTitle = eventScheduleTitle || TRANSLATIONS[language]?.eventScheduleTitle || 'ઉત્સવનો મંગલ પ્રવાસ';
 
   return (
     <div className="w-full py-8 text-center relative overflow-hidden">
       {/* Title */}
       <h2 className="text-2xl sm:text-3xl font-bold font-hindi mb-12 tracking-wide z-10 relative" style={{ color: appliedTextColor }}>
-        {TRANSLATIONS[language]?.eventScheduleTitle || 'Utsav Ka Mangal Pravas'}
+        {displayTitle}
       </h2>
 
       {/* Timeline Container */}

@@ -42,6 +42,7 @@ export interface InvitationData {
   time: string;
   location: string;
   googleMapsUrl: string;
+  eventScheduleTitle?: string;
   events?: EventSchedule[];
   familyPhotos: string[];
   familyPhoto?: string;

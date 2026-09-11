@@ -405,9 +405,11 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
         {/* NEW SECTIONS TO MATCH VIDEO STRUCTURE */}
         <EventScheduleTimeline
           events={data.events}
+          eventScheduleTitle={data.eventScheduleTitle}
           template={template}
           language={activeLang}
-        textColor={canvasTextColor} />
+          textColor={canvasTextColor}
+        />
         <EventLocation
           location={data.location}
           mapsUrl={mapsUrl}
