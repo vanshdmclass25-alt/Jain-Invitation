@@ -14,7 +14,6 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
-    // Public CDN audio stream for sacred devotional flute & garba
     audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
   },
   {
@@ -48,7 +47,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio-[#1359].mp3', // Royal Shehnai audio
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_993f3c11ec.mp3',
   },
   {
     id: 'jaiHoTapasvi',
@@ -70,7 +69,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio-[#0888].mp3', // Temple Stotra bell audio
+    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_a43878b76c.mp3',
   },
 ];
 

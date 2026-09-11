@@ -12,6 +12,7 @@ interface NavbarProps {
   onOpenDoorCeremony?: () => void;
   selectedTemplateName: string;
   selectedSongId?: string;
+  customAudioUrl?: string;
   songAudioUrls?: Record<string, string>;
   onSelectSong?: (songId: string) => void;
 }
@@ -24,6 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenDoorCeremony,
   selectedTemplateName,
   selectedSongId = 'reAavyaTapashvi',
+  customAudioUrl = '',
   songAudioUrls = {},
   onSelectSong,
 }) => {
@@ -34,8 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const currentSong = TAPASYA_SONGS.find((s) => s.id === selectedSongId) || TAPASYA_SONGS[0];
 
   const toggleSound = () => {
-    const customUrl = songAudioUrls[selectedSongId];
-    spiritualAudio.selectSong(selectedSongId, customUrl);
+    spiritualAudio.selectSong(selectedSongId, customAudioUrl);
     const active = spiritualAudio.toggle();
     setIsPlayingAudio(active);
   };
@@ -44,8 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (onSelectSong) {
       onSelectSong(songId);
     }
-    const customUrl = songAudioUrls[songId];
-    spiritualAudio.selectSong(songId, customUrl);
+    spiritualAudio.selectSong(songId, customAudioUrl);
     if (!spiritualAudio.getStatus() && songId !== 'none') {
       spiritualAudio.start();
       setIsPlayingAudio(true);
