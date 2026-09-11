@@ -41,13 +41,21 @@
         },
         "status": {
           "type": "string",
-          "enum": ["pending", "approved", "rejected"]
+          "enum": ["pending", "approved", "rejected", "expired"]
         },
         "createdAt": {
           "type": "string",
           "format": "date-time"
         },
         "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "approvedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
           "type": "string",
           "format": "date-time"
         }

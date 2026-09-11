@@ -81,6 +81,20 @@ export interface TemplateColors {
   particleTheme: 'rajwada' | 'shwet' | 'sukoon' | 'divya' | 'aura' | 'param' | 'mangalam';
 }
 
+export interface InvitationRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  whatsappNumber: string;
+  templateId: TemplateId | string;
+  status: 'pending' | 'approved' | 'rejected' | 'expired';
+  createdAt: any;
+  updatedAt?: any;
+  approvedAt?: any;
+  expiresAt?: any;
+}
+
 export interface TemplateDefinition {
   id: TemplateId;
   name: string;
