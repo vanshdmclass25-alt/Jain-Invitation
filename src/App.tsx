@@ -119,13 +119,60 @@ export function App() {
         setDoorDestinationView('invitation');
 
         fetchInvitationById(shortId)
-          .then((fetchedData) => {
+          .then(async (fetchedData) => {
             if (fetchedData) {
               setData(fetchedData);
               // CRITICAL FIX: DO NOT call saveInvitation(fetchedData) here! 
               // This is a guest viewing a shared link. We must not overwrite their own local draft.
             } else {
-              alert("Sorry, we couldn't find this invitation. It may have expired or contained an invalid photo.");
+              // FALLBACK: If the data is missing from the database (e.g. legacy 1MB limit issue),
+              // Check if the person clicking the link is ACTUALLY the creator!
+              const myLocalId = localStorage.getItem('my_invitation_short_id');
+              const localDataRaw = localStorage.getItem('jain_parna_invitation_data_v1');
+              
+              let recoveredData = null;
+              
+              if (localDataRaw) {
+                const parsed = JSON.parse(localDataRaw);
+                // Simple hash function to check legacy ID match
+                const content = `${parsed.name || ''}_${parsed.tapasyaType || ''}_${parsed.date || ''}_${parsed.selectedTemplate || ''}_${parsed.hostNames || ''}`;
+                let hash = 0;
+                for (let i = 0; i < content.length; i++) {
+                  hash = (hash << 5) - hash + content.charCodeAt(i);
+                  hash |= 0;
+                }
+                const legacyId = (Math.abs(hash).toString(36) + '7x9k2p').substring(0, 7);
+                
+                if (myLocalId === shortId || legacyId === shortId) {
+                  recoveredData = parsed;
+                }
+              }
+
+              if (recoveredData) {
+                // It's the creator! Auto-heal their massive images right now and sync to database.
+                let modified = false;
+                if (recoveredData.profileImage && recoveredData.profileImage.length > 500000) {
+                  recoveredData.profileImage = await compressDataUrl(recoveredData.profileImage);
+                  modified = true;
+                }
+                if (recoveredData.yearlyPhotos && recoveredData.yearlyPhotos.length > 0) {
+                  recoveredData.yearlyPhotos = await Promise.all(recoveredData.yearlyPhotos.map(async (m: any) => {
+                    if (m.photoUrl && m.photoUrl.length > 500000) {
+                      modified = true;
+                      return { ...m, photoUrl: await compressDataUrl(m.photoUrl) };
+                    }
+                    return m;
+                  }));
+                }
+                
+                setData(recoveredData);
+                getOrGenerateShortUrl(recoveredData).catch(console.error);
+                
+                // Since they are the creator, let's treat them as the editor so they can make changes
+                setIsGuestView(false);
+              } else {
+                alert("Sorry, we couldn't find this invitation. It may have expired or contained an invalid photo.");
+              }
             }
             setIsLoadingShortLink(false);
             setIsDoorRevealing(true);
