@@ -75,13 +75,9 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
 
 class AmbientSpiritualAudio {
   private audioElement: HTMLAudioElement | null = null;
-  private ctx: AudioContext | null = null;
-  private masterGain: GainNode | null = null;
   private isPlaying = false;
   private currentSongId = 'reAavyaTapashvi';
   private customAudioUrl: string | null = null;
-  private activeOscillators: OscillatorNode[] = [];
-  private schedulerTimer: number | null = null;
 
   public getSongId(): string {
     return this.currentSongId;
@@ -136,157 +132,46 @@ class AmbientSpiritualAudio {
     this.stop(); // Clean slate
 
     const song = this.getCurrentSong();
-    const streamUrl = this.customAudioUrl || song.audioUrl;
+    const streamUrl =
+      this.currentSongId === 'custom'
+        ? this.customAudioUrl
+        : this.customAudioUrl || song.audioUrl;
 
-    // Try HTML5 Audio stream first for real vocal audio track
-    if (streamUrl) {
-      try {
-        if (!this.audioElement) {
-          this.audioElement = new Audio();
-          this.audioElement.loop = true;
-          this.audioElement.volume = 0.55;
-        }
-        this.audioElement.src = streamUrl;
-        this.audioElement.crossOrigin = 'anonymous';
-
-        const playPromise = this.audioElement.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              this.isPlaying = true;
-            })
-            .catch((err) => {
-              console.warn('HTML5 Audio playback interrupted, falling back to WebAudio Synth:', err);
-              this.startWebAudioSynth(song);
-            });
-        } else {
-          this.isPlaying = true;
-        }
-        return;
-      } catch (err) {
-        console.warn('HTML Audio error, switching to WebAudio Synth:', err);
-      }
+    if (!streamUrl) {
+      this.isPlaying = false;
+      return;
     }
 
-    // Fallback to high-fidelity Web Audio Synthesizer
-    this.startWebAudioSynth(song);
-  }
-
-  /* Robust Web Audio Synthesizer Engine (Guaranteed zero silence for all 6 songs) */
-  private startWebAudioSynth(song: TapasyaSong) {
     try {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext })
-          .webkitAudioContext;
-      if (!AudioCtx) return;
-
-      if (!this.ctx || this.ctx.state === 'closed') {
-        this.ctx = new AudioCtx();
+      if (!this.audioElement) {
+        this.audioElement = new Audio();
+        this.audioElement.loop = true;
+        this.audioElement.volume = 0.6;
       }
 
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume();
+      this.audioElement.src = streamUrl;
+
+      const playPromise = this.audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            this.isPlaying = true;
+          })
+          .catch((err) => {
+            console.warn('Audio playback requires user interaction or stream failed:', err);
+            this.isPlaying = false;
+          });
+      } else {
+        this.isPlaying = true;
       }
-
-      const now = this.ctx.currentTime;
-      this.masterGain = this.ctx.createGain();
-      this.masterGain.gain.setValueAtTime(0.001, now);
-      this.masterGain.gain.exponentialRampToValueAtTime(0.25, now + 1.2);
-      this.masterGain.connect(this.ctx.destination);
-
-      this.isPlaying = true;
-
-      // Render continuous multi-layered Indian acoustic instruments based on key/raga
-      this.runLookaheadScheduler(song);
     } catch (err) {
-      console.warn('WebAudio Synth error:', err);
+      console.warn('Audio error:', err);
+      this.isPlaying = false;
     }
-  }
-
-  private runLookaheadScheduler(song: TapasyaSong) {
-    if (!this.ctx || !this.masterGain) return;
-
-    // Base Tanpura Drone frequencies per song key
-    const scaleFreqs: Record<string, number[]> = {
-      reAavyaTapashvi: [146.83, 220.0, 293.66, 369.99, 440.0], // D Major (D3, A3, D4, F#4, A4)
-      tapasviNeVandana: [110.0, 164.81, 220.0, 261.63, 329.63], // A Minor Bhairavi (A2, E3, A3, C4, E4)
-      tapasyaJordar: [196.0, 246.94, 293.66, 392.0, 493.88], // G Major Yaman (G3, B3, D4, G4, B4)
-      tapasviKhammaGhani: [164.81, 246.94, 329.63, 392.0, 493.88], // E Minor Desh (E3, B3, E4, G4, B4)
-      jaiHoTapasvi: [174.61, 220.0, 261.63, 349.23, 440.0], // F Major Khamaj (F3, A3, C4, F4, A4)
-      tapasviNaTapNeVandan: [130.81, 196.0, 261.63, 329.63, 392.0], // C Major Bhoopali (C3, G3, C4, E4, G4)
-    };
-
-    const freqs = scaleFreqs[song.id] || scaleFreqs.reAavyaTapashvi;
-    const now = this.ctx.currentTime;
-
-    // 1. Continuous Tanpura / Harmonium Pad
-    freqs.slice(0, 3).forEach((freq, idx) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-
-      osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-      osc.frequency.setValueAtTime(freq, now);
-
-      const filter = this.ctx!.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(480, now);
-
-      gain.gain.setValueAtTime(0.12, now);
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.masterGain!);
-
-      osc.start(now);
-      this.activeOscillators.push(osc);
-    });
-
-    // 2. Continuous Synchronized Flute & Santoor Melodic Sequence
-    let stepIndex = 0;
-    const stepDuration = 0.42; // seconds per note
-
-    const scheduleNextStep = () => {
-      if (!this.ctx || !this.isPlaying || !this.masterGain) return;
-
-      const t = this.ctx.currentTime;
-      const noteFreq = freqs[stepIndex % freqs.length];
-
-      // Flute note
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(noteFreq, t);
-
-      gain.gain.setValueAtTime(0.001, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + stepDuration * 0.95);
-
-      osc.connect(gain);
-      gain.connect(this.masterGain);
-
-      osc.start(t);
-      osc.stop(t + stepDuration);
-
-      // Temple bell on every 8th step
-      if (stepIndex % 8 === 0) {
-        playTempleBellChime();
-      }
-
-      stepIndex++;
-    };
-
-    scheduleNextStep();
-    this.schedulerTimer = window.setInterval(scheduleNextStep, stepDuration * 1000);
   }
 
   public stop() {
     this.isPlaying = false;
-
-    if (this.schedulerTimer) {
-      window.clearInterval(this.schedulerTimer);
-      this.schedulerTimer = null;
-    }
 
     if (this.audioElement) {
       try {
@@ -296,34 +181,12 @@ class AmbientSpiritualAudio {
         /* noop */
       }
     }
-
-    if (this.activeOscillators.length > 0) {
-      this.activeOscillators.forEach((osc) => {
-        try {
-          osc.stop();
-          osc.disconnect();
-        } catch {
-          /* noop */
-        }
-      });
-      this.activeOscillators = [];
-    }
-
-    if (this.masterGain && this.ctx) {
-      try {
-        const now = this.ctx.currentTime;
-        this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-        this.masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      } catch {
-        /* noop */
-      }
-    }
   }
 }
 
 export const spiritualAudio = new AmbientSpiritualAudio();
 
-// Shared AudioContext singleton for bells and chimes
+// Shared AudioContext singleton for authentic temple bell chime (Ghanti)
 let sharedChimeCtx: AudioContext | null = null;
 
 function getSharedChimeContext(): AudioContext | null {
@@ -346,8 +209,7 @@ function getSharedChimeContext(): AudioContext | null {
 }
 
 /**
- * Plays an authentic resonant temple bell (Ghanti) chime.
- * Tuned to sacred 528 Hz / harmonic overtones with realistic bronze decay.
+ * Plays a sacred temple bell (Ghanti) chime with realistic bronze resonance.
  */
 export function playTempleBellChime() {
   try {
