@@ -173,5 +173,6 @@ export const DEFAULT_INVITATION_DATA: InvitationData = {
   scratchMessage: '🌸 પાવન મિચ્છામિ દુક્કડં! Your gracious presence brings pure joy to our family. Please join us for special Manglik Aarti at 9:00 AM followed by Swami Vatsalya!',
   additionalInformation: 'Pārna Timing: 8:30 AM to 10:30 AM followed by Swami Vatsalya (Sadharmik Lunch) at 11:30 AM.\n\nDress code: Traditional Indian wear in peaceful light shades.',
   selectedTemplate: 'sukoon' as TemplateId,
+  selectedSongId: 'reAavyaTapashvi',
   hostNames: 'Kamlesh & Hansa Shah and Family',
 };

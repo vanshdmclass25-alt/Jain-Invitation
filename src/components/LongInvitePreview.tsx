@@ -24,6 +24,7 @@ import { AnumodnaAndRSVP } from './AnumodnaAndRSVP';
 import { ParnaVidhiGuide } from './ParnaVidhiGuide';
 import { useAutoScroll } from '../utils/useAutoScroll';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
+import { TAPASYA_SONGS } from '../utils/audio';
 
 interface LongInvitePreviewProps {
   data: InvitationData;
@@ -129,7 +130,9 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
             {isPlayingAudio ? (
               <>
                 <Volume2 className="w-3 h-3 animate-pulse" />
-                <span>Playing</span>
+                <span className="truncate max-w-[100px]">
+                  {TAPASYA_SONGS.find((s) => s.id === (data.selectedSongId || 'reAavyaTapashvi'))?.titleGu || 'Playing'}
+                </span>
               </>
             ) : (
               <>

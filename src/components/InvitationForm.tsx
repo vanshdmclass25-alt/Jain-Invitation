@@ -22,6 +22,7 @@ import { TEMPLATES, DEFAULT_INVITATION_DATA } from '../config/templates';
 import { ImageUploader } from './ImageUploader';
 import { FamilyPhotosUploader } from './FamilyPhotosUploader';
 import { YearlyMilestoneUploader } from './YearlyMilestoneUploader';
+import { SongSelector } from './SongSelector';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
 
 interface InvitationFormProps {
@@ -306,6 +307,12 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
         image={data.profileImage}
         onChange={(url) => updateField('profileImage', url)}
         helperText="Upload a clear portrait of the Tapasvi (JPG, PNG, WebP)"
+      />
+
+      {/* SECTION B2: BACKGROUND SONG / STOTRA SELECTOR */}
+      <SongSelector
+        selectedSongId={data.selectedSongId || 'reAavyaTapashvi'}
+        onSelectSong={(songId) => updateField('selectedSongId', songId)}
       />
 
       {/* SECTION C: BHAGWAN MAHAVIR SWAMI IMAGE */}

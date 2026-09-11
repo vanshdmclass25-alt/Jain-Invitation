@@ -2,6 +2,18 @@ export type TemplateId = 'parnaUtsav' | 'shwet' | 'sukoon';
 
 export type AudienceGroup = 'all' | 'genz' | 'midage' | 'elders';
 
+export interface TapasyaSong {
+  id: string;
+  titleGu: string;
+  titleEn: string;
+  singer: string;
+  lyricistMusic?: string;
+  tag: string;
+  key: string;
+  ragaStyle: string;
+  audioUrl?: string;
+}
+
 export interface YearlyPhotoMilestone {
   id: string;
   year: string;
@@ -37,6 +49,7 @@ export interface InvitationData {
   scratchTitle?: string;
   additionalInformation: string;
   selectedTemplate: TemplateId;
+  selectedSongId?: string;
   hostNames?: string;
 }
 

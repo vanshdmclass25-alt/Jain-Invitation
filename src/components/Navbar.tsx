@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck } from 'lucide-react';
-import { spiritualAudio } from '../utils/audio';
+import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck, Music } from 'lucide-react';
+import { spiritualAudio, TAPASYA_SONGS } from '../utils/audio';
 import { TattvaLogo } from './TattvaLogo';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,6 +11,8 @@ interface NavbarProps {
   onOpenPrint?: () => void;
   onOpenDoorCeremony?: () => void;
   selectedTemplateName: string;
+  selectedSongId?: string;
+  onSelectSong?: (songId: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -20,14 +22,34 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPrint,
   onOpenDoorCeremony,
   selectedTemplateName,
+  selectedSongId = 'reAavyaTapashvi',
+  onSelectSong,
 }) => {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [showSongDropdown, setShowSongDropdown] = useState(false);
   const { isAdmin } = useAuth();
 
+  const currentSong = TAPASYA_SONGS.find((s) => s.id === selectedSongId) || TAPASYA_SONGS[0];
 
   const toggleSound = () => {
+    spiritualAudio.selectSong(selectedSongId);
     const active = spiritualAudio.toggle();
     setIsPlayingAudio(active);
+  };
+
+  const handlePickSong = (songId: string) => {
+    if (onSelectSong) {
+      onSelectSong(songId);
+    }
+    spiritualAudio.selectSong(songId);
+    if (!spiritualAudio.getStatus() && songId !== 'none') {
+      spiritualAudio.start();
+      setIsPlayingAudio(true);
+    } else if (songId === 'none') {
+      spiritualAudio.stop();
+      setIsPlayingAudio(false);
+    }
+    setShowSongDropdown(false);
   };
 
   return (
@@ -99,29 +121,86 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Audio toggle */}
-          <button
-            id="audio-toggle-btn"
-            onClick={toggleSound}
-            title={isPlayingAudio ? 'Mute sacred ambient sound' : 'Play sacred ambient sound'}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 whitespace-nowrap ${
-              isPlayingAudio
-                ? 'bg-[#E0A458]/20 text-[#8C5D1F] border border-[#E0A458]'
-                : 'bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200'
-            }`}
-          >
-            {isPlayingAudio ? (
-              <>
-                <Volume2 className="w-3 sm:w-3.5 h-3 sm:h-3.5 animate-pulse text-[#C98A3E] shrink-0" />
-                <span className="hidden md:inline">Stotra Audio</span>
-              </>
-            ) : (
-              <>
-                <VolumeX className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-stone-500 shrink-0" />
-                <span className="hidden md:inline">Sound</span>
-              </>
+          {/* Audio toggle & song picker */}
+          <div className="relative">
+            <button
+              id="audio-toggle-btn"
+              onClick={toggleSound}
+              title={isPlayingAudio ? `Mute ${currentSong.titleEn}` : `Play ${currentSong.titleEn}`}
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 whitespace-nowrap ${
+                isPlayingAudio
+                  ? 'bg-[#E0A458]/20 text-[#8C5D1F] border border-[#E0A458] shadow-xs'
+                  : 'bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200'
+              }`}
+            >
+              {isPlayingAudio ? (
+                <>
+                  <Volume2 className="w-3 sm:w-3.5 h-3 sm:h-3.5 animate-pulse text-[#C98A3E] shrink-0" />
+                  <span className="hidden md:inline font-semibold">{currentSong.titleGu}</span>
+                  <span className="md:hidden">Song</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-stone-500 shrink-0" />
+                  <span className="hidden md:inline">{currentSong.titleGu}</span>
+                  <span className="md:hidden">Sound</span>
+                </>
+              )}
+            </button>
+
+            {/* Song Switcher Dropdown Trigger */}
+            <button
+              type="button"
+              onClick={() => setShowSongDropdown(!showSongDropdown)}
+              title="Change Stotra Song"
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#8B6E28] text-white flex items-center justify-center text-[9px] font-bold shadow-xs hover:scale-110 transition cursor-pointer"
+            >
+              <Music className="w-2.5 h-2.5" />
+            </button>
+
+            {/* Dropdown Menu */}
+            {showSongDropdown && (
+              <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-stone-200 p-2 z-50 text-left space-y-1">
+                <div className="px-2 py-1 border-b border-stone-100 flex items-center justify-between">
+                  <span className="text-[10px] font-bold font-cinzel text-stone-800 uppercase tracking-wider">
+                    Select Tapasya Song
+                  </span>
+                  <span className="text-[9px] text-[#8B6E28] font-semibold">6 Songs</span>
+                </div>
+
+                <div className="max-h-56 overflow-y-auto space-y-1 pt-1 no-scrollbar">
+                  {TAPASYA_SONGS.map((song) => (
+                    <button
+                      key={song.id}
+                      type="button"
+                      onClick={() => handlePickSong(song.id)}
+                      className={`w-full text-left p-2 rounded-lg text-xs transition cursor-pointer flex flex-col ${
+                        selectedSongId === song.id
+                          ? 'bg-[#FAF4E6] text-[#8B6E28] font-bold border border-[#E0A458]/40'
+                          : 'hover:bg-stone-50 text-stone-700 font-medium'
+                      }`}
+                    >
+                      <span className="truncate">{song.titleGu}</span>
+                      <span className="text-[10px] text-stone-400 font-normal truncate">
+                        {song.singer}
+                      </span>
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => handlePickSong('none')}
+                    className={`w-full text-left p-2 rounded-lg text-xs transition cursor-pointer ${
+                      selectedSongId === 'none'
+                        ? 'bg-stone-100 text-stone-900 font-bold'
+                        : 'hover:bg-stone-50 text-stone-500'
+                    }`}
+                  >
+                    🚫 No Music / Mute
+                  </button>
+                </div>
+              </div>
             )}
-          </button>
+          </div>
 
           {/* View switcher buttons */}
           {currentView === 'editor' && (

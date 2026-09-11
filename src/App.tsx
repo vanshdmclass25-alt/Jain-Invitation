@@ -152,6 +152,8 @@ export function App() {
           setIsDoorRevealing(true);
         }}
         selectedTemplateName={currentTemplate?.name}
+        selectedSongId={data.selectedSongId || 'reAavyaTapashvi'}
+        onSelectSong={(songId) => setData((prev) => ({ ...prev, selectedSongId: songId }))}
       />
 
       {/* 3D Door Opening Reveal Overlay with Sacred Gujarati Jai Jinendra Gateway & Digital Tilak */}
