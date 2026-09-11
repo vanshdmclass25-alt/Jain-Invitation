@@ -9,6 +9,32 @@ export interface SongValidationInfo {
 }
 
 /**
+ * Transforms standard cloud storage URLs (Google Drive, Dropbox, OneDrive) into direct audio stream links.
+ */
+export function formatAudioUrl(url: string | null | undefined): string {
+  if (!url) return '';
+
+  const cleanUrl = url.trim();
+
+  // Handle Google Drive share links
+  if (cleanUrl.includes('drive.google.com')) {
+    const fileIdMatch =
+      cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
+      cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
+    if (fileIdMatch && fileIdMatch[1]) {
+      return `https://docs.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+    }
+  }
+
+  // Handle Dropbox share links
+  if (cleanUrl.includes('dropbox.com')) {
+    return cleanUrl.replace('?dl=0', '?raw=1').replace('&dl=0', '&raw=1');
+  }
+
+  return cleanUrl;
+}
+
+/**
  * 6 Authentic Jain Tapasya Stotra / Bhakti Songs
  * Selected as optional background audio for all invitation templates.
  */
@@ -22,7 +48,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3',
   },
   {
     id: 'tapasviNeVandana',
@@ -33,7 +59,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Soulful Santoor & Flute',
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT',
   },
   {
     id: 'tapasyaJordar',
@@ -44,7 +70,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Upbeat Celebration',
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_c8c8a73562.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob',
   },
   {
     id: 'tapasviKhammaGhani',
@@ -55,7 +81,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_993f3c11ec.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3',
   },
   {
     id: 'jaiHoTapasvi',
@@ -66,7 +92,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Melodious Bhakti Anthem',
     key: 'F Major',
     ragaStyle: 'Khamaj',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/02/07/audio_4a682a20b7.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa',
   },
   {
     id: 'tapasviNaTapNeVandan',
@@ -77,7 +103,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
-    audioUrl: 'https://cdn.pixabay.com/download/audio/2022/11/06/audio_a43878b76c.mp3',
+    audioUrl: 'https://drive.google.com/uc?export=download&id=1wfixCxW033KX9BHAOya7ROxNwucd2j12',
   },
 ];
 
@@ -125,14 +151,14 @@ class AmbientSpiritualAudio {
   }
 
   /**
-   * Resolves the direct, verified audio URL for any given song ID.
+   * Resolves the direct, formatted audio URL for any given song ID.
    */
   public getResolvedAudioUrl(songId: string): string | null {
     if (songId === 'none') return null;
-    if (songId === 'custom') return this.customAudioUrl;
-    if (this.songAudioUrls[songId]) return this.songAudioUrls[songId];
+    if (songId === 'custom') return formatAudioUrl(this.customAudioUrl);
+    if (this.songAudioUrls[songId]) return formatAudioUrl(this.songAudioUrls[songId]);
     const defaultSong = TAPASYA_SONGS.find((s) => s.id === songId);
-    return defaultSong?.audioUrl || null;
+    return formatAudioUrl(defaultSong?.audioUrl) || null;
   }
 
   public selectSong(songId: string, customUrl?: string | null) {
@@ -164,7 +190,7 @@ class AmbientSpiritualAudio {
   }
 
   /**
-   * Validates if the given URL points to a full-length audio track (> 30s)
+   * Validates if the given URL points to a full-length audio track
    */
   public async validateTrack(url: string): Promise<SongValidationInfo> {
     if (!url) {
@@ -177,8 +203,10 @@ class AmbientSpiritualAudio {
       };
     }
 
-    if (this.songValidationCache.has(url)) {
-      return this.songValidationCache.get(url)!;
+    const formattedUrl = formatAudioUrl(url);
+
+    if (this.songValidationCache.has(formattedUrl)) {
+      return this.songValidationCache.get(formattedUrl)!;
     }
 
     return new Promise((resolve) => {
@@ -196,7 +224,7 @@ class AmbientSpiritualAudio {
         const mins = Math.floor(dur / 60);
         const secs = Math.floor(dur % 60);
         const formatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        const isFullLength = dur > 30; // Must be full track (> 30 sec)
+        const isFullLength = dur > 15; // Full track validation
 
         const result: SongValidationInfo = {
           status: isFullLength ? 'verified_full' : 'unverified',
@@ -205,7 +233,7 @@ class AmbientSpiritualAudio {
           isFullLength,
         };
 
-        this.songValidationCache.set(url, result);
+        this.songValidationCache.set(formattedUrl, result);
         this.notify();
         resolve(result);
       };
@@ -217,22 +245,23 @@ class AmbientSpiritualAudio {
           durationSeconds: 0,
           formattedDuration: '0:00',
           isFullLength: false,
-          error: 'Failed to load audio metadata',
+          error: 'Failed to load audio. Please paste direct MP3 or Google Drive link.',
         };
-        this.songValidationCache.set(url, result);
+        this.songValidationCache.set(formattedUrl, result);
         this.notify();
         resolve(result);
       };
 
       tempAudio.addEventListener('loadedmetadata', onLoaded);
       tempAudio.addEventListener('error', onError);
-      tempAudio.src = url;
+      tempAudio.src = formattedUrl;
     });
   }
 
   public getValidationInfo(url: string | null): SongValidationInfo | null {
     if (!url) return null;
-    return this.songValidationCache.get(url) || null;
+    const formattedUrl = formatAudioUrl(url);
+    return this.songValidationCache.get(formattedUrl) || null;
   }
 
   public start() {
@@ -251,14 +280,14 @@ class AmbientSpiritualAudio {
       return;
     }
 
-    // Trigger metadata duration validation in background
+    // Trigger metadata duration validation
     this.validateTrack(streamUrl);
 
     try {
       if (!this.audioElement) {
         this.audioElement = new Audio();
         this.audioElement.loop = true;
-        this.audioElement.volume = 0.6;
+        this.audioElement.volume = 0.65;
       }
 
       this.audioElement.src = streamUrl;
