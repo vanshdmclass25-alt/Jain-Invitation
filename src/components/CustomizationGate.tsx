@@ -45,8 +45,24 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
         id: doc.id,
         ...doc.data({ serverTimestamps: 'estimate' })
       })) as InvitationRequest[];
+      
       setUserRequests(requests);
       setLoadingRequests(false);
+      
+      // Auto-create an entry in the dashboard if none exists for this template yet
+      const hasReqForThisTemplate = requests.some(r => r.templateId === templateId);
+      if (!hasReqForThisTemplate) {
+        addDoc(collection(db, 'requests'), {
+          userId: user.uid,
+          userName: user.name || 'Tapasvi Devotee',
+          userEmail: user.email || 'No email',
+          whatsappNumber: '+91 88509 18792',
+          templateId: templateId,
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        }).catch(e => console.error("Auto-request error:", e));
+      }
     }, (err) => {
       console.error("Firestore subscription error:", err);
       setLoadingRequests(false);

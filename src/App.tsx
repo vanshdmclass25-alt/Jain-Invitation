@@ -78,10 +78,19 @@ export function App() {
     }
   }, []);
 
-  // Save changes to localStorage
+  // Save changes to localStorage and background sync to Firestore
   const handleDataChange = (newData: InvitationData) => {
     setData(newData);
     saveInvitation(newData);
+    
+    // Silently update Firestore so their live link stays in sync automatically
+    // Debounce to prevent spam
+    if (!isGuestView) {
+      if ((window as any).syncTimeout) clearTimeout((window as any).syncTimeout);
+      (window as any).syncTimeout = setTimeout(() => {
+        getOrGenerateShortUrl(newData).catch(console.error);
+      }, 2000);
+    }
   };
 
   // When user selects a template from Gallery
