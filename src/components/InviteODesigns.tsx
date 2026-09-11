@@ -78,36 +78,90 @@ export const InviteODesigns: React.FC<InviteODesignsProps> = ({
                 }`}
               >
                 {/* Badge */}
-                <div className="flex justify-start items-start mb-4">
-                  <div className="bg-[#352516] text-white text-[10px] sm:text-xs font-bold tracking-wider px-3 py-1 rounded-full uppercase">
+                <div className="flex justify-between items-center mb-4">
+                  <div 
+                    className="text-[10px] sm:text-xs font-bold tracking-wider px-3.5 py-1 rounded-full uppercase shadow-sm"
+                    style={{
+                      backgroundColor: tmpl.id === 'parnaUtsav' ? '#8B1828' : tmpl.id === 'shwet' ? '#22201D' : '#264A38',
+                      color: tmpl.id === 'parnaUtsav' ? '#FFF1C5' : tmpl.id === 'shwet' ? '#FFFFFF' : '#F0F9F3',
+                    }}
+                  >
                     {tmpl.badge}
                   </div>
+                  <span className="text-xs font-medium text-stone-500 font-serif italic">{tmpl.tagline}</span>
                 </div>
 
-                {/* Mockup Container */}
-                <div className="relative overflow-hidden mb-6 flex flex-col justify-center items-center h-[260px] sm:h-[300px]">
-                  <div className={`absolute inset-0 ${tmpl.bgPreview} opacity-50 rounded-2xl`} />
-                  
-                  {/* Idol Image based on template */}
-                  <div className="relative z-10 flex flex-col items-center mt-6">
-                    <div className="w-32 sm:w-40 h-36 sm:h-44 shadow-2xl border border-[#D4AF37]/30 bg-white flex items-center justify-center p-2">
-                      <img 
-                        src="/bhagwan-mahavir-pic.png" 
-                        alt="Mahavir Swami" 
-                        className="w-full h-full object-contain mix-blend-multiply"
-                      />
+                {/* Mockup Container with Distinct Template Themes */}
+                <div 
+                  className="relative overflow-hidden mb-6 flex flex-col justify-center items-center h-[260px] sm:h-[300px] rounded-2xl p-4 transition-all"
+                  style={{
+                    background: tmpl.id === 'parnaUtsav' 
+                      ? 'radial-gradient(circle at 50% 20%, #7A1927 0%, #4D0C17 60%, #2A040B 100%)'
+                      : tmpl.id === 'shwet'
+                      ? 'linear-gradient(180deg, #F5F3EE 0%, #E2DDD3 60%, #D0CAC0 100%)'
+                      : 'linear-gradient(180deg, #F0F6F2 0%, #E3EFE7 50%, #D4E5DA 100%)'
+                  }}
+                >
+                  {/* Pārna Utsav: Rajwada Sandstone & Royal Jharokha */}
+                  {tmpl.id === 'parnaUtsav' && (
+                    <div className="relative z-10 flex flex-col items-center w-full max-w-[220px] bg-[#3B0710]/90 border-2 border-[#D4AF37] rounded-2xl p-3 shadow-2xl">
+                      <div className="text-[9px] font-bold text-[#F5D061] tracking-widest uppercase mb-2 border-b border-[#D4AF37]/40 pb-1 w-full text-center">
+                        ❖ RAJWADA JHAROKHA ARCH ❖
+                      </div>
+                      <div className="w-28 sm:w-36 h-32 sm:h-38 rounded-xl border-2 border-[#D4AF37]/60 overflow-hidden bg-black/40 flex items-center justify-center p-1.5 shadow-inner">
+                        <img 
+                          src="/bhagwan-mahavir-pic.png" 
+                          alt="Mahavir Swami" 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span className="font-hindi text-xs font-bold text-[#F5D061] mt-2 block">॥ श्री महावीराय नमः ॥</span>
+                      <span className="text-[10px] text-[#FFF1C5] font-serif tracking-wider">SANDSTONE & KUMKUM</span>
                     </div>
-                    <div className="mt-4 text-center">
-                      <span className="font-hindi text-sm font-bold text-[#C08B46] block mb-1">॥ श्री महावीराय नमः ॥</span>
-                      <h3 className="font-cormorant text-xl font-bold text-[#352516]">{tmpl?.name} Edition</h3>
+                  )}
+
+                  {/* Sukoon: Pistachio Silk & Lotus Garden */}
+                  {tmpl.id === 'sukoon' && (
+                    <div className="relative z-10 flex flex-col items-center w-full max-w-[220px] bg-[#1D3D2E]/90 border-2 border-[#A7C8B4] rounded-2xl p-3 shadow-2xl">
+                      <div className="text-[9px] font-bold text-[#E69AB0] tracking-widest uppercase mb-2 border-b border-[#A7C8B4]/40 pb-1 w-full text-center flex items-center justify-center gap-1">
+                        🌸 PISTACHIO & LOTUS ARCH 🌸
+                      </div>
+                      <div className="w-28 sm:w-36 h-32 sm:h-38 rounded-xl border-2 border-[#A7C8B4]/60 overflow-hidden bg-[#183325] flex items-center justify-center p-1.5 shadow-inner">
+                        <img 
+                          src="/bhagwan-mahavir-pic.png" 
+                          alt="Mahavir Swami" 
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <span className="font-hindi text-xs font-bold text-[#C29B38] mt-2 block">॥ श्री महावीराय नमः ॥</span>
+                      <span className="text-[10px] text-[#A7C8B4] font-serif tracking-wider">PISTACHIO & CHANDAN</span>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Shwet: Pure Makrana White Marble & Ahimsa */}
+                  {tmpl.id === 'shwet' && (
+                    <div className="relative z-10 flex flex-col items-center w-full max-w-[220px] bg-white border-2 border-[#22201D] rounded-2xl p-3 shadow-2xl">
+                      <div className="text-[9px] font-bold text-[#22201D] tracking-widest uppercase mb-2 border-b border-[#B89758]/50 pb-1 w-full text-center">
+                        ✧ MAKRANA MARBLE ARCH ✧
+                      </div>
+                      <div className="w-28 sm:w-36 h-32 sm:h-38 rounded-xl border-2 border-[#B89758]/50 overflow-hidden bg-[#FAF8F5] flex items-center justify-center p-1.5 shadow-inner">
+                        <img 
+                          src="/bhagwan-mahavir-pic.png" 
+                          alt="Mahavir Swami" 
+                          className="w-full h-full object-contain mix-blend-multiply"
+                        />
+                      </div>
+                      <span className="font-hindi text-xs font-bold text-[#1F1E1C] mt-2 block">॥ श्री महावीराय नमः ॥</span>
+                      <span className="text-[10px] text-[#615E58] font-mono tracking-wider">PURE WHITE AHIMSA</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details */}
                 <div className="px-1 mb-6 flex-1 flex flex-col bg-white p-4 rounded-b-2xl -mt-10 pt-8 border-t-0">
-                  <div className="flex w-full justify-between items-center mb-6">
+                  <div className="flex flex-col w-full mb-4">
                     <h3 className="text-2xl font-bold text-[#352516] font-cormorant">{tmpl?.name}</h3>
+                    <p className="text-xs text-stone-600 font-sans mt-1 leading-relaxed">{tmpl.description}</p>
                   </div>
 
                   {/* Actions */}

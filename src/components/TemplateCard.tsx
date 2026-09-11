@@ -25,40 +25,92 @@ export const TemplateCard: React.FC<TemplateCardProps> = ({
     >
       {/* Top Image Section */}
       <div 
-        className="relative pt-6 px-4 pb-8 flex flex-col items-center" 
+        className="relative pt-6 px-4 pb-8 flex flex-col items-center transition-all" 
         style={{ 
-          background: `linear-gradient(to bottom, ${template?.colors.bg || '#F0F5F1'} 0%, white 100%)` 
+          background: template.id === 'parnaUtsav'
+            ? 'radial-gradient(circle at 50% 20%, #7A1927 0%, #4D0C17 60%, #2A040B 100%)'
+            : template.id === 'shwet'
+            ? 'linear-gradient(180deg, #F5F3EE 0%, #E2DDD3 60%, #D0CAC0 100%)'
+            : 'linear-gradient(180deg, #F0F6F2 0%, #E3EFE7 50%, #D4E5DA 100%)'
         }}
       >
         {/* Badge */}
-        <div className="absolute top-4 left-4 bg-[#301E13] text-white text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm z-10">
+        <div 
+          className="absolute top-4 left-4 text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md z-10"
+          style={{
+            backgroundColor: template.id === 'parnaUtsav' ? '#8B1828' : template.id === 'shwet' ? '#22201D' : '#264A38',
+            color: template.id === 'parnaUtsav' ? '#FFF1C5' : template.id === 'shwet' ? '#FFFFFF' : '#F0F9F3',
+            border: `1px solid ${template.colors.accentGold}`
+          }}
+        >
           {template.audienceBadge || template.audienceGroup}
         </div>
 
-        {/* Idol Image Placeholder */}
-        <div className="w-36 h-40 mt-4 mb-4 relative drop-shadow-2xl flex justify-center items-center overflow-hidden rounded-md border border-[#D4AF37]/20 shadow-inner">
-          <MahavirSwamiImage 
-            customImageUrl="/bhagwan-mahavir-pic.png"
-            className="w-full h-full"
-            showAura={true}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-80 pointer-events-none" />
+        {/* Template-Specific Distinct Frame */}
+        <div className="w-36 h-44 mt-4 mb-3 relative drop-shadow-2xl flex flex-col justify-center items-center overflow-hidden rounded-2xl transition-all">
+          {/* Background Texture / Accent */}
+          {template.id === 'parnaUtsav' && (
+            <div className="absolute inset-0 bg-[#3B0710] border-2 border-[#D4AF37] rounded-2xl p-1.5 flex flex-col items-center justify-between">
+              <div className="w-full text-center text-[#F5D061] text-[8px] tracking-widest font-bold border-b border-[#D4AF37]/40 pb-0.5">
+                ❖ RAJWADA HAVELI ❖
+              </div>
+              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-[#D4AF37]/50 bg-black/40 flex items-center justify-center">
+                <MahavirSwamiImage 
+                  customImageUrl="/bhagwan-mahavir-pic.png"
+                  className="w-full h-full object-contain"
+                  showAura={true}
+                />
+              </div>
+              <div className="text-[9px] text-[#F5D061] font-serif font-bold">ROYAL JHAROKHA</div>
+            </div>
+          )}
+
+          {template.id === 'sukoon' && (
+            <div className="absolute inset-0 bg-[#1D3D2E] border-2 border-[#A7C8B4] rounded-2xl p-1.5 flex flex-col items-center justify-between shadow-inner">
+              <div className="w-full text-center text-[#E69AB0] text-[8px] tracking-widest font-bold border-b border-[#A7C8B4]/30 pb-0.5 flex items-center justify-center gap-1">
+                🌸 SUKOON LOTUS 🌸
+              </div>
+              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-[#A7C8B4]/40 bg-[#183325] flex items-center justify-center">
+                <MahavirSwamiImage 
+                  customImageUrl="/bhagwan-mahavir-pic.png"
+                  className="w-full h-full object-contain"
+                  showAura={true}
+                />
+              </div>
+              <div className="text-[9px] text-[#A7C8B4] font-serif font-bold">PISTACHIO SILK</div>
+            </div>
+          )}
+
+          {template.id === 'shwet' && (
+            <div className="absolute inset-0 bg-white border-2 border-[#22201D] rounded-2xl p-1.5 flex flex-col items-center justify-between shadow-md">
+              <div className="w-full text-center text-[#22201D] text-[8px] tracking-widest font-bold border-b border-[#B89758]/50 pb-0.5">
+                ✧ SHWET MARBLE ✧
+              </div>
+              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-[#B89758]/40 bg-[#FAF8F5] flex items-center justify-center">
+                <MahavirSwamiImage 
+                  customImageUrl="/bhagwan-mahavir-pic.png"
+                  className="w-full h-full object-contain mix-blend-multiply"
+                  showAura={false}
+                />
+              </div>
+              <div className="text-[9px] text-[#22201D] font-mono font-bold tracking-tight">PURE AHIMSA</div>
+            </div>
+          )}
         </div>
 
-
-        <span className="font-hindi text-[11px] font-bold text-[#C08B46] tracking-wide mb-1 z-10">
+        <span className="font-hindi text-[11px] font-bold tracking-wide mb-1 z-10" style={{ color: template.id === 'parnaUtsav' ? '#F5D061' : template.id === 'shwet' ? '#22201D' : '#C29B38' }}>
           ॥ श्री महावीराय नमः ॥
         </span>
-        <span className="font-cormorant text-[13px] font-bold text-[#352516] z-10">
+        <span className="font-cormorant text-[13px] font-bold z-10" style={{ color: template.id === 'parnaUtsav' ? '#FFF1C5' : template.id === 'shwet' ? '#1F1E1C' : '#183325' }}>
           {template?.name} Edition
         </span>
       </div>
 
       {/* Bottom Details Section */}
       <div className="p-5 bg-white flex flex-col flex-1 border-t border-stone-100">
-        <div className="flex justify-between items-center mb-5">
-          <h3 className="font-cormorant text-[1.35rem] font-bold text-[#352516]">{template?.name}</h3>
-          <span className="text-[#C08B46] font-bold text-sm">₹899</span>
+        <div className="flex flex-col mb-4">
+          <h3 className="font-cormorant text-[1.35rem] font-bold text-[#352516] mb-1">{template?.name}</h3>
+          <p className="text-xs text-stone-500 font-sans leading-snug">{template?.tagline}</p>
         </div>
 
         <button 

@@ -146,10 +146,10 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
 
       {/* Floating Section Quick-Jump Nav */}
       <div 
-        className="px-2 py-1.5 border-b flex items-center justify-center gap-1 shrink-0 overflow-x-auto text-[9.5px] font-semibold no-scrollbar"
+        className="px-2.5 py-2 border-b flex items-center justify-start gap-1.5 shrink-0 overflow-x-auto text-[10px] font-semibold no-scrollbar scroll-smooth"
         style={{
-          backgroundColor: isDark ? '#0A121E' : '#FAF6EE',
-          borderColor: `${colors.border}20`,
+          backgroundColor: isDark ? '#12070A' : '#FAF6EE',
+          borderColor: `${colors.border}35`,
         }}
       >
         {[
@@ -161,17 +161,17 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
           { id: 'preview-pushpanjali', label: 'Pushpanjali' },
           { id: 'preview-scratch', label: 'Blessing' },
           { id: 'preview-vidhi', label: 'Vidhi' },
-          { id: 'preview-anumodna', label: 'Anumodna & Muhurat' },
+          { id: 'preview-anumodna', label: 'Anumodna' },
         ].map((item) => (
           <button
             key={item.id}
             type="button"
             onClick={() => scrollToSection(item.id)}
-            className="px-2 py-0.5 rounded-md border whitespace-nowrap transition cursor-pointer hover:brightness-110"
+            className="px-2.5 py-1 rounded-full border whitespace-nowrap transition cursor-pointer hover:scale-105 active:scale-95 shrink-0 shadow-2xs"
             style={{
-              backgroundColor: isDark ? '#1B263B' : '#FFFFFF',
-              borderColor: `${colors.border}40`,
-              color: colors.accentGold,
+              backgroundColor: isDark ? 'rgba(212, 175, 55, 0.18)' : '#FFFFFF',
+              borderColor: isDark ? 'rgba(212, 175, 55, 0.5)' : `${colors.border}50`,
+              color: isDark ? '#FFE599' : colors.primary || '#352516',
             }}
           >
             {item.label}
@@ -253,10 +253,16 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
             </div>
             
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl font-cormorant font-bold text-[#352516] mb-3 leading-tight drop-shadow-sm">
+            <h1 
+              className="text-3xl sm:text-4xl md:text-5xl font-cormorant font-bold mb-3 leading-tight drop-shadow-md text-center"
+              style={{ color: isDarkBg ? '#FFF1C5' : '#352516' }}
+            >
               Tapasya Pārna<br/>Mahotsav
             </h1>
-            <p className="font-cormorant italic text-base text-[#6F4E37] max-w-[280px] mx-auto leading-relaxed drop-shadow-sm font-semibold">
+            <p 
+              className="font-cormorant italic text-sm sm:text-base max-w-[280px] mx-auto leading-relaxed drop-shadow-sm font-semibold text-center"
+              style={{ color: isDarkBg ? '#F3E5AB' : '#6F4E37' }}
+            >
               Auspicious celebration of spiritual penance and soul purification
             </p>
           </div>
