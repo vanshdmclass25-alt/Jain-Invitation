@@ -15,7 +15,8 @@ export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }
     'Interactive Google Maps venue location with 1-tap directions',
     'Interactive Pushpanjali floral devotion & secret scratch card',
     'Instant digital invitation card download (high-res image)',
-    'Unlimited guests, shares, and lifetime website access',
+    '24-Hour Editing Pass (customize photos, music & details for 24h)',
+    'LIFETIME Live Website Access — your invitation website stays LIVE ALWAYS for all guests',
     'Zero advertisements or third-party banners',
   ];
 
@@ -59,13 +60,13 @@ export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }
 
             <div className="text-left sm:text-right">
               <div className="flex items-baseline sm:justify-end gap-2">
-                <span className="text-sm text-stone-400 line-through">₹1,499</span>
+                <span className="text-sm text-stone-400 line-through">₹999</span>
                 <span className="text-3xl sm:text-4xl font-black font-poppins text-[#2A2018]">
-                  ₹899
+                  ₹499
                 </span>
               </div>
               <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-1">
-                Special Offer (Save ₹600)
+                Special Offer (Save ₹500)
               </span>
             </div>
           </div>
@@ -90,7 +91,7 @@ export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }
               onClick={onCreateInvite}
               className="w-full py-4 px-6 rounded-full bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] font-poppins font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Create Your Invite Website — ₹899</span>
+              <span>Create Your Invite Website — ₹499</span>
               <ArrowRight className="w-4 h-4 text-[#E0A458]" />
             </button>
 

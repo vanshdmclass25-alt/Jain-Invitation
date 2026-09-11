@@ -247,11 +247,14 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
         Restricted Customization
       </span>
       <h2 className="text-2xl font-cinzel font-bold text-stone-800 mb-2">
-        24-Hour Single Template Pass
+        24-Hour Customization Pass
       </h2>
 
       <p className="text-xs text-stone-600 mb-6 leading-relaxed">
-        Upon approval, access is granted for <strong>1 selected template only</strong> for a period of <strong>24 hours</strong>, after which access automatically blocks.
+        Upon approval, <strong>24-hour editing access</strong> is granted for 1 selected template. <br/>
+        <span className="inline-block mt-1 text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 font-semibold text-[11px]">
+          ✦ Note: Your published invitation website remains <strong>LIVE ALWAYS</strong> for your guests!
+        </span>
       </p>
 
       {/* Alert if user has pass for OTHER template */}
@@ -289,10 +292,14 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
         <div className="bg-stone-50 border border-stone-300 p-4 rounded-xl mb-6 text-left space-y-2">
           <div className="flex items-center gap-2 text-stone-800 font-semibold text-xs">
             <Lock className="w-4 h-4 text-stone-600" />
-            <span>24h Pass Expired</span>
+            <span>24h Editing Window Expired</span>
           </div>
           <p className="text-xs text-stone-600 leading-normal">
-            Your previous 24-hour pass for <strong className="font-cinzel">{templateId}</strong> has ended. Request a pass renewal below to unlock the editor again.
+            Your 24-hour editing window for <strong className="font-cinzel">{templateId}</strong> has ended. <br/>
+            <span className="text-emerald-700 font-semibold block mt-1">
+              ✓ Your published invitation website remains LIVE ALWAYS for your guests!
+            </span>
+            If you need to edit details again, request a pass renewal below.
           </p>
           <button 
             onClick={handleRequestAccess}

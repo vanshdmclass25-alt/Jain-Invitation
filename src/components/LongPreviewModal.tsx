@@ -67,7 +67,7 @@ export const LongPreviewModal: React.FC<LongPreviewModalProps> = ({
                     Tattva Live Website Preview
                   </h3>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#3D3024] text-[#E0A458] border border-[#E0A458]/30">
-                    ₹899 Full Access
+                    ₹499 Full Access
                   </span>
                 </div>
                 <p className="text-[11px] text-[#A69989]">
@@ -204,7 +204,7 @@ export const LongPreviewModal: React.FC<LongPreviewModalProps> = ({
 
               <div className="p-3 rounded-xl bg-gradient-to-r from-[#C98A3E]/20 to-[#E0A458]/10 border border-[#C98A3E]/40 text-center">
                 <p className="text-[11px] font-semibold text-[#E0A458]">
-                  Price: ₹899 (One-Time) • Unlimited Guest Views
+                  Price: ₹499 (One-Time) • 24h Editing Access • Website Live Always
                 </p>
               </div>
             </div>

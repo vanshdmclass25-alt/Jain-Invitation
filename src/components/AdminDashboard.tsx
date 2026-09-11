@@ -209,7 +209,7 @@ export const AdminDashboard: React.FC = () => {
             Admin Approval Dashboard
           </h1>
           <p className="text-xs text-stone-500 mt-1">
-            Grant 24-hour access passes per template and automatically re-block upon expiration.
+            Grant 24-hour editing passes per template. (Note: Published invitations remain permanently LIVE for guests).
           </p>
         </div>
 

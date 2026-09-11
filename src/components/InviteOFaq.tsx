@@ -7,7 +7,11 @@ export const InviteOFaq: React.FC = () => {
   const faqs = [
     {
       q: 'How much does a Jain Tapasya Pārna invite website cost?',
-      a: '₹899, one time, for unlimited guests. There are no subscriptions, per-guest charges, or hidden fees. Your website stays active with all features included.',
+      a: '₹499, one time, for unlimited guests. There are no subscriptions, per-guest charges, or hidden fees. You get a 24-hour editing pass to customize all photos, music, and ceremony details, while your invitation website remains LIVE ALWAYS for your family and guests.',
+    },
+    {
+      q: 'How long does my invitation website stay live?',
+      a: 'Your invitation website stays LIVE ALWAYS with unlimited guest views and zero expiration. The 24-hour duration applies ONLY to editing/customization access in the editor. Once you save your details, your invitation link stays active permanently.',
     },
     {
       q: 'What is a Pārna invite website?',
