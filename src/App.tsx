@@ -14,6 +14,7 @@ import { TEMPLATES } from './config/templates';
 import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
 import { fetchInvitationById, getOrGenerateShortUrl } from './utils/shortener';
 import { downloadInvitationCard } from './utils/download';
+import { compressDataUrl } from './utils/image';
 import { 
   Eye, 
   Edit3, 
@@ -61,6 +62,49 @@ export function App() {
     }
     return false;
   });
+
+  // Auto-heal legacy uncompressed images so they can successfully save to Firestore under the 1MB limit
+  useEffect(() => {
+    if (isGuestView) return;
+    
+    const healLegacyData = async () => {
+      let modified = false;
+      const healedData = { ...data };
+      
+      try {
+        if (healedData.profileImage && healedData.profileImage.length > 500000) {
+          healedData.profileImage = await compressDataUrl(healedData.profileImage);
+          modified = true;
+        }
+        
+        if (healedData.yearlyPhotos && healedData.yearlyPhotos.length > 0) {
+          const newYearly = await Promise.all(healedData.yearlyPhotos.map(async (m) => {
+            if (m.photoUrl && m.photoUrl.length > 500000) {
+              return { ...m, photoUrl: await compressDataUrl(m.photoUrl) };
+            }
+            return m;
+          }));
+          
+          const anyChanged = newYearly.some((m, i) => m.photoUrl !== healedData.yearlyPhotos![i].photoUrl);
+          if (anyChanged) {
+            healedData.yearlyPhotos = newYearly;
+            modified = true;
+          }
+        }
+        
+        if (modified) {
+          setData(healedData);
+          saveInvitation(healedData);
+          // Silently sync the healed data to Firestore so their broken link instantly works
+          getOrGenerateShortUrl(healedData).catch(e => console.warn("Auto-heal sync failed:", e));
+        }
+      } catch (e) {
+        console.warn("Failed to heal legacy images:", e);
+      }
+    };
+    
+    healLegacyData();
+  }, [isGuestView]); // Only run once on mount for the editor view
 
   // Auto-detect if someone opened an existing invitation via URL or short link
   useEffect(() => {
