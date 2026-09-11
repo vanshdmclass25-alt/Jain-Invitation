@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Upload, Trash2, Eye, RefreshCw, Users, CheckCircle2 } from 'lucide-react';
 
+import { compressImage } from '../utils/image';
+
 interface FamilyPhotosUploaderProps {
   photos: string[];
   onChange: (photos: string[]) => void;
@@ -14,21 +16,25 @@ export const FamilyPhotosUploader: React.FC<FamilyPhotosUploaderProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
   // Strictly single family photo
   const currentPhoto = photos && photos.length > 0 ? photos[0] : '';
 
-  const handleSingleFile = (file: File | undefined | null) => {
+  const handleSingleFile = async (file: File | undefined | null) => {
     if (!file) return;
     if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/i)) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (typeof e.target?.result === 'string') {
-        onChange([e.target.result]);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsCompressing(true);
+    try {
+      const compressedDataUrl = await compressImage(file, 800, 0.7);
+      onChange([compressedDataUrl]);
+    } catch (e) {
+      console.error("Error compressing family photo:", e);
+      alert("Failed to process photo.");
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {

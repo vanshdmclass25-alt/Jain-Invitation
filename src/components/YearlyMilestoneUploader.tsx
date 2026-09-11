@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { Upload, Trash2, Camera, RefreshCw, Eye, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
 import { YearlyPhotoMilestone } from '../types';
 
+import { compressImage } from '../utils/image';
+
 interface YearlyMilestoneUploaderProps {
   milestone: YearlyPhotoMilestone;
   index: number;
@@ -20,21 +22,25 @@ export const YearlyMilestoneUploader: React.FC<YearlyMilestoneUploaderProps> = (
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
-  const handleFile = (file: File | undefined | null) => {
+  const handleFile = async (file: File | undefined | null) => {
     if (!file) return;
     if (!file.type.match(/^image\/(jpeg|jpg|png|webp|gif)$/i)) {
       alert('Please select a valid image file (JPG, PNG, WebP).');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (typeof e.target?.result === 'string') {
-        onUpdate('photoUrl', e.target.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsCompressing(true);
+    try {
+      const compressedDataUrl = await compressImage(file, 800, 0.7);
+      onUpdate('photoUrl', compressedDataUrl);
+    } catch (e) {
+      console.error("Error compressing yearly photo:", e);
+      alert("Failed to process photo.");
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {

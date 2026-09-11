@@ -1,6 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { Upload, RefreshCw, Trash2, Image as ImageIcon, Camera } from 'lucide-react';
 
+import { compressImage } from '../utils/image';
+
 interface ImageUploaderProps {
   label: string;
   image: string;
@@ -18,21 +20,25 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file) return;
     if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/i)) {
       alert('Please upload a valid JPG, PNG, or WebP image.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (typeof e.target?.result === 'string') {
-        onChange(e.target.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    setIsCompressing(true);
+    try {
+      const compressedDataUrl = await compressImage(file, 800, 0.7);
+      onChange(compressedDataUrl);
+    } catch (e) {
+      console.error("Error compressing image:", e);
+      alert("Failed to process image. Please try a different photo.");
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {

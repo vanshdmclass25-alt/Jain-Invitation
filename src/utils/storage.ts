@@ -6,8 +6,15 @@ const STORAGE_KEY = 'jain_parna_invitation_data_v1';
 export function loadSavedInvitation(): InvitationData {
   if (typeof window === 'undefined') return DEFAULT_INVITATION_DATA;
   try {
-    // 1. Check URL parameters first (allows shared URLs like ?name=...&tapasya=...)
     const params = new URLSearchParams(window.location.search);
+    
+    // If viewing a shared link by ID, DO NOT load from local storage
+    // otherwise the guest's own local draft will contaminate the viewed invitation!
+    if (params.get('id') || params.get('i')) {
+      return DEFAULT_INVITATION_DATA;
+    }
+
+    // 1. Check URL parameters first (allows shared URLs like ?name=...&tapasya=...)
     const urlData = params.get('invitation');
     if (urlData) {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(urlData))));

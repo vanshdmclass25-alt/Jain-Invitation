@@ -58,7 +58,10 @@ export function App() {
           .then((fetchedData) => {
             if (fetchedData) {
               setData(fetchedData);
-              saveInvitation(fetchedData);
+              // CRITICAL FIX: DO NOT call saveInvitation(fetchedData) here! 
+              // This is a guest viewing a shared link. We must not overwrite their own local draft.
+            } else {
+              alert("Sorry, we couldn't find this invitation. It may have expired or contained an invalid photo.");
             }
             setIsLoadingShortLink(false);
             setIsDoorRevealing(true);
