@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Share2, Copy, Check, ExternalLink, MessageCircle, Heart } from 'lucide-react';
 import { InvitationData, TemplateDefinition } from '../types';
 import { MahavirSwamiImage } from './MahavirSwamiImage';
+import { copyToClipboard } from '../utils/shortener';
 
 interface InviteOWhatsAppProofProps {
   data: InvitationData;
@@ -33,10 +34,12 @@ With the divine grace and blessings of *Bhagwan Mahavir Swami*, we cordially inv
 _Blessings & Pranam:_
 *${data.hostNames || 'Shah Parivar and Family'}*`;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(formattedShareText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+  const handleCopy = async () => {
+    const success = await copyToClipboard(formattedShareText);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   };
 
   const handleOpenWhatsApp = () => {

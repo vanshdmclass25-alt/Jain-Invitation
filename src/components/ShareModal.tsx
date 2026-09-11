@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { InvitationData } from '../types';
 import { generateShareableUrl } from '../utils/storage';
-import { getOrGenerateShortUrl } from '../utils/shortener';
+import { getOrGenerateShortUrl, copyToClipboard } from '../utils/shortener';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -56,9 +56,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     `Tap the link to view the complete invitation:\n${displayUrl}`
   );
 
-  const handleCopy = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(displayUrl);
+  const handleCopy = async () => {
+    const success = await copyToClipboard(displayUrl);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }

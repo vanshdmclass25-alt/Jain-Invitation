@@ -7,6 +7,42 @@ import { generateShareableUrl } from './storage';
 const shortUrlCache = new Map<string, string>();
 
 /**
+ * Robust clipboard copy function working across all desktop and mobile browsers
+ */
+export async function copyToClipboard(text: string): Promise<boolean> {
+  if (!text) return false;
+  
+  // 1. Modern Navigator Clipboard API
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch (err) {
+    console.warn('Navigator clipboard API failed, attempting fallback:', err);
+  }
+
+  // 2. ExecCommand Fallback (works in iFrames & non-HTTPS HTTP environments)
+  try {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    textArea.setAttribute('readonly', '');
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    const successful = document.execCommand('copy');
+    document.body.removeChild(textArea);
+    return successful;
+  } catch (err) {
+    console.error('Fallback execCommand copy failed:', err);
+    return false;
+  }
+}
+
+/**
  * Generates a deterministic short 7-character alphanumeric ID based on invitation content
  */
 export function generateShortId(data: InvitationData): string {
@@ -22,8 +58,7 @@ export function generateShortId(data: InvitationData): string {
 }
 
 /**
- * Creates a short invitation URL by saving payload to Firestore under a short ID,
- * then running it through an ultra-short link generator (is.gd / tinyurl).
+ * Creates a clean short invitation URL by saving payload to Firestore under a short ID.
  */
 export async function getOrGenerateShortUrl(data: InvitationData): Promise<string> {
   if (typeof window === 'undefined') return '';
@@ -49,13 +84,10 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
       });
     }
   } catch (err) {
-    console.warn('Firestore short document save warning:', err);
-    // If Firestore fails, fallback to standard encoded URL
-    const fallbackUrl = generateShareableUrl(data);
-    return fallbackUrl;
+    console.warn('Firestore short document save notice:', err);
   }
 
-  // 2. Shorten the clean direct short URL via backend API (is.gd / tinyurl)
+  // 2. Shorten via backend API (is.gd / tinyurl)
   let finalShortUrl = directShortUrl;
   try {
     const res = await fetch('/api/shorten-url', {
@@ -70,7 +102,7 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
       }
     }
   } catch (err) {
-    console.warn('Shortener service fetch warning:', err);
+    console.warn('Shortener service fetch notice:', err);
   }
 
   shortUrlCache.set(shortId, finalShortUrl);
@@ -96,3 +128,4 @@ export async function fetchInvitationById(id: string): Promise<InvitationData | 
   }
   return null;
 }
+

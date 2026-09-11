@@ -374,14 +374,14 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
                     key={lang}
                     type="button"
                     onClick={() => setActiveLang(lang)}
-                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium border transition cursor-pointer ${
+                    className={`px-3 py-1 rounded-full text-[11px] font-semibold border transition-all cursor-pointer ${
                       isSelected
-                        ? 'font-bold shadow-xs'
-                        : 'opacity-70 hover:opacity-100'
+                        ? 'shadow-xs'
+                        : 'hover:bg-stone-200/50'
                     }`}
                     style={{
-                      backgroundColor: isSelected ? colors.primary : 'transparent',
-                      color: isSelected ? colors.secondary : colors.text,
+                      backgroundColor: isSelected ? colors.primary : 'rgba(0, 0, 0, 0.04)',
+                      color: isSelected ? '#FFFFFF' : colors.text || '#2B080F',
                       borderColor: isSelected ? colors.primary : `${colors.border}60`,
                     }}
                   >

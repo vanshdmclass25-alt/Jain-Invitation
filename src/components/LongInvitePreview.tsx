@@ -345,14 +345,15 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
             </div>
           </div>
           
-          <h2 className="text-2xl font-bold tracking-tight mt-1 mb-1" style={{ color: canvasTextColor }}>
+          {/* Tapasvi Name & Type - High contrast dark text for bg-[#FAF6EB] */}
+          <h2 className="text-2xl font-bold tracking-tight mt-1 mb-1 text-[#2B080F]">
             {data.name || 'Tapasvi Name'}
           </h2>
-          <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: colors.accentGold }}>
+          <p className="text-xs sm:text-sm font-bold uppercase tracking-wider mb-2 text-[#8C5D1F]">
             {data.tapasyaType || t.defaultTapasyaName}
           </p>
           {data.hostNames && (
-            <p className="text-xs font-cormorant italic" style={{ color: canvasSubtextColor }}>
+            <p className="text-xs sm:text-sm font-cormorant italic font-medium text-[#6F4E37]">
               {t.familyHostedBy(data.hostNames)}
             </p>
           )}
@@ -371,25 +372,28 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
               borderColor: `${colors.border}50`
             }}
           >
-            {/* Language Selector */}
-            <div className="flex items-center justify-center gap-1.5 mb-2">
-              {(['gu', 'hi', 'en'] as const).map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  onClick={() => setActiveLang(lang)}
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium border cursor-pointer ${
-                    activeLang === lang ? 'font-bold' : 'opacity-70'
-                  }`}
-                  style={{
-                    backgroundColor: activeLang === lang ? colors.primary : 'transparent',
-                    color: activeLang === lang ? colors.secondary : canvasTextColor,
-                    borderColor: activeLang === lang ? colors.primary : `${colors.border}60`,
-                  }}
-                >
-                  {lang === 'gu' ? 'ગુજરાતી' : lang === 'hi' ? 'हिंदी' : 'English'}
-                </button>
-              ))}
+            {/* Language Selector - High contrast active and inactive pills */}
+            <div className="flex items-center justify-center gap-1.5 mb-3">
+              {(['gu', 'hi', 'en'] as const).map((lang) => {
+                const isActive = activeLang === lang;
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => setActiveLang(lang)}
+                    className={`px-3 py-1 rounded-full text-[11px] font-semibold border cursor-pointer transition-all ${
+                      isActive ? 'shadow-xs' : 'hover:bg-stone-200/50'
+                    }`}
+                    style={{
+                      backgroundColor: isActive ? colors.primary : 'rgba(0, 0, 0, 0.04)',
+                      color: isActive ? '#FFFFFF' : colors.text || '#2B080F',
+                      borderColor: isActive ? colors.primary : `${colors.border}60`,
+                    }}
+                  >
+                    {lang === 'gu' ? 'ગુજરાતી' : lang === 'hi' ? 'हिंदी' : 'English'}
+                  </button>
+                );
+              })}
             </div>
 
             <h3 
