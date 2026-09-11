@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Music, Play, Pause, Check, Volume2, Sparkles, VolumeX, Upload, Link, Trash2, ShieldCheck, Disc } from 'lucide-react';
 import { TAPASYA_SONGS, spiritualAudio } from '../utils/audio';
 
@@ -22,6 +22,15 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(spiritualAudio.getStatus());
   const [activeUrlInputSongId, setActiveUrlInputSongId] = useState<string | null>(null);
   const [tempUrlInput, setTempUrlInput] = useState<string>('');
+
+  useEffect(() => {
+    const update = () => {
+      setIsPlaying(spiritualAudio.getStatus());
+    };
+    update();
+    const unsub = spiritualAudio.subscribe(update);
+    return unsub;
+  }, []);
 
   const handleSelect = (songId: string) => {
     onSelectSong(songId);
