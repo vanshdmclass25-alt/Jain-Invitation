@@ -351,10 +351,10 @@ class AmbientSpiritualAudio {
 
     if (fileIdMatch && fileIdMatch[1]) {
       const id = fileIdMatch[1];
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
       return [
+        `${origin}/api/audio-proxy?id=${id}`,
         `/api/audio-proxy?id=${id}`,
-        `https://drive.usercontent.google.com/download?id=${id}&export=download`,
-        `https://drive.google.com/uc?export=download&id=${id}`,
       ];
     }
 
@@ -492,15 +492,17 @@ class AmbientSpiritualAudio {
                 }
               }
             },
-            onError: () => {
-              console.warn('YouTube audio notice: Fallback to Web Audio Synth');
-              this.startWebAudioBhaktiSynth();
+            onError: (err) => {
+              console.warn('YouTube audio playback notice:', err);
+              this.isPlaying = false;
+              this.notify();
             },
           },
         });
       } catch (err) {
         console.warn('YouTube player setup note:', err);
-        this.startWebAudioBhaktiSynth();
+        this.isPlaying = false;
+        this.notify();
       }
     } else {
       try {
@@ -509,7 +511,8 @@ class AmbientSpiritualAudio {
         this.isPlaying = true;
         this.notify();
       } catch {
-        this.startWebAudioBhaktiSynth();
+        this.isPlaying = false;
+        this.notify();
       }
     }
   }
@@ -614,7 +617,7 @@ class AmbientSpiritualAudio {
         });
       }
     } else {
-      // Fallback to YouTube if available or Web Audio Bhakti Synth
+      // Fallback to YouTube if available
       const song = this.getCurrentSong();
       if (song?.youtubeUrl) {
         const ytId = extractYouTubeId(song.youtubeUrl);
@@ -624,9 +627,9 @@ class AmbientSpiritualAudio {
         }
       }
 
-      // Ultimate zero-network Web Audio synthesizer fallback
-      console.warn('All streaming sources failed. Activating Web Audio Bhakti Synth');
-      this.startWebAudioBhaktiSynth();
+      console.warn('Audio stream unavailable for current track:', this.currentSongId);
+      this.isPlaying = false;
+      this.notify();
     }
   }
 
@@ -732,7 +735,8 @@ class AmbientSpiritualAudio {
 
     const candidates = this.getCandidateUrls(this.currentSongId);
     if (candidates.length === 0) {
-      this.startWebAudioBhaktiSynth();
+      this.isPlaying = false;
+      this.notify();
       return;
     }
 
@@ -760,9 +764,20 @@ class AmbientSpiritualAudio {
             this.notify();
           })
           .catch((err) => {
-            console.warn('Audio play request notice:', err);
-            // Try next fallback or synth
-            this.handleStreamError();
+            console.warn('Audio play request notice (waiting for user gesture):', err);
+            // On user interaction retry
+            const retry = () => {
+              if (this.currentSongId !== 'none' && !this.isPlaying) {
+                audio.play().then(() => {
+                  this.isPlaying = true;
+                  this.notify();
+                }).catch(() => {});
+              }
+              window.removeEventListener('click', retry);
+              window.removeEventListener('pointerdown', retry);
+            };
+            window.addEventListener('click', retry, { once: true });
+            window.addEventListener('pointerdown', retry, { once: true });
           });
       } else {
         this.isPlaying = true;
