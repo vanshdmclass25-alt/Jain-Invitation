@@ -72,15 +72,15 @@ export function App() {
       const healedData = { ...data };
       
       try {
-        if (healedData.profileImage && healedData.profileImage.length > 500000) {
-          healedData.profileImage = await compressDataUrl(healedData.profileImage);
+        if (healedData.profileImage && healedData.profileImage.length > 100000) {
+          healedData.profileImage = await compressDataUrl(healedData.profileImage, 400, 0.6);
           modified = true;
         }
         
         if (healedData.yearlyPhotos && healedData.yearlyPhotos.length > 0) {
           const newYearly = await Promise.all(healedData.yearlyPhotos.map(async (m) => {
-            if (m.photoUrl && m.photoUrl.length > 500000) {
-              return { ...m, photoUrl: await compressDataUrl(m.photoUrl) };
+            if (m.photoUrl && m.photoUrl.length > 100000) {
+              return { ...m, photoUrl: await compressDataUrl(m.photoUrl, 400, 0.6) };
             }
             return m;
           }));
@@ -153,15 +153,15 @@ export function App() {
               if (recoveredData) {
                 // It's the creator! Auto-heal their massive images right now and sync to database.
                 let modified = false;
-                if (recoveredData.profileImage && recoveredData.profileImage.length > 500000) {
-                  recoveredData.profileImage = await compressDataUrl(recoveredData.profileImage);
+                if (recoveredData.profileImage && recoveredData.profileImage.length > 100000) {
+                  recoveredData.profileImage = await compressDataUrl(recoveredData.profileImage, 400, 0.6);
                   modified = true;
                 }
                 if (recoveredData.yearlyPhotos && recoveredData.yearlyPhotos.length > 0) {
                   recoveredData.yearlyPhotos = await Promise.all(recoveredData.yearlyPhotos.map(async (m: any) => {
-                    if (m.photoUrl && m.photoUrl.length > 500000) {
+                    if (m.photoUrl && m.photoUrl.length > 100000) {
                       modified = true;
-                      return { ...m, photoUrl: await compressDataUrl(m.photoUrl) };
+                      return { ...m, photoUrl: await compressDataUrl(m.photoUrl, 400, 0.6) };
                     }
                     return m;
                   }));

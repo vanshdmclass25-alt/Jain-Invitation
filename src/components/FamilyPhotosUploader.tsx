@@ -27,7 +27,7 @@ export const FamilyPhotosUploader: React.FC<FamilyPhotosUploaderProps> = ({
 
     setIsCompressing(true);
     try {
-      const compressedDataUrl = await compressImage(file, 800, 0.7);
+      const compressedDataUrl = await compressImage(file, 400, 0.6);
       onChange([compressedDataUrl]);
     } catch (e) {
       console.error("Error compressing family photo:", e);

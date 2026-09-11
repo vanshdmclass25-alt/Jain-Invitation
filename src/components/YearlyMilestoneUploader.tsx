@@ -33,7 +33,7 @@ export const YearlyMilestoneUploader: React.FC<YearlyMilestoneUploaderProps> = (
 
     setIsCompressing(true);
     try {
-      const compressedDataUrl = await compressImage(file, 800, 0.7);
+      const compressedDataUrl = await compressImage(file, 400, 0.6);
       onUpdate('photoUrl', compressedDataUrl);
     } catch (e) {
       console.error("Error compressing yearly photo:", e);
