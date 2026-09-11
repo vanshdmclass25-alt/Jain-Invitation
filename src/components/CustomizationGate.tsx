@@ -192,7 +192,7 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
   }
 
   const isPassActive = matchingReq && matchingReq.status === 'approved' && expiresTime > now;
-  const isPassExpired = matchingReq && matchingReq.status === 'approved' && expiresTime <= now;
+  const isPassExpired = matchingReq && (matchingReq.status === 'expired' || (matchingReq.status === 'approved' && expiresTime <= now));
   const isPending = matchingReq && matchingReq.status === 'pending';
 
   // Format remaining time for active pass

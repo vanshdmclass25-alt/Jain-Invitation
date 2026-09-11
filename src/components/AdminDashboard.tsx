@@ -142,7 +142,11 @@ export const AdminDashboard: React.FC = () => {
       expiresTime = approvedTime + 24 * 60 * 60 * 1000;
     }
 
-    if (!expiresTime || req.status === 'expired' || now > expiresTime) {
+    if (req.status === 'expired') {
+      return { status: 'expired', label: 'Stopped / Expired (Access Locked)', color: 'bg-stone-200 text-stone-700 border-stone-300' };
+    }
+
+    if (!expiresTime || now > expiresTime) {
       return { status: 'expired', label: 'Expired (24h Pass Ended)', color: 'bg-stone-200 text-stone-700 border-stone-300' };
     }
 
@@ -296,7 +300,7 @@ export const AdminDashboard: React.FC = () => {
                               title="Grant 24-hour access pass for this specific template"
                             >
                               <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Approve 24h Pass</span>
+                              <span>{passInfo.status === 'expired' ? 'Re-Approve 24h Pass' : 'Approve 24h Pass'}</span>
                             </button>
                           )}
 
@@ -312,10 +316,11 @@ export const AdminDashboard: React.FC = () => {
                               </button>
                               <button 
                                 onClick={() => handleRevoke(req.id)}
-                                className="text-stone-700 bg-stone-100 hover:bg-stone-200 border border-stone-300 px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer"
-                                title="Instantly block access"
+                                className="text-white bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg font-semibold shadow-2xs transition cursor-pointer flex items-center gap-1"
+                                title="Instantly stop editable access for this user midway"
                               >
-                                Revoke
+                                <XCircle className="w-3.5 h-3.5" />
+                                <span>Stop Editable Access</span>
                               </button>
                             </>
                           )}
