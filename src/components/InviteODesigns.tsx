@@ -46,14 +46,14 @@ export const InviteODesigns: React.FC<InviteODesignsProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Top Language Toggle like User screenshot */}
-        <div className="flex justify-center mb-10">
-          <div className="bg-white rounded-full p-1.5 flex items-center shadow-sm border border-[#E0A458]/20 gap-1">
-            <span className="px-3 text-sm text-stone-600 font-medium mr-1">Preview in:</span>
+        <div className="flex justify-center mb-8 sm:mb-10 px-2">
+          <div className="bg-white rounded-2xl sm:rounded-full p-1.5 flex flex-wrap sm:flex-nowrap items-center justify-center shadow-sm border border-[#E0A458]/20 gap-1 max-w-full">
+            <span className="px-2 text-xs sm:text-sm text-stone-600 font-medium whitespace-nowrap">Preview in:</span>
             {(['gu', 'hi', 'en'] as const).map((lang) => (
               <button
                 key={lang}
                 onClick={() => setSelectedLang(lang)}
-                className={`px-6 py-1.5 rounded-full text-sm font-medium transition-all ${
+                className={`px-3.5 sm:px-6 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
                   selectedLang === lang 
                     ? 'bg-[#352516] text-white shadow-md' 
                     : 'text-stone-600 hover:bg-stone-100'

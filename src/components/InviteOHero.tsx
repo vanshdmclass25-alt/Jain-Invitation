@@ -90,9 +90,9 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.1 }}
-              className="font-cormorant text-4xl sm:text-5xl md:text-6xl lg:text-[4rem] font-bold text-[#352516] tracking-tight leading-[1.1] mb-5"
+              className="font-cormorant text-3xl sm:text-4xl md:text-5xl lg:text-[3.75rem] font-bold text-[#352516] tracking-tight leading-[1.15] mb-4 sm:mb-5"
             >
-              Your own <span className="text-[#C08B46] italic relative inline-block underline decoration-1 underline-offset-8">Jain Tapasya Pārna</span> <br className="hidden lg:block"/> invite website by <span className="font-bold text-[#6F4E37]">Tattva</span> — <br className="hidden lg:block"/> ready in 2 minutes
+              Your own <span className="text-[#C08B46] italic relative inline-block underline decoration-1 underline-offset-4 sm:underline-offset-8">Jain Tapasya Pārna</span> <br className="hidden lg:block"/> invite website by <span className="font-bold text-[#6F4E37]">Tattva</span> — ready in 2 minutes
             </motion.h1>
 
             {/* Subtitle */}
@@ -100,7 +100,7 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-[#5C4E42] text-base sm:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed mb-8"
+              className="text-[#5C4E42] text-sm sm:text-base md:text-lg max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed mb-6 sm:mb-8"
             >
               Not a card. Not a PDF — a real interactive website your guests walk through on their phone, shared as one WhatsApp link. Featuring sacred Bhagwan Mahavir Swami darshan, tapasvi photo, and event details. No calls, no waiting.
             </motion.p>
@@ -110,12 +110,12 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8"
             >
               <button
                 id="hero-create-btn"
                 onClick={onCreateInvite}
-                className="w-full sm:w-auto px-6 py-4 rounded-full bg-[#301E13] hover:bg-[#1A0F08] text-[#FBF8EE] font-poppins font-semibold text-base shadow-xl shadow-[#2A2018]/25 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-[#301E13] hover:bg-[#1A0F08] text-[#FBF8EE] font-poppins font-semibold text-sm sm:text-base shadow-xl shadow-[#2A2018]/25 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
               >
                 <span>Create yours — ₹899</span>
                 <ArrowRight className="w-4 h-4 text-[#E0A458]" />
@@ -124,7 +124,7 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               <button
                 id="hero-sample-btn"
                 onClick={onSeeRealInvite}
-                className="w-full sm:w-auto px-5 py-4 rounded-full bg-white hover:bg-stone-50 text-[#2A2018] font-poppins font-medium text-sm border border-stone-300/80 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-5 py-3.5 sm:py-4 rounded-full bg-white hover:bg-stone-50 text-[#2A2018] font-poppins font-medium text-sm border border-stone-300/80 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Eye className="w-4 h-4 text-[#C98A3E]" />
                 <span>See sample</span>
@@ -196,7 +196,7 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative w-full max-w-[340px] sm:max-w-[365px]"
+              className="relative w-full max-w-[300px] min-[380px]:max-w-[340px] sm:max-w-[365px]"
             >
               {/* Outer Phone Hardware Shell */}
               <div className="relative rounded-[48px] p-3 bg-[#2A2018] shadow-2xl border-[5px] border-[#3D3024]">

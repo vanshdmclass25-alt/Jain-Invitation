@@ -32,13 +32,13 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-[#FAF8EE]/95 border-b border-[#E0A458]/30 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
         
         {/* Brand / Logo (Tattva Paarna Invitations) */}
         <button
           id="nav-brand-btn"
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-2.5 text-left group transition cursor-pointer"
+          className="flex items-center gap-2 text-left group transition cursor-pointer shrink-0"
         >
           <TattvaLogo size="sm" showText={true} />
         </button>
@@ -70,17 +70,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right Navigation Actions */}
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
           {/* Sacred Door Entrance & Digital Tilak Ceremony Trigger */}
           {onOpenDoorCeremony && (
             <button
               id="nav-door-ceremony-btn"
               onClick={onOpenDoorCeremony}
               title="Experience Bhagwan Mahavir Swami Darshan, Sacred Doors & Digital Tilak"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] via-[#F6E8C3] to-[#ECCF8D] border border-[#D4AF37] hover:shadow-sm transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] via-[#F6E8C3] to-[#ECCF8D] border border-[#D4AF37] hover:shadow-sm transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#B8860B] animate-pulse" />
-              <span>॥ પાવન દ્વાર & તિલક ॥</span>
+              <Sparkles className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#B8860B] animate-pulse shrink-0" />
+              <span>
+                <span className="hidden min-[400px]:inline">॥ પાવન </span>દ્વાર & તિલક<span className="hidden min-[400px]:inline"> ॥</span>
+              </span>
             </button>
           )}
 
@@ -90,9 +92,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="nav-print-pdf-btn"
               onClick={onOpenPrint}
               title="Print or Save PDF for elderly relatives"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-[#543007] bg-[#FFFBF0] border border-[#D4AF37]/70 hover:bg-[#FDF4D9] transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold text-[#543007] bg-[#FFFBF0] border border-[#D4AF37]/70 hover:bg-[#FDF4D9] transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <Printer className="w-3.5 h-3.5 text-[#8C5D1F]" />
+              <Printer className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#8C5D1F] shrink-0" />
               <span className="hidden sm:inline">પ્રિન્ટ / PDF</span>
             </button>
           )}
@@ -102,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             id="audio-toggle-btn"
             onClick={toggleSound}
             title={isPlayingAudio ? 'Mute sacred ambient sound' : 'Play sacred ambient sound'}
-            className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium transition-all cursor-pointer shrink-0 whitespace-nowrap ${
               isPlayingAudio
                 ? 'bg-[#E0A458]/20 text-[#8C5D1F] border border-[#E0A458]'
                 : 'bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-200'
@@ -110,12 +112,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             {isPlayingAudio ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#C98A3E]" />
+                <Volume2 className="w-3 sm:w-3.5 h-3 sm:h-3.5 animate-pulse text-[#C98A3E] shrink-0" />
                 <span className="hidden md:inline">Stotra Audio</span>
               </>
             ) : (
               <>
-                <VolumeX className="w-3.5 h-3.5 text-stone-500" />
+                <VolumeX className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-stone-500 shrink-0" />
                 <span className="hidden md:inline">Sound</span>
               </>
             )}
@@ -126,9 +128,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="view-full-invite-nav-btn"
               onClick={() => onNavigate('invitation')}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] shadow-sm transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] shadow-sm transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <Eye className="w-3.5 h-3.5 text-[#E0A458]" />
+              <Eye className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#E0A458] shrink-0" />
               <span>Full Invite</span>
             </button>
           )}
@@ -137,9 +139,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="edit-details-nav-btn"
               onClick={() => onNavigate('editor')}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#FAF4E6] border border-[#E0A458]/50 hover:bg-[#F3ECCE] text-[#8C5D1F] transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#FAF4E6] border border-[#E0A458]/50 hover:bg-[#F3ECCE] text-[#8C5D1F] transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <Edit3 className="w-3.5 h-3.5" />
+              <Edit3 className="w-3 sm:w-3.5 h-3 sm:h-3.5 shrink-0" />
               <span>Edit Details</span>
             </button>
           )}
@@ -149,9 +151,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="share-nav-btn"
               onClick={onOpenShare}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#008069] hover:bg-[#006A57] text-white shadow-sm transition cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#008069] hover:bg-[#006A57] text-white shadow-sm transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3 sm:w-3.5 h-3 sm:h-3.5 shrink-0" />
               <span>Share</span>
             </button>
           )}
@@ -160,20 +162,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               id="nav-create-btn"
               onClick={() => onNavigate('editor')}
-              className="px-4 py-1.5 rounded-full text-xs font-bold font-poppins bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] shadow-sm flex items-center gap-1.5 transition cursor-pointer"
+              className="px-2.5 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-bold font-poppins bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] shadow-sm flex items-center gap-1 sm:gap-1.5 transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <span>Create — ₹899</span>
-              <ArrowRight className="w-3 h-3 text-[#E0A458]" />
+              <span>Create <span className="hidden min-[380px]:inline">— ₹899</span></span>
+              <ArrowRight className="w-3 h-3 text-[#E0A458] shrink-0" />
             </button>
           )}
         </div>
       </div>
     
       {/* Sacred Invocation Banner */}
-      <div className="w-full bg-[#FAF8F3] border-t border-b border-[#D4AF37]/30 py-1.5 flex justify-center">
-        <span className="font-hindi text-[11px] text-[#C08B46] tracking-widest font-medium">॥ श्री महावीराय नमः ॥</span>
+      <div className="w-full bg-[#FAF8F3] border-t border-b border-[#D4AF37]/30 py-1 px-2 flex justify-center overflow-hidden">
+        <span className="font-hindi text-[10px] sm:text-[11px] text-[#C08B46] tracking-widest font-medium whitespace-nowrap truncate">
+          ॥ श्री महावीराय नमः ॥
+        </span>
       </div>
     </header>
-
   );
 };
