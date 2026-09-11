@@ -1,5 +1,6 @@
 import React from 'react';
 import { Check, Sparkles, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
+import { PriceTagBadge } from './PriceTagBadge';
 
 interface InviteOPricingProps {
   onCreateInvite: () => void;
@@ -87,13 +88,18 @@ export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }
 
           {/* Action CTA */}
           <div className="pt-6 border-t border-stone-100">
-            <button
-              onClick={onCreateInvite}
-              className="w-full py-4 px-6 rounded-full bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] font-poppins font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>Create Your Invite Website — ₹499</span>
-              <ArrowRight className="w-4 h-4 text-[#E0A458]" />
-            </button>
+            <div className="relative">
+              <div className="absolute -top-3.5 left-2 sm:left-4 z-20">
+                <PriceTagBadge price="₹499" period="ONE-TIME" />
+              </div>
+              <button
+                onClick={onCreateInvite}
+                className="w-full py-4 px-6 rounded-full bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] font-poppins font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Create Your Invite Website — ₹499</span>
+                <ArrowRight className="w-4 h-4 text-[#E0A458]" />
+              </button>
+            </div>
 
             <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-stone-500">
               <span className="flex items-center gap-1">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { PriceTagBadge } from './PriceTagBadge';
 
 interface InviteOCtaBandProps {
   onCreateInvite: () => void;
@@ -29,14 +30,19 @@ export const InviteOCtaBand: React.FC<InviteOCtaBandProps> = ({ onCreateInvite }
           Create your own interactive invitation website right now. It takes less than 2 minutes and is ready to share on WhatsApp.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button
-            onClick={onCreateInvite}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#E0A458] hover:bg-[#C98A3E] text-[#2A2018] font-poppins font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
-          >
-            <span>Create Your Invite Website</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <div className="relative inline-block w-full sm:w-auto">
+            <div className="absolute -top-3.5 -left-1 sm:-left-2 z-20">
+              <PriceTagBadge price="₹499" period="ONE-TIME" />
+            </div>
+            <button
+              onClick={onCreateInvite}
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#E0A458] hover:bg-[#C98A3E] text-[#2A2018] font-poppins font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
+            >
+              <span>Create Your Invite Website</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <p className="text-[11px] text-stone-400 mt-4">

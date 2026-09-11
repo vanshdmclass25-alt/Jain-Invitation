@@ -5,6 +5,7 @@ import { MahavirSwamiImage } from './MahavirSwamiImage';
 import { InvitationData, TemplateDefinition } from '../types';
 import { spiritualAudio } from '../utils/audio';
 import { LongInvitePreview } from './LongInvitePreview';
+import { PriceTagBadge } from './PriceTagBadge';
 
 interface InviteOHeroProps {
   data: InvitationData;
@@ -110,21 +111,28 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-8"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-4 mb-8 pt-2"
             >
-              <button
-                id="hero-create-btn"
-                onClick={onCreateInvite}
-                className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-[#301E13] hover:bg-[#1A0F08] text-[#FBF8EE] font-poppins font-semibold text-sm sm:text-base shadow-xl shadow-[#2A2018]/25 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
-              >
-                <span>Create yours</span>
-                <ArrowRight className="w-4 h-4 text-[#E0A458]" />
-              </button>
+              {/* Primary CTA with Tilted Price Tag Badge */}
+              <div className="relative inline-block w-full sm:w-auto">
+                <div className="absolute -top-3.5 -left-1 sm:-left-2 z-20">
+                  <PriceTagBadge price="₹499" period="ONE-TIME" />
+                </div>
+
+                <button
+                  id="hero-create-btn"
+                  onClick={onCreateInvite}
+                  className="w-full sm:w-auto px-7 py-3.5 sm:py-4 rounded-full bg-[#301E13] hover:bg-[#1A0F08] text-[#FBF8EE] font-poppins font-semibold text-sm sm:text-base shadow-xl shadow-[#2A2018]/25 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <span>Create yours</span>
+                  <ArrowRight className="w-4 h-4 text-[#E0A458]" />
+                </button>
+              </div>
 
               <button
                 id="hero-sample-btn"
                 onClick={onSeeRealInvite}
-                className="w-full sm:w-auto px-5 py-3.5 sm:py-4 rounded-full bg-white hover:bg-stone-50 text-[#2A2018] font-poppins font-medium text-sm border border-stone-300/80 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-white hover:bg-stone-50 text-[#2A2018] font-poppins font-medium text-sm border border-stone-300/80 shadow-xs hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Eye className="w-4 h-4 text-[#C98A3E]" />
                 <span>See sample</span>
@@ -136,26 +144,33 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 pt-4 border-t border-[#E0A458]/25 text-xs text-[#5C4E42]"
+              className="flex flex-col gap-2 pt-4 border-t border-[#E0A458]/25 text-xs text-[#5C4E42]"
             >
-              <div className="flex items-center gap-1.5">
-                <div className="flex text-amber-500">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                  ))}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6">
+                <div className="flex items-center gap-1.5">
+                  <div className="flex text-amber-500">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
+                  <span className="font-semibold text-[#2A2018]">5/5</span>
+                  <span>by 1,200+ Jain families</span>
                 </div>
-                <span className="font-semibold text-[#2A2018]">5/5</span>
-                <span>by 1,200+ Jain families</span>
+
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#C98A3E]" />
+                  <span>2 min self-serve</span>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-[#C98A3E]" />
+                  <span>Unlimited guests</span>
+                </div>
               </div>
 
-              <div className="hidden sm:flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#C98A3E]" />
-                <span>2 min self-serve</span>
-              </div>
-
-              <div className="hidden sm:flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-[#C98A3E]" />
-                <span>Unlimited guests</span>
+              {/* Explicit pricing disclaimer line */}
+              <div className="text-center lg:text-left text-[11px] font-medium text-[#7C6352] mt-0.5">
+                <span className="font-bold text-[#2A2018]">₹499</span> one-time · no hidden fees
               </div>
             </motion.div>
           </div>
