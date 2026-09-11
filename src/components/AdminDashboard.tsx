@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, query, getDocs, doc, updateDoc, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, orderBy, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ShieldCheck, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Lock } from 'lucide-react';
 
 interface Request {
@@ -30,26 +30,31 @@ export const AdminDashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const fetchRequests = async () => {
-    setLoading(true);
-    try {
-      const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Request[];
-      setRequests(data);
-    } catch (e) {
-      console.error("Error fetching requests:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (!isAdmin) {
       setLoading(false);
       return;
     }
-    fetchRequests();
+
+    setLoading(true);
+    const q = query(collection(db, 'requests'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Request[];
+        setRequests(data);
+        setLoading(false);
+      },
+      (e) => {
+        console.error('Error fetching requests:', e);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
   }, [isAdmin]);
 
   const handleApprove24h = async (id: string, currentExpiresAt?: any) => {
@@ -218,11 +223,10 @@ export const AdminDashboard: React.FC = () => {
         </div>
 
         <button
-          onClick={fetchRequests}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg bg-green-50 text-green-700 transition cursor-default pointer-events-none"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
-          <span>Refresh List</span>
+          <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
+          <span>Live Auto-Sync</span>
         </button>
       </div>
 
