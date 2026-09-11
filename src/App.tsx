@@ -124,6 +124,8 @@ export function App() {
               setData(fetchedData);
               // CRITICAL FIX: DO NOT call saveInvitation(fetchedData) here! 
               // This is a guest viewing a shared link. We must not overwrite their own local draft.
+              setIsLoadingShortLink(false);
+              setIsDoorRevealing(true);
             } else {
               // FALLBACK: If the data is missing from the database (e.g. legacy 1MB limit issue),
               // Check if the person clicking the link is ACTUALLY the creator!
@@ -170,12 +172,19 @@ export function App() {
                 
                 // Since they are the creator, let's treat them as the editor so they can make changes
                 setIsGuestView(false);
+                setIsLoadingShortLink(false);
+                setIsDoorRevealing(true);
               } else {
-                alert("Sorry, we couldn't find this invitation. It may have expired or contained an invalid photo.");
+                // If it's truly lost or the link is invalid, don't show an ugly alert and black screen.
+                // Reset them gracefully back to the landing page so they can create a new one.
+                console.warn("Invitation not found. Redirecting to landing page.");
+                setCurrentView('landing');
+                setDoorDestinationView('landing');
+                window.history.replaceState({}, document.title, "/");
+                setIsLoadingShortLink(false);
+                setIsDoorRevealing(false); // Do not reveal the door, just go to landing page
               }
             }
-            setIsLoadingShortLink(false);
-            setIsDoorRevealing(true);
           })
           .catch((err) => {
             console.error('Error fetching short link invitation:', err);
