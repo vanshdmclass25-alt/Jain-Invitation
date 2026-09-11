@@ -12,7 +12,6 @@ import {
 } from '../config/assets';
 import { MahavirSwamiImage } from './MahavirSwamiImage';
 import { SereneParticleSystem } from './SereneParticleSystem';
-import { DigitalTilakCeremony } from './DigitalTilakCeremony';
 import confetti from 'canvas-confetti';
 
 interface DoorRevealProps {
@@ -36,7 +35,6 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
   const [doorsFullyOpen, setDoorsFullyOpen] = useState(false);
-  const [showTilakCeremony, setShowTilakCeremony] = useState(false);
   const [textPhase, setTextPhase] = useState<'awaits' | 'enter' | 'darshan'>('enter');
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -84,15 +82,17 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
       setTextPhase('darshan');
     }, 1400);
 
-    // Transition to Digital Tilak ceremony after appreciating Bhagwan Mahavir Swami
+    // Directly open the invitation after appreciating Bhagwan Mahavir Swami
     autoAdvanceRef.current = setTimeout(() => {
-      setShowTilakCeremony(true);
-    }, 4200);
+      setIsOpen(true);
+      onDoorOpened();
+    }, 2800);
   };
 
   const handleProceed = () => {
     if (autoAdvanceRef.current) clearTimeout(autoAdvanceRef.current);
-    setShowTilakCeremony(true);
+    setIsOpen(true);
+    onDoorOpened();
   };
 
   const handleStageClick = () => {
@@ -102,24 +102,6 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
       handleProceed();
     }
   };
-
-  // If user transitions to the Digital Tilak ceremony
-  if (showTilakCeremony) {
-    return (
-      <DigitalTilakCeremony
-        data={invitationData || DEFAULT_INVITATION_DATA}
-        template={template}
-        onComplete={() => {
-          setIsOpen(true);
-          onDoorOpened();
-        }}
-        onSkip={() => {
-          setIsOpen(true);
-          onDoorOpened();
-        }}
-      />
-    );
-  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#110D09]/95 backdrop-blur-xl overflow-hidden px-4">
@@ -359,7 +341,7 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                     </h3>
                   </motion.div>
 
-                  {/* Action Button to enter the invitation via Tilak */}
+                  {/* Action Button to enter the invitation directly */}
                   <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={isOpening ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
@@ -370,7 +352,7 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                     }}
                     className="mt-3 px-5 py-2 rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C29B38] text-[#261C0B] font-hindi text-xs tracking-wider font-bold shadow-lg shadow-[#D4AF37]/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group border border-[#AA771C]/40 cursor-pointer"
                   >
-                    <span>॥ મંગલ તિલક અને પ્રવેશ ॥</span>
+                    <span>॥ પાવન પ્રવેશ ॥</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </motion.button>
                 </motion.div>

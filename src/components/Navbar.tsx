@@ -99,17 +99,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Navigation Actions */}
         <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-          {/* Sacred Door Entrance & Digital Tilak Ceremony Trigger */}
+          {/* Sacred Door Entrance Trigger */}
           {onOpenDoorCeremony && (
             <button
               id="nav-door-ceremony-btn"
               onClick={onOpenDoorCeremony}
-              title="Experience Bhagwan Mahavir Swami Darshan, Sacred Doors & Digital Tilak"
+              title="Experience Bhagwan Mahavir Swami Darshan & Sacred Doors"
               className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] via-[#F6E8C3] to-[#ECCF8D] border border-[#D4AF37] hover:shadow-sm transition cursor-pointer shrink-0 whitespace-nowrap"
             >
               <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#B8860B] animate-pulse shrink-0" />
               <span>
-                <span className="hidden sm:inline">॥ પાવન </span>દ્વાર<span className="hidden min-[400px]:inline"> & તિલક</span><span className="hidden sm:inline"> ॥</span>
+                <span className="hidden sm:inline">॥ પાવન </span>દ્વાર<span className="hidden sm:inline"> ॥</span>
               </span>
             </button>
           )}

@@ -71,6 +71,9 @@ export function App() {
   const handleDoorOpened = () => {
     setIsDoorRevealing(false);
     setCurrentView(doorDestinationView);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     // Soft celebratory confetti
     try {
       confetti({
@@ -83,6 +86,12 @@ export function App() {
       // noop
     }
   };
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [currentView, isDoorRevealing]);
 
   const handleDownload = async () => {
     await downloadInvitationCard(

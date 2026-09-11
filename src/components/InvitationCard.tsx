@@ -76,6 +76,15 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
     }
   }, [data.language]);
 
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    if (cardRef.current) {
+      cardRef.current.scrollTop = 0;
+    }
+  }, [currentTemplate.id]);
+
   const t = TRANSLATIONS[activeLang] || TRANSLATIONS.gu;
 
   // Auto-scroll disabled by default to keep website layout completely locked and steady
