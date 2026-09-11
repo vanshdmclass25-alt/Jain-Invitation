@@ -312,7 +312,18 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
       {/* SECTION B2: BACKGROUND SONG / STOTRA SELECTOR */}
       <SongSelector
         selectedSongId={data.selectedSongId || 'reAavyaTapashvi'}
+        songAudioUrls={data.songAudioUrls || {}}
         onSelectSong={(songId) => updateField('selectedSongId', songId)}
+        onUpdateSongAudioUrl={(songId, url) => {
+          const currentUrls = data.songAudioUrls || {};
+          if (url) {
+            updateField('songAudioUrls', { ...currentUrls, [songId]: url });
+          } else {
+            const copy = { ...currentUrls };
+            delete copy[songId];
+            updateField('songAudioUrls', copy);
+          }
+        }}
       />
 
       {/* SECTION C: BHAGWAN MAHAVIR SWAMI IMAGE */}

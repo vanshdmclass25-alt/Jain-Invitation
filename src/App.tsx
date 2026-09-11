@@ -153,6 +153,7 @@ export function App() {
         }}
         selectedTemplateName={currentTemplate?.name}
         selectedSongId={data.selectedSongId || 'reAavyaTapashvi'}
+        songAudioUrls={data.songAudioUrls}
         onSelectSong={(songId) => setData((prev) => ({ ...prev, selectedSongId: songId }))}
       />
 

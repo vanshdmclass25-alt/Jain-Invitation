@@ -102,8 +102,11 @@ class AmbientSpiritualAudio {
     );
   }
 
-  public selectSong(songId: string) {
-    if (this.currentSongId === songId && this.isPlaying) return;
+  public selectSong(songId: string, customUrl?: string | null) {
+    if (customUrl !== undefined) {
+      this.customAudioUrl = customUrl;
+    }
+    if (this.currentSongId === songId && this.isPlaying && customUrl === undefined) return;
     this.currentSongId = songId;
     if (this.isPlaying) {
       this.stop();

@@ -50,6 +50,7 @@ export interface InvitationData {
   additionalInformation: string;
   selectedTemplate: TemplateId;
   selectedSongId?: string;
+  songAudioUrls?: Record<string, string>;
   hostNames?: string;
 }
 

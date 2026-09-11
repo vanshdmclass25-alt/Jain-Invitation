@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
-import { Music, Play, Pause, Check, Volume2, Sparkles, VolumeX, Link, RotateCcw } from 'lucide-react';
+import { Music, Play, Pause, Check, Volume2, Sparkles, VolumeX, Upload, Link, Trash2, ShieldCheck } from 'lucide-react';
 import { TAPASYA_SONGS, spiritualAudio } from '../utils/audio';
 
 interface SongSelectorProps {
   selectedSongId?: string;
+  songAudioUrls?: Record<string, string>;
   onSelectSong: (songId: string) => void;
+  onUpdateSongAudioUrl?: (songId: string, url: string | null) => void;
 }
 
 export const SongSelector: React.FC<SongSelectorProps> = ({
   selectedSongId = 'reAavyaTapashvi',
+  songAudioUrls = {},
   onSelectSong,
+  onUpdateSongAudioUrl,
 }) => {
   const [previewingSongId, setPreviewingSongId] = useState<string | null>(null);
-  const [customAudioUrl, setCustomAudioUrl] = useState<string>('');
-  const [showCustomInput, setShowCustomInput] = useState<boolean>(false);
+  const [activeUrlInputSongId, setActiveUrlInputSongId] = useState<string | null>(null);
+  const [tempUrlInput, setTempUrlInput] = useState<string>('');
 
   const handlePreviewSong = (e: React.MouseEvent, songId: string) => {
     e.stopPropagation();
+    const customUrl = songAudioUrls[songId];
     if (previewingSongId === songId && spiritualAudio.getStatus()) {
       spiritualAudio.stop();
       setPreviewingSongId(null);
     } else {
-      spiritualAudio.selectSong(songId);
+      spiritualAudio.selectSong(songId, customUrl);
       spiritualAudio.start();
       setPreviewingSongId(songId);
     }
@@ -29,24 +34,53 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
   const handleChooseSong = (songId: string) => {
     onSelectSong(songId);
-    spiritualAudio.selectSong(songId);
+    const customUrl = songAudioUrls[songId];
+    spiritualAudio.selectSong(songId, customUrl);
     if (!spiritualAudio.getStatus() && songId !== 'none') {
       spiritualAudio.start();
       setPreviewingSongId(songId);
     }
   };
 
-  const handleApplyCustomUrl = () => {
-    if (customAudioUrl.trim()) {
-      spiritualAudio.setCustomAudioUrl(customAudioUrl.trim());
-      spiritualAudio.start();
-      setPreviewingSongId(selectedSongId);
+  const handleFileUpload = (songId: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 20 * 1024 * 1024) {
+      alert('Please select an audio MP3 file smaller than 20MB.');
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const resultUrl = e.target?.result as string;
+      if (resultUrl && onUpdateSongAudioUrl) {
+        onUpdateSongAudioUrl(songId, resultUrl);
+        spiritualAudio.selectSong(songId, resultUrl);
+        spiritualAudio.start();
+        setPreviewingSongId(songId);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleResetCustomUrl = () => {
-    setCustomAudioUrl('');
-    spiritualAudio.setCustomAudioUrl(null);
+  const handleSaveUrl = (songId: string) => {
+    if (tempUrlInput.trim() && onUpdateSongAudioUrl) {
+      onUpdateSongAudioUrl(songId, tempUrlInput.trim());
+      spiritualAudio.selectSong(songId, tempUrlInput.trim());
+      spiritualAudio.start();
+      setPreviewingSongId(songId);
+    }
+    setActiveUrlInputSongId(null);
+    setTempUrlInput('');
+  };
+
+  const handleRemoveCustomAudio = (e: React.MouseEvent, songId: string) => {
+    e.stopPropagation();
+    if (onUpdateSongAudioUrl) {
+      onUpdateSongAudioUrl(songId, null);
+    }
+    spiritualAudio.selectSong(songId, null);
     spiritualAudio.start();
   };
 
@@ -64,7 +98,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
             </h3>
             <p className="text-xs text-stone-500">
-              Pick a sacred song for your invitation (Plays when guests open the website)
+              Pick a sacred song or upload your original MP3 track for guests
             </p>
           </div>
         </div>
@@ -79,16 +113,17 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
       </div>
 
       {/* Song List */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
         {TAPASYA_SONGS.map((song) => {
           const isSelected = selectedSongId === song.id;
           const isPreviewing = previewingSongId === song.id && spiritualAudio.getStatus();
+          const customUrl = songAudioUrls[song.id];
 
           return (
             <div
               key={song.id}
               onClick={() => handleChooseSong(song.id)}
-              className={`relative p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+              className={`relative p-3.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                 isSelected
                   ? 'bg-white border-[#8B6E28] ring-2 ring-[#8B6E28]/20 shadow-md'
                   : 'bg-white/80 hover:bg-white border-stone-200/80 hover:border-[#D4AF37] shadow-2xs'
@@ -96,7 +131,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             >
               {/* Top row */}
               <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                       isSelected
@@ -121,7 +156,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                   type="button"
                   onClick={(e) => handlePreviewSong(e, song.id)}
                   title={isPreviewing ? 'Stop Preview' : 'Listen Preview'}
-                  className={`px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0 transition ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 shrink-0 transition ${
                     isPreviewing
                       ? 'bg-[#8B6E28] text-white shadow-xs'
                       : 'bg-stone-100 hover:bg-[#FAF3DF] text-stone-700 hover:text-[#8B6E28] border border-stone-200'
@@ -141,7 +176,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                 </button>
               </div>
 
-              {/* Bottom details */}
+              {/* Singer & Tag */}
               <div className="mt-2 pt-2 border-t border-stone-100 flex items-center justify-between gap-1 flex-wrap">
                 <span className="text-[10.5px] font-semibold text-[#8B6E28]">
                   🎤 {song.singer}
@@ -150,6 +185,87 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                   {song.tag}
                 </span>
               </div>
+
+              {/* Attached Audio Status or Upload MP3 Button */}
+              <div className="mt-2 pt-2 border-t border-stone-100 flex items-center justify-between gap-2 flex-wrap">
+                {customUrl ? (
+                  <div className="flex items-center justify-between w-full bg-[#F0FDF4] border border-green-300 rounded-lg p-1.5 text-xs text-green-800">
+                    <span className="flex items-center gap-1 font-semibold text-[11px] truncate">
+                      <ShieldCheck className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                      <span>Custom MP3 Track Attached</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => handleRemoveCustomAudio(e, song.id)}
+                      title="Remove custom MP3"
+                      className="p-1 text-red-500 hover:text-red-700 transition cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 w-full justify-end">
+                    <label
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-2 py-1 rounded-md bg-stone-100 hover:bg-stone-200 border border-stone-300 text-[10px] font-bold text-stone-700 flex items-center gap-1 cursor-pointer transition"
+                    >
+                      <Upload className="w-3 h-3 text-[#8B6E28]" />
+                      <span>Upload Original MP3</span>
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        onChange={(e) => handleFileUpload(song.id, e)}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveUrlInputSongId(activeUrlInputSongId === song.id ? null : song.id);
+                        setTempUrlInput('');
+                      }}
+                      className="px-2 py-1 rounded-md bg-stone-100 hover:bg-stone-200 border border-stone-300 text-[10px] font-bold text-stone-700 flex items-center gap-1 cursor-pointer transition"
+                    >
+                      <Link className="w-3 h-3 text-[#8B6E28]" />
+                      <span>Paste MP3 Link</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Inline URL Input Box */}
+                {activeUrlInputSongId === song.id && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full mt-2 p-2 bg-stone-50 border border-stone-300 rounded-lg space-y-1.5"
+                  >
+                    <input
+                      type="url"
+                      value={tempUrlInput}
+                      onChange={(e) => setTempUrlInput(e.target.value)}
+                      placeholder="https://.../song.mp3"
+                      className="w-full px-2 py-1 text-xs border rounded bg-white"
+                    />
+                    <div className="flex justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setActiveUrlInputSongId(null)}
+                        className="px-2 py-0.5 text-[10px] rounded bg-stone-200 text-stone-700"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveUrl(song.id)}
+                        className="px-2 py-0.5 text-[10px] font-bold rounded bg-[#8B6E28] text-white"
+                      >
+                        Save Track
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
@@ -157,13 +273,13 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
         {/* Option for No Music / Mute */}
         <div
           onClick={() => handleChooseSong('none')}
-          className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+          className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
             selectedSongId === 'none'
               ? 'bg-white border-stone-400 ring-2 ring-stone-300 shadow-md'
               : 'bg-white/60 hover:bg-white border-stone-200 shadow-2xs'
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <div
               className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
                 selectedSongId === 'none'
@@ -184,55 +300,6 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
           </div>
           <VolumeX className="w-4 h-4 text-stone-400 shrink-0" />
         </div>
-      </div>
-
-      {/* Optional Custom Audio URL Section */}
-      <div className="pt-2 border-t border-[#D4AF37]/30">
-        <button
-          type="button"
-          onClick={() => setShowCustomInput(!showCustomInput)}
-          className="text-xs font-semibold text-[#8B6E28] hover:underline flex items-center gap-1.5 cursor-pointer"
-        >
-          <Link className="w-3.5 h-3.5" />
-          <span>{showCustomInput ? 'Hide Custom Audio URL Input' : 'Have your own song MP3 link? (Optional)'}</span>
-        </button>
-
-        {showCustomInput && (
-          <div className="mt-2.5 p-3 rounded-xl bg-white border border-[#D4AF37]/40 space-y-2">
-            <label className="block text-xs font-bold text-stone-800">
-              Paste Direct Audio / MP3 Stream URL:
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                type="url"
-                value={customAudioUrl}
-                onChange={(e) => setCustomAudioUrl(e.target.value)}
-                placeholder="https://domain.com/my-tapasya-song.mp3"
-                className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#8B6E28]"
-              />
-              <button
-                type="button"
-                onClick={handleApplyCustomUrl}
-                className="px-3 py-1.5 text-xs font-bold rounded-lg bg-[#8B6E28] text-white hover:bg-[#6E551E] transition cursor-pointer"
-              >
-                Test & Play
-              </button>
-              {customAudioUrl && (
-                <button
-                  type="button"
-                  onClick={handleResetCustomUrl}
-                  title="Reset to default song"
-                  className="p-1.5 text-stone-500 hover:text-stone-800 transition cursor-pointer"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-            <p className="text-[11px] text-stone-500">
-              Supports any direct `.mp3` or audio link from Google Drive, Dropbox, Archive.org, or your server.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
