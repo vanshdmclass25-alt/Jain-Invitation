@@ -438,7 +438,7 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
           <FlowerDevotion customMahavirSwamiImage={data.mahavirSwamiImage} template={template} language={activeLang} textColor={canvasTextColor} subtextColor={canvasTextColor} />
         </div>
         <FamilyHosts
-          photos={data.familyPhotos}
+          photos={data.familyPhotos && data.familyPhotos.length > 0 ? data.familyPhotos : (data.familyPhoto ? [data.familyPhoto] : [])}
           hostNames={data.hostNames}
           template={template}
           language={activeLang}

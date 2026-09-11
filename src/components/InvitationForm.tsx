@@ -794,10 +794,13 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
 
       {/* SECTION J: FAMILY PHOTO */}
       <FamilyPhotosUploader
-        photos={data.familyPhotos || (data.familyPhoto ? [data.familyPhoto] : [])}
+        photos={data.familyPhotos && data.familyPhotos.length > 0 ? data.familyPhotos : (data.familyPhoto ? [data.familyPhoto] : [])}
         onChange={(photos) => {
-          updateField('familyPhotos', photos);
-          updateField('familyPhoto', photos[0] || '');
+          onChange({
+            ...data,
+            familyPhotos: photos,
+            familyPhoto: photos[0] || '',
+          });
         }}
         onPreviewPhoto={onPreviewPhoto}
       />

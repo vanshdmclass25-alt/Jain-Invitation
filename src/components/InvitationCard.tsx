@@ -437,7 +437,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
             />
           </div>
           <FamilyHosts
-            photos={data.familyPhotos}
+            photos={data.familyPhotos && data.familyPhotos.length > 0 ? data.familyPhotos : (data.familyPhoto ? [data.familyPhoto] : [])}
             hostNames={data.hostNames}
             template={currentTemplate}
             language={activeLang}

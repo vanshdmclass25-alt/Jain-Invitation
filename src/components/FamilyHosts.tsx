@@ -57,17 +57,17 @@ export const FamilyHosts: React.FC<FamilyHostsProps> = ({
             className="flex flex-col items-center"
           >
             <div 
-              className="w-full rounded-2xl sm:rounded-3xl overflow-hidden p-2 sm:p-2.5 shadow-xl border mb-3.5 transition-transform hover:scale-[1.01]"
+              className="w-full rounded-2xl sm:rounded-3xl overflow-hidden p-1.5 sm:p-2 shadow-lg border mb-3.5 transition-transform hover:scale-[1.01]"
               style={{ 
-                backgroundColor: isDarkBg ? 'rgba(0, 0, 0, 0.25)' : 'rgba(255, 255, 255, 0.7)',
-                borderColor: `${colors.accentGold || '#C98A3E'}50` 
+                backgroundColor: isDarkBg ? 'rgba(0, 0, 0, 0.25)' : '#FFFFFF',
+                borderColor: `${colors.accentGold || '#C98A3E'}60` 
               }}
             >
-              <div className="w-full rounded-xl sm:rounded-2xl overflow-hidden bg-stone-100 flex items-center justify-center min-h-[200px] max-h-[380px]">
+              <div className="w-full rounded-xl sm:rounded-2xl overflow-hidden bg-stone-50">
                 <img 
                   src={validPhotos[0]} 
                   alt="Family Portrait" 
-                  className="w-full h-auto max-h-[380px] object-contain sm:object-cover rounded-xl"
+                  className="w-full h-auto max-h-[450px] object-cover rounded-xl sm:rounded-2xl block"
                   referrerPolicy="no-referrer"
                 />
               </div>
