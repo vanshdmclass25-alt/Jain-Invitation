@@ -34,7 +34,7 @@ export const InviteOCtaBand: React.FC<InviteOCtaBandProps> = ({ onCreateInvite }
             onClick={onCreateInvite}
             className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#E0A458] hover:bg-[#C98A3E] text-[#2A2018] font-poppins font-bold text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer transform hover:-translate-y-0.5"
           >
-            <span>Create Your Invite Website — ₹899</span>
+            <span>Create Your Invite Website</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

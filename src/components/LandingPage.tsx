@@ -4,7 +4,6 @@ import { InviteOHero } from './InviteOHero';
 import { InviteODesigns } from './InviteODesigns';
 import { InviteOWhatsAppProof } from './InviteOWhatsAppProof';
 import { InviteOHowItWorks } from './InviteOHowItWorks';
-import { InviteOPricing } from './InviteOPricing';
 import { InviteOTestimonials } from './InviteOTestimonials';
 import { InviteOFaq } from './InviteOFaq';
 import { InviteOCtaBand } from './InviteOCtaBand';
@@ -88,10 +87,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* 4. SECTION: THREE STEPS. TWO MINUTES. ZERO PHONE CALLS. */}
         <InviteOHowItWorks />
 
-        {/* 5. SECTION: ONE PRICE. UNLIMITED GUESTS. */}
-        <InviteOPricing onCreateInvite={onExplore} />
-
-        {/* 6. SECTION: FAMILIES LOVE THEIR INVITE WEBSITES */}
+        {/* 5. SECTION: FAMILIES LOVE THEIR INVITE WEBSITES */}
         <InviteOTestimonials />
 
         {/* 7. SECTION: FREQUENTLY ASKED QUESTIONS */}

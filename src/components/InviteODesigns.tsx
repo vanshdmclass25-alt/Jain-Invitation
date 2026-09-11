@@ -108,7 +108,6 @@ export const InviteODesigns: React.FC<InviteODesignsProps> = ({
                 <div className="px-1 mb-6 flex-1 flex flex-col bg-white p-4 rounded-b-2xl -mt-10 pt-8 border-t-0">
                   <div className="flex w-full justify-between items-center mb-6">
                     <h3 className="text-2xl font-bold text-[#352516] font-cormorant">{tmpl?.name}</h3>
-                    <div className="text-lg font-bold text-[#C98A3E]">₹899</div>
                   </div>
 
                   {/* Actions */}

@@ -85,9 +85,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           <a href="https://jain-invitation.vercel.app/#how" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             How It Works
           </a>
-          <a href="https://jain-invitation.vercel.app/#pricing" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
-            Pricing
-          </a>
           <a href="https://jain-invitation.vercel.app/#faq" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             FAQ
           </a>
@@ -241,7 +238,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onNavigate('editor')}
               className="px-2 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold font-poppins bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] shadow-sm flex items-center gap-1 transition cursor-pointer shrink-0 whitespace-nowrap"
             >
-              <span>Create <span className="hidden sm:inline">— ₹899</span></span>
+              <span>Create Invite</span>
               <ArrowRight className="w-3 h-3 text-[#E0A458] shrink-0" />
             </button>
           )}

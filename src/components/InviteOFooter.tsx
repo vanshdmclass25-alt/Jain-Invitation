@@ -27,7 +27,6 @@ export const InviteOFooter: React.FC = () => {
             <a href="https://jain-invitation.vercel.app/#designs" target="_blank" rel="noopener noreferrer" className="hover:text-[#E0A458] transition">Designs</a>
             <a href="https://jain-invitation.vercel.app/#whatsapp" target="_blank" rel="noopener noreferrer" className="hover:text-[#E0A458] transition">WhatsApp Preview</a>
             <a href="https://jain-invitation.vercel.app/#how" target="_blank" rel="noopener noreferrer" className="hover:text-[#E0A458] transition">How It Works</a>
-            <a href="https://jain-invitation.vercel.app/#pricing" target="_blank" rel="noopener noreferrer" className="hover:text-[#E0A458] transition">Pricing</a>
             <a href="https://jain-invitation.vercel.app/#faq" target="_blank" rel="noopener noreferrer" className="hover:text-[#E0A458] transition">FAQ</a>
           </div>
 

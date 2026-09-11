@@ -117,7 +117,7 @@ export const InviteOHero: React.FC<InviteOHeroProps> = ({
                 onClick={onCreateInvite}
                 className="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-full bg-[#301E13] hover:bg-[#1A0F08] text-[#FBF8EE] font-poppins font-semibold text-sm sm:text-base shadow-xl shadow-[#2A2018]/25 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <span>Create yours — ₹899</span>
+                <span>Create yours</span>
                 <ArrowRight className="w-4 h-4 text-[#E0A458]" />
               </button>
 

@@ -32,7 +32,7 @@ export const TemplateGallery: React.FC<TemplateGalleryProps> = ({
           <span>SACRED TEMPLATES</span>
         </div>
         <h2 className="font-cormorant text-3xl sm:text-4xl md:text-[2.75rem] font-bold text-[#352516] tracking-tight mb-4 leading-tight">
-          See the whole invite website before you pay
+          Explore interactive invite website templates
         </h2>
         <p className="text-stone-600 text-sm sm:text-base font-sans leading-relaxed max-w-xl mx-auto">
           Real screens from the live invite websites — not static mockups. Tap any card to test a working invite with Bhagwan Mahavir Swami darshan yourself.
