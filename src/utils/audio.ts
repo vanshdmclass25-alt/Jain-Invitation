@@ -22,7 +22,7 @@ export function extractYouTubeId(url: string | null | undefined): string | null 
 }
 
 /**
- * Transforms standard cloud storage URLs (Google Drive, Dropbox, OneDrive) into direct audio proxy stream links.
+ * Transforms standard cloud storage URLs (Google Drive, Dropbox, OneDrive) into direct audio stream links.
  */
 export function formatAudioUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -34,25 +34,19 @@ export function formatAudioUrl(url: string | null | undefined): string {
     return cleanUrl;
   }
 
-  // If already relative audio proxy URL
-  if (cleanUrl.startsWith('/api/audio-proxy')) {
-    return cleanUrl;
-  }
-
-  // Handle Google Drive links
-  if (cleanUrl.includes('drive.google.com') || cleanUrl.includes('docs.google.com')) {
+  // Handle Google Drive links or legacy /api/audio-proxy links
+  if (cleanUrl.includes('drive.google.com') || cleanUrl.includes('docs.google.com') || cleanUrl.includes('/api/audio-proxy')) {
     const fileIdMatch =
       cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) ||
       cleanUrl.match(/id=([a-zA-Z0-9_-]+)/);
     if (fileIdMatch && fileIdMatch[1]) {
-      return `/api/audio-proxy?id=${fileIdMatch[1]}`;
+      return `https://drive.usercontent.google.com/download?id=${fileIdMatch[1]}&export=download`;
     }
   }
 
   // Handle Dropbox share links
   if (cleanUrl.includes('dropbox.com')) {
-    const rawUrl = cleanUrl.replace('?dl=0', '?raw=1').replace('&dl=0', '&raw=1');
-    return `/api/audio-proxy?url=${encodeURIComponent(rawUrl)}`;
+    return cleanUrl.replace('?dl=0', '?raw=1').replace('&dl=0', '&raw=1');
   }
 
   return cleanUrl;
@@ -72,7 +66,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
-    audioUrl: '/api/audio-proxy?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=s5R83lO1Eag',
   },
   {
@@ -84,7 +78,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Soulful Santoor & Flute',
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
-    audioUrl: '/api/audio-proxy?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=d_xVzH7A9R8',
   },
   {
@@ -96,7 +90,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Upbeat Celebration',
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
-    audioUrl: '/api/audio-proxy?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=M5K_v5L6mD0',
   },
   {
@@ -108,7 +102,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
-    audioUrl: '/api/audio-proxy?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=Q8wK8v0N3Rk',
   },
   {
@@ -120,7 +114,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Melodious Bhakti Anthem',
     key: 'F Major',
     ragaStyle: 'Khamaj',
-    audioUrl: '/api/audio-proxy?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=P9x8w_9kR4A',
   },
   {
@@ -132,7 +126,7 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
-    audioUrl: '/api/audio-proxy?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12',
+    audioUrl: 'https://drive.usercontent.google.com/download?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12&export=download',
     youtubeUrl: 'https://www.youtube.com/watch?v=7Xw9k9Q0z6M',
   },
 ];
@@ -186,8 +180,50 @@ class AmbientSpiritualAudio {
   private songValidationCache: Map<string, SongValidationInfo> = new Map();
   private listeners: Set<() => void> = new Set();
 
+  private audioUnlocked = false;
+
   constructor() {
     this.initYouTubeApi();
+    this.setupMobileAudioUnlock();
+  }
+
+  private setupMobileAudioUnlock() {
+    if (typeof window === 'undefined') return;
+
+    const unlock = () => {
+      if (this.audioUnlocked) return;
+      this.audioUnlocked = true;
+
+      // Unlock AudioContext if used
+      try {
+        const ctx = getSharedChimeContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume();
+        }
+      } catch {
+        /* noop */
+      }
+
+      // Pre-initialize audio element
+      if (!this.audioElement) {
+        this.audioElement = new Audio();
+        this.audioElement.loop = true;
+        this.audioElement.volume = 0.65;
+      }
+
+      // If user selected to play, kick off start now
+      if (this.isPlaying) {
+        this.start();
+      }
+
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('click', unlock);
+    };
+
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('touchstart', unlock, { once: true });
+    window.addEventListener('click', unlock, { once: true });
   }
 
   public subscribe(listener: () => void) {
