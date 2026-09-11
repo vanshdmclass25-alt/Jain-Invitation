@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, query, getDocs, doc, updateDoc, orderBy, Timestamp, onSnapshot } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, orderBy, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { ShieldCheck, Clock, CheckCircle2, XCircle, AlertCircle, RefreshCw, Lock } from 'lucide-react';
 
 interface Request {
@@ -43,7 +43,7 @@ export const AdminDashboard: React.FC = () => {
       (querySnapshot) => {
         const data = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...doc.data({ serverTimestamps: 'estimate' }),
         })) as Request[];
         setRequests(data);
         setLoading(false);
@@ -67,7 +67,7 @@ export const AdminDashboard: React.FC = () => {
         status: 'approved',
         approvedAt: startTime,
         expiresAt: expiresAt,
-        updatedAt: Timestamp.now()
+        updatedAt: serverTimestamp()
       });
 
       setRequests(requests.map(req => req.id === id ? {
@@ -93,7 +93,7 @@ export const AdminDashboard: React.FC = () => {
       await updateDoc(doc(db, 'requests', id), {
         status: 'approved',
         expiresAt: newExpiresAt,
-        updatedAt: Timestamp.now()
+        updatedAt: serverTimestamp()
       });
 
       setRequests(requests.map(req => req.id === id ? {
@@ -110,7 +110,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       await updateDoc(doc(db, 'requests', id), {
         status: 'expired',
-        updatedAt: Timestamp.now()
+        updatedAt: serverTimestamp()
       });
       setRequests(requests.map(req => req.id === id ? { ...req, status: 'expired' } : req));
     } catch (e) {
@@ -122,7 +122,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       await updateDoc(doc(db, 'requests', id), {
         status: 'rejected',
-        updatedAt: Timestamp.now()
+        updatedAt: serverTimestamp()
       });
       setRequests(requests.map(req => req.id === id ? { ...req, status: 'rejected' } : req));
     } catch (e) {
