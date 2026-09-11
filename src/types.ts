@@ -13,6 +13,8 @@ export interface TapasyaSong {
   ragaStyle: string;
   audioUrl?: string;
   youtubeUrl?: string;
+  lyricsSnippet?: string;
+  durationText?: string;
 }
 
 export interface YearlyPhotoMilestone {

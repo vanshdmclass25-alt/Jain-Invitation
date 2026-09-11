@@ -77,8 +77,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Festive Dholak & Flute',
     key: 'D Major',
     ragaStyle: 'Bilaval / Garba Utsav',
-    audioUrl: '/api/audio-proxy?id=1F6ku-wm0rykq8T4Ok1NjupacAaH-yIV3',
+    audioUrl: '/assets/audio/reAavyaTapashvi.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=s5R83lO1Eag',
+    lyricsSnippet: 'ઓ તમે ઉત્સવ આજે મંડાવો, મંગલ ગીતો ગાવો... રે આવ્યા તપસ્વી',
+    durationText: '04:02',
   },
   {
     id: 'tapasviNeVandana',
@@ -89,8 +91,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Soulful Santoor & Flute',
     key: 'A Minor',
     ragaStyle: 'Bhairavi',
-    audioUrl: '/api/audio-proxy?id=1-fSRnncBFvqx4nMrJxW6mSRNSq6RAQjT',
+    audioUrl: '/assets/audio/tapasviNeVandana.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=d_xVzH7A9R8',
+    lyricsSnippet: 'આદિ પ્રભુ ના પગલે પગલે... તપ ના તોરણો બાંધ્યા છે બારણે',
+    durationText: '06:26',
   },
   {
     id: 'tapasyaJordar',
@@ -101,8 +105,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Upbeat Celebration',
     key: 'G Major',
     ragaStyle: 'Yaman / Utsav',
-    audioUrl: '/api/audio-proxy?id=1GMGaL40_eMqcY78PdzN4QH7c-GeME9ob',
+    audioUrl: '/assets/audio/tapasyaJordar.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=M5K_v5L6mD0',
+    lyricsSnippet: 'અહા તપસ્યા બડી જોરદાર વાહા તપસ્વી બડે મજેદાર... કરતે હૈ હમ નમન',
+    durationText: '03:47',
   },
   {
     id: 'tapasviKhammaGhani',
@@ -113,8 +119,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Royal Marwari Shehnai',
     key: 'E Minor',
     ragaStyle: 'Desh / Rajwada',
-    audioUrl: '/api/audio-proxy?id=1lp74SJl60H3ZObpflkR_lUcMfowEySK3',
+    audioUrl: '/assets/audio/tapasviKhammaGhani.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=Q8wK8v0N3Rk',
+    lyricsSnippet: 'ખમ્મા ઘણી ખમ્મા ઘણી મારે તપસ્વી ને ખમ્મા ઘણી... સાંઝી રો અવસર આયો સા',
+    durationText: '05:25',
   },
   {
     id: 'jaiHoTapasvi',
@@ -125,8 +133,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Melodious Bhakti Anthem',
     key: 'F Major',
     ragaStyle: 'Khamaj',
-    audioUrl: '/api/audio-proxy?id=1fucjYLjDm16aXdj4cWfVf30S5-tb7dsa',
+    audioUrl: '/assets/audio/jaiHoTapasvi.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=P9x8w_9kR4A',
+    lyricsSnippet: 'જય હો જય હો તપસ્વી... તપસ્વી ના તપ ને વંદન',
+    durationText: '03:44',
   },
   {
     id: 'tapasviNaTapNeVandan',
@@ -137,8 +147,10 @@ export const TAPASYA_SONGS: TapasyaSong[] = [
     tag: 'Sacred Temple Stotra',
     key: 'C Major',
     ragaStyle: 'Bhoopali',
-    audioUrl: '/api/audio-proxy?id=1wfixCxW033KX9BHAOya7ROxNwucd2j12',
+    audioUrl: '/assets/audio/tapasviNaTapNeVandan.mp3',
     youtubeUrl: 'https://www.youtube.com/watch?v=7Xw9k9Q0z6M',
+    lyricsSnippet: 'તપસ્વી ના તપ ને શત શત વંદન... દિવ્ય મંગલ વાણી',
+    durationText: '03:11',
   },
 ];
 
@@ -255,14 +267,14 @@ class AmbientSpiritualAudio {
     });
 
     audio.addEventListener('pause', () => {
-      if (!this.synthGainNode) {
+      if (!this.synthGainNode && audio.paused) {
         this.isPlaying = false;
         this.notify();
       }
     });
 
     audio.addEventListener('ended', () => {
-      if (!this.synthGainNode) {
+      if (!this.synthGainNode && audio.paused) {
         this.isPlaying = false;
         this.notify();
       }
@@ -329,9 +341,26 @@ class AmbientSpiritualAudio {
       rawUrl = song?.audioUrl || song?.youtubeUrl;
     }
 
+    if (!rawUrl && songId !== 'custom') {
+      rawUrl = `/assets/audio/${songId}.mp3`;
+    }
+
     if (!rawUrl) return [];
 
     const clean = rawUrl.trim();
+
+    // For standard predefined Jain Tapasya tracks, return candidates sequence:
+    if (songId !== 'custom' && !this.songAudioUrls[songId]) {
+      const candidates = [
+        `/assets/audio/${songId}.mp3`,
+        `https://tattva-parna-invitation.vercel.app/assets/audio/${songId}.mp3`,
+        `/api/audio-proxy?song=${songId}`
+      ];
+      if (clean && !candidates.includes(clean)) {
+        candidates.push(clean);
+      }
+      return candidates;
+    }
 
     // YouTube link
     const ytId = extractYouTubeId(clean);
@@ -754,7 +783,12 @@ class AmbientSpiritualAudio {
 
     try {
       const audio = this.initAudioElement();
-      audio.src = streamUrl;
+      
+      // Only set src if it's different or empty, to avoid AbortError on play()
+      if (audio.getAttribute('src') !== streamUrl) {
+        audio.setAttribute('src', streamUrl);
+        audio.currentTime = 0;
+      }
 
       const playPromise = audio.play();
       if (playPromise !== undefined) {
@@ -796,7 +830,6 @@ class AmbientSpiritualAudio {
     if (this.audioElement) {
       try {
         this.audioElement.pause();
-        this.audioElement.currentTime = 0;
       } catch {
         /* noop */
       }

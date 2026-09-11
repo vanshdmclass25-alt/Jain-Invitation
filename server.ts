@@ -13,18 +13,21 @@ async function startServer() {
   app.get('/api/audio-proxy', async (req, res) => {
     const fileId = req.query.id as string;
     const directUrl = req.query.url as string;
+    const song = req.query.song as string;
 
     let targetUrl = '';
-    if (fileId) {
+    if (song) {
+      targetUrl = `https://tattva-parna-invitation.vercel.app/assets/audio/${song}.mp3`;
+    } else if (fileId) {
       targetUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download`;
     } else if (directUrl) {
       targetUrl = directUrl;
     } else {
-      res.status(400).send('Missing id or url parameter');
+      res.status(400).send('Missing id, url, or song parameter');
       return;
     }
 
-    const cacheKey = fileId || targetUrl;
+    const cacheKey = song || fileId || targetUrl;
 
     try {
       let buffer: Buffer;
