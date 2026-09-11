@@ -7,7 +7,6 @@ import {
   Download, 
   Sparkles, 
   MessageCircle,
-  Printer,
 } from 'lucide-react';
 import { InvitationData } from '../types';
 import { generateShareableUrl } from '../utils/storage';
@@ -116,20 +115,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             <Download className="w-4 h-4 text-[#8B6E28]" />
             <span>Download Invitation Card Image</span>
           </button>
-
-          {/* Print / Save PDF for Elders */}
-          {onOpenPrintModal && (
-            <button
-              onClick={() => {
-                onClose();
-                onOpenPrintModal();
-              }}
-              className="w-full py-3 px-4 rounded-xl font-semibold text-sm bg-gradient-to-r from-[#FAF3DF] to-[#F1E4C3] hover:from-[#F3ECCE] hover:to-[#E5D4A8] text-[#5A3508] border-2 border-[#D4AF37] flex items-center justify-center gap-2.5 shadow-xs transition cursor-pointer"
-            >
-              <Printer className="w-4 h-4 text-[#8B6E28]" />
-              <span>Print / Save PDF (વડીલો માટે પરંપરાગત પત્રિકા)</span>
-            </button>
-          )}
 
           {/* Copy Link Input Bar */}
           <div className="pt-2">

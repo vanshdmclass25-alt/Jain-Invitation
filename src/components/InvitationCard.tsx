@@ -5,7 +5,6 @@ import {
   ExternalLink, 
   Clock, 
   Share2, 
-  Download, 
   Sparkles, 
   Heart, 
   Users,
@@ -13,7 +12,6 @@ import {
   Volume2,
   VolumeX,
   Languages,
-  Printer,
 } from 'lucide-react';
 import { InvitationData, TemplateDefinition } from '../types';
 import { TEMPLATES } from '../config/templates';
@@ -548,7 +546,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
         </div>
       </div>
 
-      {/* Action Controls underneath */}
+      {/* Action Controls underneath - ONLY WhatsApp Share and Link Share */}
       <div className="w-full max-w-xl mx-auto mt-6 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 px-2">
         {onShareWhatsApp && (
           <button
@@ -568,50 +566,6 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
           >
             <Share2 className="w-4 h-4" />
             <span>{t.shareLink}</span>
-          </button>
-        )}
-
-        {onDownloadImage && (
-          <button
-            id="save-invitation-image-btn"
-            onClick={onDownloadImage}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-white hover:bg-stone-50 text-stone-800 border border-stone-300 shadow-xs transition cursor-pointer"
-          >
-            <Download className="w-4 h-4 text-[#8B6E28]" />
-            <span>{t.saveImage}</span>
-          </button>
-        )}
-
-        {onOpenPrintModal && (
-          <button
-            id="card-print-pdf-btn"
-            type="button"
-            onClick={onOpenPrintModal}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#FAF3DF] to-[#F1E4C3] hover:from-[#F3ECCE] hover:to-[#E5D4A8] text-[#6C3E14] border border-[#D4AF37] shadow-xs transition hover:-translate-y-0.5 cursor-pointer"
-            title="Generate print-ready physical copy or PDF for elderly relatives"
-          >
-            <Printer className="w-4 h-4 text-[#8B6E28]" />
-            <span>પ્રિન્ટ / PDF</span>
-          </button>
-        )}
-
-        {onEdit && (
-          <button
-            id="card-edit-btn"
-            onClick={onEdit}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#FAF6EC] hover:bg-[#F3ECCE] text-[#7A5B18] border border-[#D4AF37]/50 shadow-xs transition cursor-pointer"
-          >
-            <span>{t.editDetails}</span>
-          </button>
-        )}
-
-        {onChangeTemplate && (
-          <button
-            id="card-change-template-btn"
-            onClick={onChangeTemplate}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs sm:text-sm font-medium bg-stone-100 hover:bg-stone-200 text-stone-700 transition cursor-pointer"
-          >
-            <span>{t.changeDesign}</span>
           </button>
         )}
       </div>

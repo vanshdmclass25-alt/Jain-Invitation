@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Printer, Sparkles, ShieldCheck, Music, CheckCircle2 } from 'lucide-react';
+import { Volume2, VolumeX, Share2, Eye, Edit3, ArrowRight, Sparkles, ShieldCheck, Music, CheckCircle2 } from 'lucide-react';
 import { TAPASYA_SONGS } from '../utils/audio';
 import { useAudioPlayback } from '../hooks/useAudioPlayback';
 import { TattvaLogo } from './TattvaLogo';
@@ -111,19 +111,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>
                 <span className="hidden sm:inline">॥ પાવન </span>દ્વાર<span className="hidden min-[400px]:inline"> & તિલક</span><span className="hidden sm:inline"> ॥</span>
               </span>
-            </button>
-          )}
-
-          {/* Traditional Print / Save PDF for Elders (Desktop & Tablet) */}
-          {onOpenPrint && (
-            <button
-              id="nav-print-pdf-btn"
-              onClick={onOpenPrint}
-              title="Print or Save PDF for elderly relatives"
-              className="hidden sm:flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold text-[#543007] bg-[#FFFBF0] border border-[#D4AF37]/70 hover:bg-[#FDF4D9] transition cursor-pointer shrink-0 whitespace-nowrap"
-            >
-              <Printer className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#8C5D1F] shrink-0" />
-              <span>પ્રિન્ટ / PDF</span>
             </button>
           )}
 

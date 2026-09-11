@@ -7,7 +7,6 @@ import { InvitationForm } from './components/InvitationForm';
 import { InvitationCard } from './components/InvitationCard';
 import { ShareModal } from './components/ShareModal';
 import { PhotoLightbox } from './components/PhotoLightbox';
-import { PrintableInvitationModal } from './components/PrintableInvitationModal';
 import { CustomizationGate } from './components/CustomizationGate';
 import { AdminDashboard } from './components/AdminDashboard';
 import { InvitationData, TemplateId } from './types';
@@ -23,8 +22,7 @@ import {
   Monitor, 
   Check, 
   ArrowLeft,
-  RotateCcw,
-  Printer
+  RotateCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,7 +33,6 @@ export function App() {
   const [isDoorRevealing, setIsDoorRevealing] = useState<boolean>(false);
   const [pendingTemplateId, setPendingTemplateId] = useState<TemplateId | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
@@ -145,7 +142,6 @@ export function App() {
           }
         }}
         onOpenShare={() => setIsShareModalOpen(true)}
-        onOpenPrint={() => setIsPrintModalOpen(true)}
         onOpenDoorCeremony={() => {
           setPendingTemplateId(data.selectedTemplate);
           setDoorDestinationView(currentView === 'editor' ? 'editor' : 'invitation');
@@ -367,7 +363,6 @@ export function App() {
                     onShareWhatsApp={handleShareWhatsApp}
                     onWebShare={handleWebShare}
                     onDownloadImage={handleDownload}
-                    onOpenPrintModal={() => setIsPrintModalOpen(true)}
                     onEdit={() => setMobileTab('edit')}
                     onChangeTemplate={() => setCurrentView('templates')}
                   />
@@ -407,16 +402,6 @@ export function App() {
                 <span>॥ જય જિનેન્દ્ર ॥ દ્વાર</span>
               </button>
 
-              {/* Print / Save PDF for Elders */}
-              <button
-                id="invitation-view-print-btn"
-                onClick={() => setIsPrintModalOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#543007] bg-[#FFFBF0] border border-[#D4AF37]/80 hover:bg-[#FDF4D9] px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
-              >
-                <Printer className="w-3.5 h-3.5 text-[#8C5D1F]" />
-                <span>પ્રિન્ટ / PDF</span>
-              </button>
-
               <button
                 onClick={() => setIsShareModalOpen(true)}
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2D4B3E] hover:bg-[#1E332A] px-4 py-1.5 rounded-lg shadow-sm transition cursor-pointer"
@@ -437,7 +422,6 @@ export function App() {
               onShareWhatsApp={handleShareWhatsApp}
               onWebShare={handleWebShare}
               onDownloadImage={handleDownload}
-              onOpenPrintModal={() => setIsPrintModalOpen(true)}
               onEdit={() => setCurrentView('editor')}
               onChangeTemplate={() => setCurrentView('templates')}
             />
@@ -451,15 +435,6 @@ export function App() {
         onClose={() => setIsShareModalOpen(false)}
         data={data}
         onDownloadImage={handleDownload}
-        onOpenPrintModal={() => setIsPrintModalOpen(true)}
-      />
-
-      {/* Traditional Print-Ready Patrika Modal (For Elderly Relatives & PDF) */}
-      <PrintableInvitationModal
-        isOpen={isPrintModalOpen}
-        onClose={() => setIsPrintModalOpen(false)}
-        data={data}
-        template={currentTemplate}
       />
 
       {/* Lightbox for zooming photos */}
