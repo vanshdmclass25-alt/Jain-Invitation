@@ -87,12 +87,12 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
 
   const t = TRANSLATIONS[activeLang] || TRANSLATIONS.gu;
 
-  // Auto-scroll disabled by default to keep website layout completely locked and steady
+  // Auto-scroll enabled after 5 seconds of viewing invitation
   const { isAutoScrolling, stopAutoScroll } = useAutoScroll({
     delayMs: 5000,
-    scrollSpeed: 1.5,
+    scrollSpeed: 1.3,
     scrollIntervalMs: 25,
-    enabled: false,
+    enabled: true,
   });
 
   // Construct Google Maps URL if not directly set
@@ -108,10 +108,14 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
       {isAutoScrolling && (
         <div 
           onClick={stopAutoScroll}
-          className="fixed bottom-4 z-40 px-3.5 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-amber-200 border border-amber-300/40 text-xs font-medium shadow-2xl flex items-center gap-2 cursor-pointer animate-in fade-in"
+          className="fixed bottom-5 z-40 px-4 py-2 rounded-full bg-[#1A120B]/90 backdrop-blur-md text-[#FAF2DE] border border-[#D4AF37]/50 text-xs font-semibold shadow-2xl flex items-center gap-2.5 cursor-pointer hover:bg-black transition-all transform hover:scale-105"
+          title="Tap to pause auto scrolling"
         >
-          <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-          <span>{t.autoScrollTapToPause}</span>
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+          </span>
+          <span className="font-sans text-[11px] tracking-wide">{t.autoScrollTapToPause}</span>
         </div>
       )}
 

@@ -62,13 +62,13 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
 
   const t = TRANSLATIONS[activeLang] || TRANSLATIONS.gu;
 
-  // Auto-scroll disabled by default to keep website layout completely locked and steady
+  // Auto-scroll enabled after 5 seconds in preview
   const { isAutoScrolling, stopAutoScroll } = useAutoScroll({
     delayMs: 5000,
     scrollSpeed: 1.2,
     scrollIntervalMs: 25,
     containerRef: containerRef,
-    enabled: false,
+    enabled: true,
   });
 
   const formattedDate = data.date
