@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Copy, 
@@ -7,9 +7,12 @@ import {
   Download, 
   Sparkles, 
   MessageCircle,
+  Loader2,
+  Link as LinkIcon
 } from 'lucide-react';
 import { InvitationData } from '../types';
 import { generateShareableUrl } from '../utils/storage';
+import { getOrGenerateShortUrl } from '../utils/shortener';
 
 interface ShareModalProps {
   isOpen: boolean;
@@ -27,17 +30,35 @@ export const ShareModal: React.FC<ShareModalProps> = ({
   onOpenPrintModal,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [shortUrl, setShortUrl] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsGenerating(true);
+      getOrGenerateShortUrl(data)
+        .then((url) => {
+          setShortUrl(url);
+          setIsGenerating(false);
+        })
+        .catch(() => {
+          setShortUrl(generateShareableUrl(data));
+          setIsGenerating(false);
+        });
+    }
+  }, [isOpen, data]);
+
   if (!isOpen) return null;
 
-  const shareUrl = generateShareableUrl(data);
+  const displayUrl = shortUrl || generateShareableUrl(data);
   const whatsappText = encodeURIComponent(
     `✨ You are warmly invited to the sacred Pārna of ${data.name || 'our Tapasvi'}.\n\n` +
-    `Tap the link to view the complete invitation:\n${shareUrl}`
+    `Tap the link to view the complete invitation:\n${displayUrl}`
   );
 
   const handleCopy = () => {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl);
+      navigator.clipboard.writeText(displayUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     }
@@ -49,7 +70,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         await navigator.share({
           title: `Jain Tapasya Pārna Invitation - ${data.name}`,
           text: `You are warmly invited to the Pārna of ${data.name}.`,
-          url: shareUrl,
+          url: displayUrl,
         });
       } catch {
         // User cancelled or failed
@@ -65,7 +86,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition"
+          className="absolute top-4 right-4 p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -89,7 +110,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             href={`https://api.whatsapp.com/send?text=${whatsappText}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-3 px-4 rounded-xl font-medium text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2.5 shadow-sm transition transform hover:-translate-y-0.5"
+            className="w-full py-3 px-4 rounded-xl font-medium text-sm bg-[#25D366] hover:bg-[#1EBE5D] text-white flex items-center justify-center gap-2.5 shadow-sm transition transform hover:-translate-y-0.5 cursor-pointer"
           >
             <MessageCircle className="w-4 h-4" />
             <span>Send via WhatsApp</span>
@@ -98,7 +119,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           {/* Web Share (Native Mobile Sheet) */}
           <button
             onClick={handleWebShare}
-            className="w-full py-3 px-4 rounded-xl font-medium text-sm bg-stone-900 hover:bg-stone-800 text-white flex items-center justify-center gap-2.5 shadow-sm transition transform hover:-translate-y-0.5"
+            className="w-full py-3 px-4 rounded-xl font-medium text-sm bg-stone-900 hover:bg-stone-800 text-white flex items-center justify-center gap-2.5 shadow-sm transition transform hover:-translate-y-0.5 cursor-pointer"
           >
             <Share2 className="w-4 h-4" />
             <span>Native Share (Apps & SMS)</span>
@@ -116,21 +137,34 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             <span>Download Invitation Card Image</span>
           </button>
 
-          {/* Copy Link Input Bar */}
+          {/* Copy Short Link Input Bar */}
           <div className="pt-2">
-            <label className="block text-[11px] font-semibold text-stone-600 uppercase tracking-wider mb-1">
-              Invitation Link
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-[11px] font-semibold text-stone-600 uppercase tracking-wider flex items-center gap-1">
+                <LinkIcon className="w-3 h-3 text-[#D4AF37]" />
+                <span>Short Ready-to-Share Link</span>
+              </label>
+              {isGenerating ? (
+                <span className="text-[10px] text-amber-600 font-medium flex items-center gap-1 animate-pulse">
+                  <Loader2 className="w-2.5 h-2.5 animate-spin" /> Shortening...
+                </span>
+              ) : (
+                <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                  ✨ Ultra Short URL
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <input
                 type="text"
                 readOnly
-                value={shareUrl}
-                className="w-full px-3 py-2 text-xs rounded-lg border border-stone-200 bg-stone-50 text-stone-600 truncate focus:outline-hidden"
+                value={isGenerating ? 'Generating ultra-short link...' : displayUrl}
+                className="w-full px-3 py-2 text-xs rounded-lg border border-stone-200 bg-stone-50 text-stone-700 truncate font-mono focus:outline-hidden"
               />
               <button
                 onClick={handleCopy}
-                className="px-3.5 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold flex items-center gap-1.5 transition flex-shrink-0"
+                disabled={isGenerating}
+                className="px-3.5 py-2 rounded-lg bg-stone-800 hover:bg-stone-900 disabled:bg-stone-400 text-white text-xs font-semibold flex items-center gap-1.5 transition flex-shrink-0 cursor-pointer"
               >
                 {copied ? (
                   <>
@@ -150,7 +184,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* Footer info */}
         <p className="text-[11px] text-center text-stone-400 mt-5">
-          Recipients can open this link directly in any browser on phone or computer.
+          Recipients can open this ultra-short link directly in any browser on phone or computer.
         </p>
       </div>
     </div>

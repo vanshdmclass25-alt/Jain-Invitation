@@ -28,7 +28,7 @@ With the divine grace and blessings of *Bhagwan Mahavir Swami*, we cordially inv
 📍 *Venue:* ${data.location || 'Shree Parshwanath Jain Derasar'}
 
 ✨ *Touch the link below to view the sacred interactive invitation website:*
-👉 https://tattva.co.in/parna/${encodeURIComponent((data.name || 'tapasvi').toLowerCase().replace(/\s+/g, '-'))}
+👉 https://is.gd/parna-${encodeURIComponent((data.name || 'tapasvi').toLowerCase().replace(/\s+/g, ''))}
 
 _Blessings & Pranam:_
 *${data.hostNames || 'Shah Parivar and Family'}*`;

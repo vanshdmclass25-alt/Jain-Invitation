@@ -12,6 +12,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { InvitationData, TemplateId } from './types';
 import { TEMPLATES } from './config/templates';
 import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
+import { fetchInvitationById, getOrGenerateShortUrl } from './utils/shortener';
 import { downloadInvitationCard } from './utils/download';
 import { 
   Eye, 
@@ -22,7 +23,8 @@ import {
   Monitor, 
   Check, 
   ArrowLeft,
-  RotateCcw
+  RotateCcw,
+  Loader2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -37,13 +39,35 @@ export function App() {
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
   const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('invitation');
+  const [isLoadingShortLink, setIsLoadingShortLink] = useState<boolean>(false);
 
-  // Auto-detect if someone opened an existing invitation via URL
+  // Auto-detect if someone opened an existing invitation via URL or short link
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('invitation') || params.get('name')) {
-        // Direct invitation view mode for guests
+      const shortId = params.get('id') || params.get('i');
+
+      if (shortId) {
+        setIsLoadingShortLink(true);
+        setCurrentView('invitation');
+        setDoorDestinationView('invitation');
+
+        fetchInvitationById(shortId)
+          .then((fetchedData) => {
+            if (fetchedData) {
+              setData(fetchedData);
+              saveInvitation(fetchedData);
+            }
+            setIsLoadingShortLink(false);
+            setIsDoorRevealing(true);
+          })
+          .catch((err) => {
+            console.error('Error fetching short link invitation:', err);
+            setIsLoadingShortLink(false);
+            setIsDoorRevealing(true);
+          });
+      } else if (params.get('invitation') || params.get('name')) {
+        // Direct invitation view mode for guests via legacy URL
         setCurrentView('invitation');
         setDoorDestinationView('invitation');
         setIsDoorRevealing(true);
@@ -100,36 +124,42 @@ export function App() {
     );
   };
 
-  const handleShareWhatsApp = () => {
-    const shareUrl = generateShareableUrl(data);
-    const text = encodeURIComponent(
-      `✨ You are warmly invited to the sacred Pārna of ${data.name || 'our Tapasvi'}.\n\n` +
-      `Tap the link to view the complete invitation:\n${shareUrl}`
-    );
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+  const handleShareWhatsApp = async () => {
+    try {
+      const shareUrl = await getOrGenerateShortUrl(data);
+      const text = encodeURIComponent(
+        `✨ You are warmly invited to the sacred Pārna of ${data.name || 'our Tapasvi'}.\n\n` +
+        `Tap the link to view the complete invitation:\n${shareUrl}`
+      );
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    } catch {
+      const shareUrl = generateShareableUrl(data);
+      const text = encodeURIComponent(
+        `✨ You are warmly invited to the sacred Pārna of ${data.name || 'our Tapasvi'}.\n\n` +
+        `Tap the link to view the complete invitation:\n${shareUrl}`
+      );
+      window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+    }
   };
 
   const handleWebShare = async () => {
-    const shareUrl = generateShareableUrl(data);
-    if (navigator.share) {
-      try {
+    try {
+      const shareUrl = await getOrGenerateShortUrl(data);
+      if (navigator.share) {
         await navigator.share({
           title: `Jain Tapasya Pārna Invitation - ${data.name}`,
           text: `You are warmly invited to the Pārna of ${data.name}.`,
           url: shareUrl,
         });
-      } catch {
-        // User cancelled
+      } else {
+        setIsShareModalOpen(true);
       }
-    } else {
+    } catch {
       setIsShareModalOpen(true);
     }
   };
 
   const currentTemplate = TEMPLATES[data.selectedTemplate] || TEMPLATES.sukoon || {};
-  if (!currentTemplate) 
-  console.log("TEMPLATES", TEMPLATES);
-  console.log("currentTemplate", currentTemplate);
 
   return (
     <div 
@@ -139,6 +169,14 @@ export function App() {
         color: currentView === 'invitation' && currentTemplate.id === 'divya' ? '#E8ECEF' : '#2C241E',
       }}
     >
+      {/* Short Link Loading Overlay */}
+      {isLoadingShortLink && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#110D09] text-[#EAD096] p-6 backdrop-blur-md">
+          <div className="w-16 h-16 rounded-full border-2 border-[#D4AF37]/30 border-t-[#D4AF37] animate-spin mb-5 shadow-lg shadow-[#D4AF37]/20" />
+          <p className="font-hindi text-xl font-bold tracking-wide text-[#F3E5AB]">॥ મંગલ પાવન નિમંત્રણ પત્ર ॥</p>
+          <p className="text-xs text-[#C5A059] mt-2 animate-pulse font-medium">Opening Sacred Tapasvi Invitation...</p>
+        </div>
+      )}
       {/* Top Navigation */}
       <Navbar
         currentView={currentView}

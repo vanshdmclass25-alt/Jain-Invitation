@@ -78,6 +78,43 @@ async function startServer() {
     }
   });
 
+  app.use(express.json());
+
+  // High-performance URL shortener proxy endpoint
+  app.post('/api/shorten-url', async (req, res) => {
+    const { url } = req.body || {};
+    if (!url) {
+      res.status(400).json({ error: 'URL is required' });
+      return;
+    }
+    try {
+      // 1. Try is.gd API (returns clean short JSON)
+      const isGdRes = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
+      if (isGdRes.ok) {
+        const data = (await isGdRes.json()) as { shorturl?: string };
+        if (data.shorturl) {
+          res.json({ shortUrl: data.shorturl });
+          return;
+        }
+      }
+
+      // 2. Fallback to TinyURL API
+      const tinyRes = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+      if (tinyRes.ok) {
+        const shortUrl = await tinyRes.text();
+        if (shortUrl && shortUrl.startsWith('http')) {
+          res.json({ shortUrl: shortUrl.trim() });
+          return;
+        }
+      }
+
+      res.json({ shortUrl: url });
+    } catch (err) {
+      console.warn('URL shortener error:', err);
+      res.json({ shortUrl: url });
+    }
+  });
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
