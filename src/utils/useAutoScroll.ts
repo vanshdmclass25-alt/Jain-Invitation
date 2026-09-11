@@ -29,21 +29,26 @@ export function useAutoScroll({
 
   speedRef.current = speedMultiplier;
 
+  const lastProgressRef = useRef<number>(-1);
+
   // Calculate current scroll percentage
   const updateProgress = useCallback(() => {
+    let pct = 0;
     if (containerRef?.current) {
       const el = containerRef.current;
       const maxScroll = el.scrollHeight - el.clientHeight;
       if (maxScroll > 0) {
-        const pct = Math.min(100, Math.max(0, Math.round((el.scrollTop / maxScroll) * 100)));
-        setScrollProgress(pct);
+        pct = Math.min(100, Math.max(0, Math.round((el.scrollTop / maxScroll) * 100)));
       }
     } else if (typeof window !== 'undefined') {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (maxScroll > 0) {
-        const pct = Math.min(100, Math.max(0, Math.round((window.scrollY / maxScroll) * 100)));
-        setScrollProgress(pct);
+        pct = Math.min(100, Math.max(0, Math.round((window.scrollY / maxScroll) * 100)));
       }
+    }
+    if (pct !== lastProgressRef.current) {
+      lastProgressRef.current = pct;
+      setScrollProgress(pct);
     }
   }, [containerRef]);
 

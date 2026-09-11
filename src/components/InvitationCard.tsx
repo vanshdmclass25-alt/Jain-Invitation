@@ -87,12 +87,11 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
 
   const t = TRANSLATIONS[activeLang] || TRANSLATIONS.gu;
 
-  // Auto-scroll enabled after 5 seconds of viewing invitation
+  // Auto-scroll disabled by default so guests have smooth, uninterrupted touch scroll control
   const { isAutoScrolling, stopAutoScroll } = useAutoScroll({
-    delayMs: 5000,
-    scrollSpeed: 1.3,
-    scrollIntervalMs: 25,
-    enabled: true,
+    delayMs: 8000,
+    scrollSpeed: 1.0,
+    enabled: false,
   });
 
   // Construct Google Maps URL if not directly set

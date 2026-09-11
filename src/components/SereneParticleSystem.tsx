@@ -237,8 +237,21 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
     let animationFrameId: number;
     let width = 0;
     let height = 0;
-    let dpr = window.devicePixelRatio || 1;
+    const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+    let dpr = isMobileScreen ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
     let isDisposed = false;
+    let isIntersecting = true;
+
+    // IntersectionObserver to pause particle rendering when canvas is scrolled out of view
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          isIntersecting = entry.isIntersecting;
+        }
+      },
+      { threshold: 0.05 }
+    );
+    intersectionObserver.observe(container);
 
     // Check prefers-reduced-motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -303,11 +316,12 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
       if (width <= 0 || height <= 0) return;
 
       if (variant === 'ambient') {
-        // Base count scaled to screen area
+        // Base count scaled to screen area with mobile cap
         const area = width * height;
+        const maxCap = isMobileScreen ? (density === 'subtle' ? 12 : 20) : 55;
         const targetCount = Math.min(
-          70,
-          Math.max(16, Math.floor((area / 14000) * countMultiplier))
+          maxCap,
+          Math.max(8, Math.floor((area / 16000) * countMultiplier * (isMobileScreen ? 0.45 : 1.0)))
         );
 
         for (let i = 0; i < targetCount; i++) {
@@ -509,6 +523,11 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
     // Render loop
     const render = (time: number) => {
       if (isDisposed) return;
+
+      if (!isIntersecting) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
 
       ctx.clearRect(0, 0, width, height);
 
@@ -727,6 +746,7 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
     return () => {
       isDisposed = true;
       cancelAnimationFrame(animationFrameId);
+      intersectionObserver.disconnect();
       resizeObserver.disconnect();
       if (interactive) {
         window.removeEventListener('mousemove', handlePointerMove);
@@ -738,7 +758,8 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`pointer-events-none overflow-hidden ${className}`}
+      className={`pointer-events-none overflow-hidden transform-gpu ${className}`}
+      style={{ transform: 'translateZ(0)', willChange: 'transform' }}
       aria-hidden="true"
     >
       <canvas ref={canvasRef} className="block w-full h-full" />

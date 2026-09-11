@@ -67,6 +67,8 @@ export const FamilyHosts: React.FC<FamilyHostsProps> = ({
                 <img 
                   src={validPhotos[0]} 
                   alt="Family Portrait" 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-auto max-h-[450px] object-cover rounded-xl sm:rounded-2xl block"
                   referrerPolicy="no-referrer"
                 />

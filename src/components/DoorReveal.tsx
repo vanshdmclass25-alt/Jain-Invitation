@@ -125,7 +125,7 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
       {/* Ambient Floating Spiritual Particles */}
       <SereneParticleSystem
         variant="ambient"
-        density="medium"
+        density="subtle"
         colorScheme={template.id === 'divya' ? 'celestial' : template.id === 'shwet' ? 'champagne' : 'gold'}
         templateTheme={template?.colors.particleTheme}
         className="absolute inset-0 w-full h-full pointer-events-none"

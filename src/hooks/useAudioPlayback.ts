@@ -44,9 +44,14 @@ export function useAudioPlayback(
   useEffect(() => {
     const url = spiritualAudio.getResolvedAudioUrl(selectedSongId);
     if (url) {
-      spiritualAudio.validateTrack(url).then((info) => {
-        setValidationInfo(info);
-      });
+      const cached = spiritualAudio.getValidationInfo(url);
+      if (cached) {
+        setValidationInfo(cached);
+      } else {
+        spiritualAudio.validateTrack(url).then((info) => {
+          setValidationInfo(info);
+        });
+      }
     }
   }, [selectedSongId, customAudioUrl, songAudioUrls]);
 
