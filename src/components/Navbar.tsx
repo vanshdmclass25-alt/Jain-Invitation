@@ -16,6 +16,7 @@ interface NavbarProps {
   customAudioUrl?: string;
   songAudioUrls?: Record<string, string>;
   onSelectSong?: (songId: string) => void;
+  isGuestView?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -29,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   customAudioUrl = '',
   songAudioUrls = {},
   onSelectSong,
+  isGuestView = false,
 }) => {
   const [showSongDropdown, setShowSongDropdown] = useState(false);
   const { isAdmin } = useAuth();
@@ -54,9 +56,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-3">
         
         {/* Brand / Logo (Tattva Paarna Invitations) */}
-        <button
-          id="nav-brand-btn"
-          onClick={() => onNavigate('landing')}
+        <a
+          href="https://jain-invitation.vercel.app/#designs"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-1.5 sm:gap-2 text-left group transition cursor-pointer shrink-0"
         >
           {/* On small mobile, show compact logo without long subtitle to avoid topbar overflow */}
@@ -69,32 +72,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               Tattva
             </span>
           </div>
-        </button>
+        </a>
 
         {/* Center Nav Links (Desktop) */}
         <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-[#5C4E42]">
-          <a href="#designs" className="hover:text-[#C98A3E] transition">
+          <a href="https://jain-invitation.vercel.app/#designs" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             Designs
           </a>
-          <a href="#whatsapp" className="hover:text-[#C98A3E] transition">
+          <a href="https://jain-invitation.vercel.app/#whatsapp" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             WhatsApp Preview
           </a>
-          <a href="#how" className="hover:text-[#C98A3E] transition">
+          <a href="https://jain-invitation.vercel.app/#how" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             How It Works
           </a>
-          <a href="#pricing" className="hover:text-[#C98A3E] transition">
+          <a href="https://jain-invitation.vercel.app/#pricing" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             Pricing
           </a>
-          <a href="#faq" className="hover:text-[#C98A3E] transition">
+          <a href="https://jain-invitation.vercel.app/#faq" target="_blank" rel="noopener noreferrer" className="hover:text-[#C98A3E] transition">
             FAQ
           </a>
-          <button 
-            onClick={() => onNavigate('admin')} 
-            className={`transition flex items-center gap-1 ${currentView === 'admin' ? 'text-[#C98A3E]' : 'text-stone-300 hover:text-[#C98A3E]'}`}
-            title="Admin Access"
-          >
-            <ShieldCheck className="w-4 h-4" />
-          </button>
+          {!isGuestView && (
+            <button 
+              onClick={() => onNavigate('admin')} 
+              className={`transition flex items-center gap-1 ${currentView === 'admin' ? 'text-[#C98A3E]' : 'text-stone-300 hover:text-[#C98A3E]'}`}
+              title="Admin Access"
+            >
+              <ShieldCheck className="w-4 h-4" />
+            </button>
+          )}
         </nav>
 
         {/* Right Navigation Actions */}
@@ -196,7 +201,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* View switcher buttons */}
-          {currentView === 'editor' && (
+          {!isGuestView && currentView === 'editor' && (
             <button
               id="view-full-invite-nav-btn"
               onClick={() => onNavigate('invitation')}
@@ -207,7 +212,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {currentView === 'invitation' && (
+          {!isGuestView && currentView === 'invitation' && (
             <button
               id="edit-details-nav-btn"
               onClick={() => onNavigate('editor')}
@@ -230,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {currentView === 'landing' && (
+          {!isGuestView && currentView === 'landing' && (
             <button
               id="nav-create-btn"
               onClick={() => onNavigate('editor')}

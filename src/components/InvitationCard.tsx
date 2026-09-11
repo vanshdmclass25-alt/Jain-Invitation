@@ -532,7 +532,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
               style={{ borderColor: `${colors.border}25` }}
             >
               <a
-                href="https://tattva.co.in"
+                href="https://jain-invitation.vercel.app/#designs"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-cinzel font-semibold transition hover:scale-105 border shadow-2xs group"
@@ -541,13 +541,13 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
                   borderColor: `${colors.accentGold}40`,
                   color: colors.text,
                 }}
-                title="Visit Tattva Official Website"
+                title="Visit Official Website"
               >
                 <div className="w-4 h-4 rounded-full overflow-hidden border border-[#D4AF37]/60">
                   <img src="/logo.png" alt="Tattva Logo" className="w-full h-full object-cover" />
                 </div>
                 <span>{t.craftedBy} <strong className="underline underline-offset-2 text-[#C29B38] group-hover:text-amber-500">Tattva</strong></span>
-                <span className="text-[9px] text-stone-400 font-mono">www.tattva.co.in</span>
+                <span className="text-[9px] text-stone-400 font-mono">jain-invitation.vercel.app</span>
                 <ExternalLink className="w-2.5 h-2.5 opacity-60 ml-0.5" />
               </a>
             </div>

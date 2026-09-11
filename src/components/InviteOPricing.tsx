@@ -7,7 +7,7 @@ interface InviteOPricingProps {
 
 export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }) => {
   const features = [
-    'Your own personal link (e.g. tattva.co.in/parna/riya-shah)',
+    'Your own personal link (e.g. jain-invitation.vercel.app/#designs)',
     'Sacred darshan with Bhagwan Mahavir Swami',
     'Tapasvi portrait photo & sacred tapasya vow highlights',
     'Sacred ambient audio stotra & bell chimes',

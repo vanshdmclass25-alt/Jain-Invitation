@@ -497,7 +497,7 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
             style={{ borderColor: `${colors.border}30` }}
           >
             <a
-              href="https://tattva.co.in"
+              href="https://jain-invitation.vercel.app/#designs"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9.5px] font-cinzel font-semibold transition hover:scale-105 border shadow-2xs"
@@ -511,7 +511,7 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
                 <img src="/logo.png" alt="Tattva" className="w-full h-full object-cover" />
               </div>
               <span>{t.craftedBy} <strong className="text-[#C29B38]">Tattva</strong></span>
-              <span className="text-[8.5px] text-stone-400 font-mono">www.tattva.co.in</span>
+              <span className="text-[8.5px] text-stone-400 font-mono">jain-invitation.vercel.app</span>
               <ExternalLink className="w-2.5 h-2.5 opacity-60" />
             </a>
           </div>

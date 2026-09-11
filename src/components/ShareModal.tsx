@@ -182,10 +182,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           </div>
         </div>
 
-        {/* Footer info */}
-        <p className="text-[11px] text-center text-stone-400 mt-5">
-          Recipients can open this ultra-short link directly in any browser on phone or computer.
-        </p>
+        {/* Footer info & website hyperlink */}
+        <div className="text-center mt-5 space-y-1">
+          <p className="text-[11px] text-stone-400">
+            Recipients can open this ultra-short link directly in any browser on phone or computer.
+          </p>
+          <a
+            href="https://jain-invitation.vercel.app/#designs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block text-[10px] text-[#8B6E28] hover:underline font-medium"
+          >
+            Explore more designs at jain-invitation.vercel.app
+          </a>
+        </div>
       </div>
     </div>
   );

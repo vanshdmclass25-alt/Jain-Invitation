@@ -40,6 +40,7 @@ export function App() {
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
   const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('invitation');
   const [isLoadingShortLink, setIsLoadingShortLink] = useState<boolean>(false);
+  const [isGuestView, setIsGuestView] = useState<boolean>(false);
 
   // Auto-detect if someone opened an existing invitation via URL or short link
   useEffect(() => {
@@ -48,6 +49,7 @@ export function App() {
       const shortId = params.get('id') || params.get('i');
 
       if (shortId) {
+        setIsGuestView(true);
         setIsLoadingShortLink(true);
         setCurrentView('invitation');
         setDoorDestinationView('invitation');
@@ -66,8 +68,9 @@ export function App() {
             setIsLoadingShortLink(false);
             setIsDoorRevealing(true);
           });
-      } else if (params.get('invitation') || params.get('name')) {
-        // Direct invitation view mode for guests via legacy URL
+      } else if (params.get('invitation') || params.get('name') || params.get('guest')) {
+        // Direct invitation view mode for guests via shared link
+        setIsGuestView(true);
         setCurrentView('invitation');
         setDoorDestinationView('invitation');
         setIsDoorRevealing(true);
@@ -180,6 +183,7 @@ export function App() {
       {/* Top Navigation */}
       <Navbar
         currentView={currentView}
+        isGuestView={isGuestView}
         onNavigate={(view) => {
           if (view === 'door') {
             setPendingTemplateId(data.selectedTemplate);
@@ -426,38 +430,40 @@ export function App() {
       {currentView === 'invitation' && (
         <main className="flex-1 py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
           
-          {/* Top Navigation Banner */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-3 border-b border-stone-200">
-            <button
-              onClick={() => setCurrentView('editor')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-white border border-stone-200 px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
-            >
-              <Edit3 className="w-3.5 h-3.5 text-[#8B6E28]" />
-              <span>Back to Editor</span>
-            </button>
-
-            <div className="flex items-center gap-2">
-              {/* Door Ceremony Replay */}
+          {/* Top Navigation Banner - ONLY shown in Creator Mode */}
+          {!isGuestView && (
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6 pb-3 border-b border-stone-200">
               <button
-                onClick={() => {
-                  setPendingTemplateId(data.selectedTemplate);
-                  setIsDoorRevealing(true);
-                }}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] to-[#F1E4C3] border border-[#D4AF37] px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
+                onClick={() => setCurrentView('editor')}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-700 hover:text-stone-900 bg-white border border-stone-200 px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#B8860B]" />
-                <span>॥ જય જિનેન્દ્ર ॥ દ્વાર</span>
+                <Edit3 className="w-3.5 h-3.5 text-[#8B6E28]" />
+                <span>Back to Editor</span>
               </button>
 
-              <button
-                onClick={() => setIsShareModalOpen(true)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2D4B3E] hover:bg-[#1E332A] px-4 py-1.5 rounded-lg shadow-sm transition cursor-pointer"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>Share</span>
-              </button>
+              <div className="flex items-center gap-2">
+                {/* Door Ceremony Replay */}
+                <button
+                  onClick={() => {
+                    setPendingTemplateId(data.selectedTemplate);
+                    setIsDoorRevealing(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#683D10] bg-gradient-to-r from-[#FAF2DE] to-[#F1E4C3] border border-[#D4AF37] px-3.5 py-1.5 rounded-lg shadow-2xs transition cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#B8860B]" />
+                  <span>॥ જય જિનેન્દ્ર ॥ દ્વાર</span>
+                </button>
+
+                <button
+                  onClick={() => setIsShareModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[#2D4B3E] hover:bg-[#1E332A] px-4 py-1.5 rounded-lg shadow-sm transition cursor-pointer"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>Share</span>
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Centered Full Invitation Card */}
           <div className="w-full flex justify-center">

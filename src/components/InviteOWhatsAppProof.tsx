@@ -151,7 +151,7 @@ _Blessings & Pranam:_
                   {/* Link Meta Details */}
                   <div className="p-2.5">
                     <span className="text-[10px] text-stone-400 font-mono block">
-                      tattva.co.in/parna/{((data.name || 'tapasvi').toLowerCase()).replace(/\s+/g, '-')}
+                      jain-invitation.vercel.app/#designs
                     </span>
                     <h5 className="font-poppins text-xs font-bold text-[#2A2018] leading-snug mt-0.5 group-hover:text-[#C98A3E] transition">
                       🙏 Tapasya Pārna Mahotsav | {data.name}
