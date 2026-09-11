@@ -12,7 +12,7 @@ interface EventLocationProps {
   language?: SupportedLanguage;
 }
 
-export const EventLocation: React.FC<EventLocationProps> = ({
+export const EventLocation: React.FC<EventLocationProps> = React.memo(({
   location,
   mapsUrl,
   template,
@@ -92,4 +92,4 @@ export const EventLocation: React.FC<EventLocationProps> = ({
       </motion.div>
     </div>
   );
-};
+});

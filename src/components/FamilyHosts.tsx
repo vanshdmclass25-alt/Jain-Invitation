@@ -11,7 +11,7 @@ interface FamilyHostsProps {
   language?: SupportedLanguage;
 }
 
-export const FamilyHosts: React.FC<FamilyHostsProps> = ({
+export const FamilyHosts: React.FC<FamilyHostsProps> = React.memo(({
   photos = [],
   hostNames,
   template,
@@ -114,4 +114,4 @@ export const FamilyHosts: React.FC<FamilyHostsProps> = ({
       </div>
     </div>
   );
-};
+});

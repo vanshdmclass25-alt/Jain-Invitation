@@ -11,7 +11,7 @@ interface FestiveTemplePavilionArtworkProps {
  * - White marble derasar jharokha pavilion with arched dome chhatri and balustrade railing
  * - Auspicious Kalash with blossoms, Dharma Chakra wheels on left, festive Dholak drums on right!
  */
-export const FestiveTemplePavilionArtwork: React.FC<FestiveTemplePavilionArtworkProps> = ({
+export const FestiveTemplePavilionArtwork: React.FC<FestiveTemplePavilionArtworkProps> = React.memo(({
   className = 'w-full h-auto',
   variant = 'bottom-palace',
 }) => {
@@ -288,4 +288,4 @@ export const FestiveTemplePavilionArtwork: React.FC<FestiveTemplePavilionArtwork
       </svg>
     </div>
   );
-};
+});

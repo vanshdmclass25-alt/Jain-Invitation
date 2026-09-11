@@ -11,7 +11,7 @@ interface JainTempleAccentsProps {
  * Ashtamangala - The 8 Auspicious Symbols of Jain Tradition
  * Swastik, Shrivatsa, Nandyavarta, Vardhamanaka, Kalash, Matsya, Darpana, Bhadrasana
  */
-export const AshtamangalaRow: React.FC<{ color?: string; className?: string }> = ({
+export const AshtamangalaRow: React.FC<{ color?: string; className?: string }> = React.memo(({
   color = '#D4AF37',
   className = 'w-full',
 }) => {
@@ -56,12 +56,12 @@ export const AshtamangalaRow: React.FC<{ color?: string; className?: string }> =
       <span className="text-xs font-bold" style={{ color }} title="Bhadrasana">卐</span>
     </div>
   );
-};
+});
 
 /**
  * Hanging Temple Bells with Auspicious Mango Leaf (Aso Palav) Garlands
  */
-export const TempleBellHanging: React.FC<{ color?: string; side?: 'left' | 'right' }> = ({
+export const TempleBellHanging: React.FC<{ color?: string; side?: 'left' | 'right' }> = React.memo(({
   color = '#D4AF37',
   side = 'left',
 }) => {
@@ -79,13 +79,13 @@ export const TempleBellHanging: React.FC<{ color?: string; side?: 'left' | 'righ
       </div>
     </div>
   );
-};
+});
 
 /**
  * Ornate Template-Specific Frame & Motifs
  * Completely differentiates the 4 templates visually
  */
-export const JainTempleAccents: React.FC<JainTempleAccentsProps> = ({
+export const JainTempleAccents: React.FC<JainTempleAccentsProps> = React.memo(({
   templateId,
   color,
   accentColor,
@@ -354,4 +354,4 @@ export const JainTempleAccents: React.FC<JainTempleAccentsProps> = ({
       <div className="absolute bottom-3 right-3 text-sm font-bold text-[#F5D061] opacity-90">❖</div>
     </div>
   );
-};
+});

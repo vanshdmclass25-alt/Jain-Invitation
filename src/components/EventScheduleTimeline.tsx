@@ -12,7 +12,7 @@ interface EventScheduleTimelineProps {
   language?: SupportedLanguage;
 }
 
-export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = ({
+export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = React.memo(({
   events = [],
   eventScheduleTitle,
   template,
@@ -96,4 +96,4 @@ export const EventScheduleTimeline: React.FC<EventScheduleTimelineProps> = ({
       </div>
     </div>
   );
-};
+});

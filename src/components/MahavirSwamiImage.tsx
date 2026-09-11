@@ -6,7 +6,7 @@ interface MahavirSwamiImageProps {
   showAura?: boolean;
 }
 
-export const MahavirSwamiImage: React.FC<MahavirSwamiImageProps> = ({
+export const MahavirSwamiImage: React.FC<MahavirSwamiImageProps> = React.memo(({
   className = 'w-48 h-56',
   customImageUrl,
   showAura = true,
@@ -298,4 +298,4 @@ export const MahavirSwamiImage: React.FC<MahavirSwamiImageProps> = ({
       </svg>
     </div>
   );
-};
+});

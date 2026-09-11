@@ -14,7 +14,7 @@ interface MangalMuhuratProps {
   language?: SupportedLanguage;
 }
 
-export const MangalMuhurat: React.FC<MangalMuhuratProps> = ({
+export const MangalMuhurat: React.FC<MangalMuhuratProps> = React.memo(({
   date,
   time,
   location,
@@ -101,4 +101,4 @@ export const MangalMuhurat: React.FC<MangalMuhuratProps> = ({
       </div>
     </div>
   );
-};
+});

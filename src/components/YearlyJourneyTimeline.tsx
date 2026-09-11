@@ -12,7 +12,7 @@ interface YearlyJourneyTimelineProps {
   className?: string;
 }
 
-export const YearlyJourneyTimeline: React.FC<YearlyJourneyTimelineProps> = ({
+export const YearlyJourneyTimeline: React.FC<YearlyJourneyTimelineProps> = React.memo(({
   milestones = [],
   template,
   language = 'hi',
@@ -70,4 +70,4 @@ export const YearlyJourneyTimeline: React.FC<YearlyJourneyTimelineProps> = ({
       </div>
     </div>
   );
-};
+});

@@ -23,7 +23,7 @@ interface FlowerPetal {
   duration: number;
 }
 
-export const FlowerDevotion: React.FC<FlowerDevotionProps> = ({
+export const FlowerDevotion: React.FC<FlowerDevotionProps> = React.memo(({
   customMahavirSwamiImage,
   template,
   className = '',
@@ -274,5 +274,5 @@ export const FlowerDevotion: React.FC<FlowerDevotionProps> = ({
       `}</style>
     </div>
   );
-};
+});
 

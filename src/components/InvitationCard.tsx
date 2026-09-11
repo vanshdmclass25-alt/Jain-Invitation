@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -47,7 +47,7 @@ interface InvitationCardProps {
   onOpenPrintModal?: () => void;
 }
 
-export const InvitationCard: React.FC<InvitationCardProps> = ({
+export const InvitationCard: React.FC<InvitationCardProps> = React.memo(({
   data,
   template,
   isInteractivePreview = false,
@@ -59,11 +59,11 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
   onDownloadImage,
   onOpenPrintModal,
 }) => {
-  const currentTemplate = template || TEMPLATES[data.selectedTemplate] || TEMPLATES.sukoon;
-  const formattedDate = formatDatePretty(data.date);
+  const currentTemplate = useMemo(() => template || TEMPLATES[data.selectedTemplate] || TEMPLATES.sukoon, [template, data.selectedTemplate]);
+  const formattedDate = useMemo(() => formatDatePretty(data.date), [data.date]);
   const cardRef = useRef<HTMLDivElement>(null);
   const colors = currentTemplate?.colors;
-  const isDark = currentTemplate.id === 'divya' || currentTemplate.id === 'param';
+  const isDark = useMemo(() => currentTemplate.id === 'divya' || currentTemplate.id === 'param', [currentTemplate.id]);
 
   // Selected language for full invitation card
   const [activeLang, setActiveLang] = useState<SupportedLanguage>(
@@ -85,7 +85,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
     }
   }, [currentTemplate.id]);
 
-  const t = TRANSLATIONS[activeLang] || TRANSLATIONS.gu;
+  const t = useMemo(() => TRANSLATIONS[activeLang] || TRANSLATIONS.gu, [activeLang]);
 
   // Auto-scroll disabled by default so guests have smooth, uninterrupted touch scroll control
   const { isAutoScrolling, stopAutoScroll } = useAutoScroll({
@@ -95,11 +95,18 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
   });
 
   // Construct Google Maps URL if not directly set
-  const mapsUrl =
+  const mapsUrl = useMemo(() =>
     data.googleMapsUrl ||
     (data.location
       ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`
-      : 'https://maps.google.com');
+      : 'https://maps.google.com'),
+    [data.googleMapsUrl, data.location]
+  );
+
+  const familyPhotos = useMemo(() => 
+    data.familyPhotos && data.familyPhotos.length > 0 ? data.familyPhotos : (data.familyPhoto ? [data.familyPhoto] : []),
+    [data.familyPhotos, data.familyPhoto]
+  );
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -436,7 +443,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
             />
           </div>
           <FamilyHosts
-            photos={data.familyPhotos && data.familyPhotos.length > 0 ? data.familyPhotos : (data.familyPhoto ? [data.familyPhoto] : [])}
+            photos={familyPhotos}
             hostNames={data.hostNames}
             template={currentTemplate}
             language={activeLang}
@@ -583,4 +590,4 @@ export const InvitationCard: React.FC<InvitationCardProps> = ({
       </div>
     </div>
   );
-};
+});

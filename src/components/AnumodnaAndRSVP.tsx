@@ -13,7 +13,7 @@ interface AnumodnaAndRSVPProps {
   sectionBorder?: string;
 }
 
-export const AnumodnaAndRSVP: React.FC<AnumodnaAndRSVPProps> = ({
+export const AnumodnaAndRSVP: React.FC<AnumodnaAndRSVPProps> = React.memo(({
   data,
   accentColor = '#C29B38',
   textColor = '#2C1810',
@@ -180,4 +180,4 @@ export const AnumodnaAndRSVP: React.FC<AnumodnaAndRSVPProps> = ({
       </div>
     </div>
   );
-};
+});

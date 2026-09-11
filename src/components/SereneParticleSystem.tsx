@@ -215,7 +215,7 @@ const drawDewdrop = (ctx: CanvasRenderingContext2D, x: number, y: number, r: num
   ctx.restore();
 };
 
-export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
+export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = React.memo(({
   variant = 'ambient',
   density = 'medium',
   colorScheme = 'gold',
@@ -765,4 +765,4 @@ export const SereneParticleSystem: React.FC<SereneParticleSystemProps> = ({
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );
-};
+});

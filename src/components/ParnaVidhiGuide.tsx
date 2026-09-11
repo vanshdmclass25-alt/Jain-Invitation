@@ -10,7 +10,7 @@ interface ParnaVidhiGuideProps {
   sectionBorder?: string;
 }
 
-export const ParnaVidhiGuide: React.FC<ParnaVidhiGuideProps> = ({
+export const ParnaVidhiGuide: React.FC<ParnaVidhiGuideProps> = React.memo(({
   accentColor = '#C29B38',
   textColor = '#2C1810',
   isDark = false,
@@ -105,4 +105,4 @@ export const ParnaVidhiGuide: React.FC<ParnaVidhiGuideProps> = ({
       )}
     </div>
   );
-};
+});

@@ -12,7 +12,7 @@ interface LotusPranamArtworkProps {
  * - Blooming pink lotuses with gold-veined green leaves
  * - Two hands folded in Anjali Mudra / Pranam emerging from an open blooming lotus
  */
-export const LotusPranamArtwork: React.FC<LotusPranamArtworkProps> = ({
+export const LotusPranamArtwork: React.FC<LotusPranamArtworkProps> = React.memo(({
   className = 'w-full h-auto',
   variant = 'bottom-pranam',
   strokeColor = '#B8860B',
@@ -325,4 +325,4 @@ export const LotusPranamArtwork: React.FC<LotusPranamArtworkProps> = ({
       <rect x="40" y="45" width="320" height="565" fill="url(#mandalaWatermark)" />
     </svg>
   );
-};
+});
