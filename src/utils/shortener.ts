@@ -43,46 +43,39 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 /**
- * Generates a deterministic short 7-character alphanumeric ID based on invitation content
+ * Gets or creates a unique ID for this device's invitation.
+ * This ensures the user's shared link stays the same, and they don't overwrite others.
  */
-export function generateShortId(data: InvitationData): string {
-  const content = `${data.name || ''}_${data.tapasyaType || ''}_${data.date || ''}_${data.selectedTemplate || ''}_${data.hostNames || ''}`;
-  let hash = 0;
-  for (let i = 0; i < content.length; i++) {
-    hash = (hash << 5) - hash + content.charCodeAt(i);
-    hash |= 0;
-  }
-  const positive = Math.abs(hash).toString(36);
-  // Pad or trim to 6-7 chars
-  return (positive + '7x9k2p').substring(0, 7);
+export function getOrCreateInvitationId(): string {
+  if (typeof window === 'undefined') return 'preview_mode';
+  
+  let existingId = localStorage.getItem('my_invitation_short_id');
+  if (existingId) return existingId;
+  
+  // Generate random 7 chars
+  const newId = Math.random().toString(36).substring(2, 9);
+  localStorage.setItem('my_invitation_short_id', newId);
+  return newId;
 }
 
 /**
- * Creates a clean short invitation URL by saving payload to Firestore under a short ID.
+ * Creates a clean short invitation URL by saving payload to Firestore under a unique ID.
  */
 export async function getOrGenerateShortUrl(data: InvitationData): Promise<string> {
   if (typeof window === 'undefined') return '';
 
-  const shortId = generateShortId(data);
-
-  // Check cache first
-  if (shortUrlCache.has(shortId)) {
-    return shortUrlCache.get(shortId)!;
-  }
-
+  const shortId = getOrCreateInvitationId();
+  
   const origin = window.location.origin;
   const directShortUrl = `${origin}/?id=${shortId}`;
 
-  // 1. Save payload to Firestore under 'invitations' collection with shortId as key
+  // 1. Save or Update payload to Firestore
   try {
     const docRef = doc(db, 'invitations', shortId);
-    const docSnap = await getDoc(docRef);
-    if (!docSnap.exists()) {
-      await setDoc(docRef, {
-        data,
-        createdAt: new Date().toISOString(),
-      });
-    }
+    await setDoc(docRef, {
+      data,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true }); // Always merge/update the latest data
   } catch (err) {
     console.warn('Firestore short document save notice:', err);
   }
@@ -105,7 +98,6 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
     console.warn('Shortener service fetch notice:', err);
   }
 
-  shortUrlCache.set(shortId, finalShortUrl);
   return finalShortUrl;
 }
 
