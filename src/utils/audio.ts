@@ -787,6 +787,10 @@ class AmbientSpiritualAudio {
         audio.currentTime = 0;
       }
 
+      // We must explicitly ensure volume and loop are set just in case
+      audio.volume = 0.7;
+      audio.loop = true;
+
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise
@@ -796,19 +800,24 @@ class AmbientSpiritualAudio {
           })
           .catch((err) => {
             console.warn('Audio play request notice (waiting for user gesture):', err);
+            
+            // Set state to playing anyway so the UI knows we *want* to be playing,
+            // and the retry listener will catch the actual gesture.
+            this.isPlaying = true;
+            this.notify();
+
             // On user interaction retry
             const retry = () => {
-              if (this.currentSongId !== 'none' && !this.isPlaying) {
-                audio.play().then(() => {
-                  this.isPlaying = true;
-                  this.notify();
-                }).catch(() => {});
+              if (this.currentSongId !== 'none' && this.isPlaying) {
+                audio.play().catch(() => {});
               }
               window.removeEventListener('click', retry);
               window.removeEventListener('pointerdown', retry);
+              window.removeEventListener('touchstart', retry);
             };
             window.addEventListener('click', retry, { once: true });
             window.addEventListener('pointerdown', retry, { once: true });
+            window.addEventListener('touchstart', retry, { once: true });
           });
       } else {
         this.isPlaying = true;
