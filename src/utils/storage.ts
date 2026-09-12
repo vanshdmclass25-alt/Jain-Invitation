@@ -57,6 +57,15 @@ export function generateShareableUrl(data: InvitationData): string {
   if (typeof window === 'undefined') return '';
   try {
     // Keep payload lightweight for URL (omit large base64 images if too long, or encode text fields)
+    const cleanYearlyPhotos = data.yearlyPhotos?.map(m => ({
+      ...m,
+      photoUrl: m.photoUrl?.startsWith('data:') ? '' : m.photoUrl
+    }));
+    
+    const cleanFamilyPhotos = data.familyPhotos?.map(url => 
+      url?.startsWith('data:') ? '' : url
+    ).filter(Boolean) as string[];
+
     const shareableFields = {
       name: data.name,
       headline: data.headline,
@@ -70,9 +79,13 @@ export function generateShareableUrl(data: InvitationData): string {
       googleMapsUrl: data.googleMapsUrl,
       scratchMessage: data.scratchMessage,
       scratchTitle: data.scratchTitle,
-      yearlyPhotos: data.yearlyPhotos,
+      yearlyPhotos: cleanYearlyPhotos,
+      familyPhotos: cleanFamilyPhotos,
+      familyPhoto: data.familyPhoto?.startsWith('data:') ? '' : data.familyPhoto,
+      mahavirSwamiImage: data.mahavirSwamiImage?.startsWith('data:') ? '' : data.mahavirSwamiImage,
       additionalInformation: data.additionalInformation,
       selectedTemplate: data.selectedTemplate,
+      selectedSongId: data.selectedSongId,
       hostNames: data.hostNames,
       profileImage: data.profileImage?.startsWith('data:') ? '' : data.profileImage,
     };

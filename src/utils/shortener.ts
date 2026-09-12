@@ -101,6 +101,10 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
     }, { merge: true }); // Always merge/update the latest data
   } catch (err) {
     console.warn('Firestore short document save notice:', err);
+    // CRITICAL: We MUST throw here! If Firestore fails (e.g. payload > 1MB even after compression),
+    // returning the directShortUrl will point to an empty document, breaking the link!
+    // By throwing, the share handler will automatically fall back to the long base64 URL which ALWAYS works.
+    throw err;
   }
 
   // 2. Shorten via backend API (is.gd / tinyurl)

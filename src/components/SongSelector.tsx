@@ -64,34 +64,6 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     }
   };
 
-  const handleFileUpload = (songId: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 25 * 1024 * 1024) {
-      alert('Please select an audio MP3 file smaller than 25MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const resultUrl = e.target?.result as string;
-      if (!resultUrl) return;
-
-      if (songId === 'custom') {
-        if (onUpdateCustomAudioUrl) onUpdateCustomAudioUrl(resultUrl);
-      } else {
-        if (onUpdateSongAudioUrl) onUpdateSongAudioUrl(songId, resultUrl);
-      }
-
-      onSelectSong(songId);
-      spiritualAudio.selectSong(songId, resultUrl);
-      spiritualAudio.start();
-      setIsPlaying(true);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleSaveUrl = (songId: string) => {
     if (tempUrlInput.trim()) {
       const url = tempUrlInput.trim();
@@ -222,19 +194,6 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <label
-                    onClick={(e) => e.stopPropagation()}
-                    title="Upload MP3 for this song"
-                    className="p-1 rounded bg-stone-100 hover:bg-[#FAF3DF] text-stone-600 hover:text-[#8B6E28] border border-stone-200 text-[10px] flex items-center gap-0.5 cursor-pointer"
-                  >
-                    <Upload className="w-3 h-3" />
-                    <input
-                      type="file"
-                      accept="audio/*"
-                      onChange={(e) => handleFileUpload(song.id, e)}
-                      className="hidden"
-                    />
-                  </label>
 
                   <button
                     type="button"
@@ -346,20 +305,67 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
           </div>
 
           <div className="mt-2.5 pt-2 border-t border-stone-100 flex items-center gap-2">
-            <label
-              onClick={(e) => e.stopPropagation()}
-              className="px-2.5 py-1.5 rounded-lg bg-[#8B6E28] hover:bg-[#6E551E] text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveUrlInputSongId(activeUrlInputSongId === 'custom' ? null : 'custom');
+                setTempUrlInput(customAudioUrl || '');
+              }}
+              title="Paste direct MP3 URL"
+              className="p-1 rounded bg-stone-100 hover:bg-[#FAF3DF] text-stone-600 hover:text-[#8B6E28] border border-stone-200 text-[10px] flex items-center gap-0.5 cursor-pointer"
             >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Choose MP3 File</span>
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => handleFileUpload('custom', e)}
-                className="hidden"
-              />
-            </label>
+              <Link className="w-3 h-3" />
+              <span>Paste Custom MP3 Link</span>
+            </button>
           </div>
+          {/* Show Custom Attached URL Badge */}
+          {customAudioUrl && (
+            <div className="mt-1.5 p-1 bg-green-50 border border-green-200 rounded text-[10px] text-green-700 flex items-center justify-between">
+              <span className="truncate font-medium max-w-[200px]">{customAudioUrl}</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onUpdateCustomAudioUrl) onUpdateCustomAudioUrl('');
+                }}
+                className="text-red-500 font-bold ml-1 hover:underline shrink-0"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+          {/* Inline URL Input */}
+          {activeUrlInputSongId === 'custom' && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="mt-2 p-2 bg-stone-50 border border-stone-300 rounded-lg space-y-1.5"
+            >
+              <input
+                type="url"
+                value={tempUrlInput}
+                onChange={(e) => setTempUrlInput(e.target.value)}
+                placeholder="Paste exact MP3 link (https://...)"
+                className="w-full px-2 py-1 text-xs border rounded bg-white"
+              />
+              <div className="flex justify-end gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setActiveUrlInputSongId(null)}
+                  className="px-2 py-0.5 text-[10px] rounded bg-stone-200 text-stone-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSaveUrl('custom')}
+                  className="px-2.5 py-0.5 text-[10px] font-bold rounded bg-[#8B6E28] text-white"
+                >
+                  Save MP3 Link
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* OPTION 8: MUTE */}

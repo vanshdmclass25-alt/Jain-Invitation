@@ -77,6 +77,27 @@ export function App() {
           modified = true;
         }
         
+        if (healedData.mahavirSwamiImage && healedData.mahavirSwamiImage.length > 100000) {
+          healedData.mahavirSwamiImage = await compressDataUrl(healedData.mahavirSwamiImage, 400, 0.6);
+          modified = true;
+        }
+
+        if (healedData.familyPhoto && healedData.familyPhoto.length > 100000) {
+          healedData.familyPhoto = await compressDataUrl(healedData.familyPhoto, 400, 0.6);
+          modified = true;
+        }
+
+        if (healedData.familyPhotos && healedData.familyPhotos.length > 0) {
+          const newFamily = await Promise.all(healedData.familyPhotos.map(async (url) => {
+            if (url && url.length > 100000) {
+              modified = true;
+              return await compressDataUrl(url, 400, 0.6);
+            }
+            return url;
+          }));
+          healedData.familyPhotos = newFamily;
+        }
+        
         if (healedData.yearlyPhotos && healedData.yearlyPhotos.length > 0) {
           const newYearly = await Promise.all(healedData.yearlyPhotos.map(async (m) => {
             if (m.photoUrl && m.photoUrl.length > 100000) {
@@ -157,6 +178,27 @@ export function App() {
                   recoveredData.profileImage = await compressDataUrl(recoveredData.profileImage, 400, 0.6);
                   modified = true;
                 }
+                
+                if (recoveredData.mahavirSwamiImage && recoveredData.mahavirSwamiImage.length > 100000) {
+                  recoveredData.mahavirSwamiImage = await compressDataUrl(recoveredData.mahavirSwamiImage, 400, 0.6);
+                  modified = true;
+                }
+
+                if (recoveredData.familyPhoto && recoveredData.familyPhoto.length > 100000) {
+                  recoveredData.familyPhoto = await compressDataUrl(recoveredData.familyPhoto, 400, 0.6);
+                  modified = true;
+                }
+
+                if (recoveredData.familyPhotos && recoveredData.familyPhotos.length > 0) {
+                  recoveredData.familyPhotos = await Promise.all(recoveredData.familyPhotos.map(async (url: string) => {
+                    if (url && url.length > 100000) {
+                      modified = true;
+                      return await compressDataUrl(url, 400, 0.6);
+                    }
+                    return url;
+                  }));
+                }
+
                 if (recoveredData.yearlyPhotos && recoveredData.yearlyPhotos.length > 0) {
                   recoveredData.yearlyPhotos = await Promise.all(recoveredData.yearlyPhotos.map(async (m: any) => {
                     if (m.photoUrl && m.photoUrl.length > 100000) {

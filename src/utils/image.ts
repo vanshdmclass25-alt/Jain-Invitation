@@ -2,7 +2,7 @@
  * Compresses an image file and returns a base64 string suitable for Firestore storage.
  * It resizes the image down and reduces quality to ensure the payload stays under 1MB.
  */
-export function compressImage(file: File, maxWidth = 800, quality = 0.7): Promise<string> {
+export function compressImage(file: File, maxWidth = 400, quality = 0.6): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -18,7 +18,7 @@ export function compressImage(file: File, maxWidth = 800, quality = 0.7): Promis
 /**
  * Compresses an existing base64 data URL.
  */
-export function compressDataUrl(dataUrl: string, maxWidth = 800, quality = 0.7): Promise<string> {
+export function compressDataUrl(dataUrl: string, maxWidth = 400, quality = 0.6): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!dataUrl || !dataUrl.startsWith('data:')) {
       resolve(dataUrl);
@@ -26,7 +26,7 @@ export function compressDataUrl(dataUrl: string, maxWidth = 800, quality = 0.7):
     }
     
     // If it's already reasonably small, don't bother re-compressing
-    if (dataUrl.length < 300000) {
+    if (dataUrl.length < 50000) {
       resolve(dataUrl);
       return;
     }
