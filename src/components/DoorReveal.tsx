@@ -151,19 +151,24 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                 </span>
               </motion.div>
             ) : textPhase === 'enter' ? (
-              <motion.div
+              <motion.button
                 key="enter"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ duration: 0.5 }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 backdrop-blur-md shadow-lg shadow-[#D4AF37]/10"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDoors();
+                }}
+                disabled={isOpening}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 backdrop-blur-md shadow-lg shadow-[#D4AF37]/10 cursor-pointer hover:bg-[#D4AF37]/30 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#F3E5AB] animate-pulse" />
                 <span className="font-cinzel text-xs sm:text-sm text-[#FBF5B7] tracking-[0.2em] font-semibold uppercase">
                   {t.doorTapToEnter}
                 </span>
-              </motion.div>
+              </motion.button>
             ) : (
               <motion.div
                 key="darshan"
@@ -369,20 +374,34 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                 }}
                 className="w-1/2 h-full border-r relative flex flex-col justify-between shadow-2xl backface-hidden z-20 overflow-hidden"
               >
-                {/* Door Sandstone Plaster Texture */}
+                {/* Premium Temple Door Architectural Carving */}
                 <div 
-                  className="absolute inset-0 opacity-20 pointer-events-none"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 50% 50%, ${template?.colors.accentGold} 1px, transparent 1px)`,
-                    backgroundSize: '16px 16px',
-                  }}
-                />
-
-                {/* Subtle Inner Border Frame */}
-                <div 
-                  className="absolute inset-2 border pointer-events-none"
-                  style={{ borderColor: `${template?.colors.doorTrimGold}50` }}
-                />
+                  className="absolute inset-2.5 sm:inset-3 border-[3px] shadow-[inset_0_0_20px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] pointer-events-none flex flex-col p-2.5 sm:p-3 z-0"
+                  style={{ borderColor: `${template?.colors.doorTrimGold}90`, backgroundColor: 'rgba(0,0,0,0.25)' }}
+                >
+                  {/* Outer Bevel Frame */}
+                  <div className="absolute inset-0 border border-[#00000080]" />
+                  
+                  {/* Grid of Deep Carved Panels */}
+                  <div className="w-full h-full grid grid-cols-2 grid-rows-5 gap-2.5 sm:gap-3">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <div 
+                        key={`l-panel-${i}`} 
+                        className="rounded-sm shadow-[inset_0_2px_5px_rgba(255,255,255,0.15),0_3px_8px_rgba(0,0,0,0.6)] border border-[#00000080] flex items-center justify-center relative overflow-hidden"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+                      >
+                        {/* Inner Recessed Bevel */}
+                        <div className="absolute inset-1.5 sm:inset-2 border border-[#00000040] shadow-[inset_0_0_8px_rgba(0,0,0,0.5)]" />
+                        
+                        {/* Raised Brass Floral Stud */}
+                        <div 
+                          className="w-4 h-4 sm:w-5 sm:h-5 rounded-full shadow-[0_3px_6px_rgba(0,0,0,0.6)] z-10 border border-[#FFF3CF]/40" 
+                          style={{ background: `radial-gradient(circle at 35% 35%, ${template?.colors.doorTrimGold}, #4A330B)` }} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* ORNATE GOLD FLOWER RING KNOCKER */}
                 <div className="absolute top-1/2 right-2.5 -translate-y-1/2 flex flex-col items-center select-none">
@@ -446,20 +465,34 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                 }}
                 className="w-1/2 h-full border-l relative flex flex-col justify-between shadow-2xl backface-hidden z-20 overflow-hidden"
               >
-                {/* Door Texture */}
+                {/* Premium Temple Door Architectural Carving */}
                 <div 
-                  className="absolute inset-0 opacity-20 pointer-events-none"
-                  style={{
-                    backgroundImage: `radial-gradient(circle at 50% 50%, ${template?.colors.accentGold} 1px, transparent 1px)`,
-                    backgroundSize: '16px 16px',
-                  }}
-                />
-
-                {/* Subtle Inner Border Frame */}
-                <div 
-                  className="absolute inset-2 border pointer-events-none"
-                  style={{ borderColor: `${template?.colors.doorTrimGold}50` }}
-                />
+                  className="absolute inset-2.5 sm:inset-3 border-[3px] shadow-[inset_0_0_20px_rgba(0,0,0,0.8),0_4px_10px_rgba(0,0,0,0.5)] pointer-events-none flex flex-col p-2.5 sm:p-3 z-0"
+                  style={{ borderColor: `${template?.colors.doorTrimGold}90`, backgroundColor: 'rgba(0,0,0,0.25)' }}
+                >
+                  {/* Outer Bevel Frame */}
+                  <div className="absolute inset-0 border border-[#00000080]" />
+                  
+                  {/* Grid of Deep Carved Panels */}
+                  <div className="w-full h-full grid grid-cols-2 grid-rows-5 gap-2.5 sm:gap-3">
+                    {Array.from({ length: 10 }).map((_, i) => (
+                      <div 
+                        key={`r-panel-${i}`} 
+                        className="rounded-sm shadow-[inset_0_2px_5px_rgba(255,255,255,0.15),0_3px_8px_rgba(0,0,0,0.6)] border border-[#00000080] flex items-center justify-center relative overflow-hidden"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}
+                      >
+                        {/* Inner Recessed Bevel */}
+                        <div className="absolute inset-1.5 sm:inset-2 border border-[#00000040] shadow-[inset_0_0_8px_rgba(0,0,0,0.5)]" />
+                        
+                        {/* Raised Brass Floral Stud */}
+                        <div 
+                          className="w-4 h-4 sm:w-5 sm:h-5 rounded-full shadow-[0_3px_6px_rgba(0,0,0,0.6)] z-10 border border-[#FFF3CF]/40" 
+                          style={{ background: `radial-gradient(circle at 35% 35%, ${template?.colors.doorTrimGold}, #4A330B)` }} 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* ORNATE GOLD FLOWER RING KNOCKER */}
                 <div className="absolute top-1/2 left-2.5 -translate-y-1/2 flex flex-col items-center select-none">
@@ -514,27 +547,32 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
 
               {/* Vertical Door Seam Shadow Line (Reference 3) */}
               <div 
-                className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] bg-gradient-to-b from-[#A56B48] via-[#7D4829] to-[#542B15] pointer-events-none transition-opacity duration-300 z-30 shadow-xs ${
+                className={`absolute top-0 bottom-0 left-1/2 w-[3px] bg-gradient-to-b from-[#A56B48] via-[#7D4829] to-[#542B15] pointer-events-none transition-opacity duration-300 z-30 shadow-xs ${
                   isOpening ? 'opacity-0' : 'opacity-100'
                 }`} 
+                style={{ transform: 'translateX(-50%) translateZ(40px)' }}
               />
 
               {/* SACRED JAI JINENDRA ENTRANCE BUTTON & CEREMONIAL SEAL */}
               {!isOpening && !doorsFullyOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: [1, 1.03, 1],
-                  }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-40 flex flex-col items-center select-none"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenDoors();
-                  }}
+                <div 
+                  className="absolute top-1/2 left-1/2 z-40 flex flex-col items-center justify-center pointer-events-none"
+                  style={{ transform: 'translate(-50%, -50%) translateZ(80px)' }}
                 >
-                  {/* Concentric Divine Halo Rings */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: [1, 1.03, 1],
+                    }}
+                    transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+                    className="flex flex-col items-center select-none pointer-events-auto"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDoors();
+                    }}
+                  >
+                    {/* Concentric Divine Halo Rings */}
                   <div className="relative flex items-center justify-center">
                     <div className="absolute w-44 h-44 rounded-full bg-amber-400/20 animate-ping pointer-events-none" />
                     <div className="absolute w-36 h-36 rounded-full bg-gradient-to-r from-amber-300/30 via-yellow-200/40 to-amber-400/30 blur-sm pointer-events-none" />
@@ -573,6 +611,7 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
                     </button>
                   </div>
                 </motion.div>
+                </div>
               )}
             </div>
           </div>
