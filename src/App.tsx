@@ -12,7 +12,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { InvitationData, TemplateId } from './types';
 import { TEMPLATES } from './config/templates';
 import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
-import { fetchInvitationById, getOrGenerateShortUrl } from './utils/shortener';
+import { fetchInvitationById, getOrGenerateShortUrl, getOrCreateInvitationId } from './utils/shortener';
 import { downloadInvitationCard } from './utils/download';
 import { compressDataUrl } from './utils/image';
 import { 
@@ -32,7 +32,7 @@ import confetti from 'canvas-confetti';
 export function App() {
   // Centralized State
   const [data, setData] = useState<InvitationData>(() => loadSavedInvitation());
-  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'admin'>(() => {
+  const [currentView, setCurrentView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'admin' | 'not-found'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('id') || params.get('i') || params.get('invitation') || params.get('name') || params.get('guest')) {
@@ -47,7 +47,7 @@ export function App() {
   const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
   const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
   const [previewDevice, setPreviewDevice] = useState<'mobile' | 'desktop'>('mobile');
-  const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation'>('invitation');
+  const [doorDestinationView, setDoorDestinationView] = useState<'landing' | 'templates' | 'editor' | 'invitation' | 'not-found'>('invitation');
   const [isLoadingShortLink, setIsLoadingShortLink] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -245,21 +245,23 @@ export function App() {
                 setIsLoadingShortLink(false);
                 setIsDoorRevealing(true);
               } else {
-                // If it's truly lost or the link is invalid, don't show an ugly alert and black screen.
-                // Reset them gracefully back to the landing page so they can create a new one.
-                console.warn("Invitation not found. Redirecting to landing page.");
-                setCurrentView('landing');
-                setDoorDestinationView('landing');
-                window.history.replaceState({}, document.title, "/");
+                // Link is broken, missing, or payload was too large for Firestore.
+                // Do not redirect to the landing page, as users find it confusing.
+                // Show a proper "Not Found" error screen.
+                console.warn("Invitation not found. Showing error screen.");
+                setCurrentView('not-found');
+                setDoorDestinationView('not-found');
                 setIsLoadingShortLink(false);
-                setIsDoorRevealing(false); // Do not reveal the door, just go to landing page
+                setIsDoorRevealing(false); // Do not reveal the door, just go to error page
               }
             }
           })
           .catch((err) => {
             console.error('Error fetching short link invitation:', err);
+            setCurrentView('not-found');
+            setDoorDestinationView('not-found');
             setIsLoadingShortLink(false);
-            setIsDoorRevealing(true);
+            setIsDoorRevealing(false);
           });
       } else if (params.get('invitation') || params.get('name') || params.get('guest')) {
         // Direct invitation view mode for guests via shared link
@@ -270,6 +272,19 @@ export function App() {
       }
     }
   }, []);
+
+  // Sync URL for easy copy-pasting for the creator
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!isGuestView && (currentView === 'editor' || currentView === 'invitation')) {
+      const shortId = getOrCreateInvitationId(data);
+      if (shortId && shortId !== 'preview_mode') {
+        window.history.replaceState({}, '', `/?id=${shortId}`);
+      }
+    } else if (!isGuestView && currentView === 'landing') {
+      window.history.replaceState({}, '', '/');
+    }
+  }, [currentView, isGuestView, data]);
 
   // Save changes to localStorage and background sync to Firestore
   const handleDataChange = (newData: InvitationData) => {
@@ -416,6 +431,31 @@ export function App() {
           language={data.language}
           invitationData={data}
         />
+      )}
+
+      {/* VIEW: NOT FOUND / EXPIRED ERROR */}
+      {currentView === 'not-found' && (
+        <main className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[70vh]">
+          <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl border border-stone-200 animate-in fade-in zoom-in-95 duration-500">
+            <div className="w-20 h-20 mx-auto bg-rose-50 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-10 h-10 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-cinzel font-bold text-stone-900 mb-3">Invitation Not Found</h2>
+            <p className="text-stone-600 mb-8 leading-relaxed">
+              This invitation link is incomplete, expired, or the data was too large to save. Please request a new link from the host.
+            </p>
+            <button
+              onClick={() => {
+                window.location.href = '/';
+              }}
+              className="w-full py-4 px-6 rounded-xl font-medium text-white bg-stone-900 hover:bg-stone-800 transition shadow-sm"
+            >
+              Go to Homepage
+            </button>
+          </div>
+        </main>
       )}
 
       {/* VIEW 1: INVITEO-STYLE LANDING PAGE WITH 8 COMPLETE SECTIONS */}
