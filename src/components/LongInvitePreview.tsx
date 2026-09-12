@@ -455,17 +455,6 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
           />
         </div>
 
-        {/* SECTION 8: PARNA VIDHI GUIDE */}
-        <div id="preview-vidhi" className="py-5 px-3">
-          <ParnaVidhiGuide
-            accentColor={colors.accentGold}
-            textColor={colors.text}
-            isDark={isDark}
-            sectionBg={colors.sectionBg}
-            sectionBorder={colors.sectionBorder}
-          />
-        </div>
-
         {/* SECTION 9: SACRED ANUMODNA & SWAMI VATSALYA RSVP */}
         <div id="preview-anumodna" className="py-5 px-3">
           <AnumodnaAndRSVP

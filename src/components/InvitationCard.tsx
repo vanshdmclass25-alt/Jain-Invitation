@@ -487,17 +487,6 @@ export const InvitationCard: React.FC<InvitationCardProps> = React.memo(({
             </div>
           )}
 
-          {/* 9. Parna Vidhi & Rituals Guide */}
-          <div className="relative z-10 w-full max-w-md my-4">
-            <ParnaVidhiGuide
-              accentColor={colors.accentGold}
-              textColor={colors.text}
-              isDark={isDark}
-              sectionBg={colors.sectionBg}
-              sectionBorder={colors.sectionBorder}
-            />
-          </div>
-
           {/* 10. Sacred Anumodna Celebration & Swami Vatsalya RSVP */}
           <div className="relative z-10 w-full max-w-md my-4">
             <AnumodnaAndRSVP
