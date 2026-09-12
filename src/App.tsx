@@ -434,7 +434,7 @@ export function App() {
         />
       )}
 
-      {/* VIEW: NOT FOUND / EXPIRED ERROR */}
+      {/* VIEW: NOT FOUND / ERROR */}
       {currentView === 'not-found' && (
         <main className="flex-1 flex flex-col items-center justify-center p-6 text-center min-h-[70vh]">
           <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl border border-stone-200 animate-in fade-in zoom-in-95 duration-500">
@@ -445,7 +445,7 @@ export function App() {
             </div>
             <h2 className="text-2xl font-cinzel font-bold text-stone-900 mb-3">Invitation Not Found</h2>
             <p className="text-stone-600 mb-8 leading-relaxed">
-              This invitation link is incomplete, expired, or the data was too large to save. Please request a new link from the host.
+              This invitation link could not be loaded. The link may be incomplete, temporarily unavailable, or the data exceeded size limits. Please ask the host to re-share the link.
             </p>
             <button
               onClick={() => {
