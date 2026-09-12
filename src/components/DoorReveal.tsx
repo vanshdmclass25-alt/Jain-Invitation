@@ -4,7 +4,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 import { TemplateDefinition, InvitationData } from '../types';
 import { DEFAULT_INVITATION_DATA } from '../config/templates';
 import { SupportedLanguage, TRANSLATIONS } from '../utils/translations';
-import { playTempleBellChime } from '../utils/audio';
+import { playTempleBellChime, spiritualAudio } from '../utils/audio';
 import {
   OrnateArchBorder,
   JainDhyanaSymbol,
@@ -62,6 +62,9 @@ export const DoorReveal: React.FC<DoorRevealProps> = ({
     if (isOpening || isOpen) return;
     setIsOpening(true);
     playTempleBellChime();
+    
+    // Start background bhajan audio
+    spiritualAudio.start();
 
     // Trigger celebratory soft gold particles
     try {
