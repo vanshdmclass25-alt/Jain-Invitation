@@ -97,6 +97,47 @@ async function startServer() {
     });
   }
 
+  // High-performance Open Graph Image Proxy
+  // Converts base64 profile images stored in Firestore into raw binary images for social media crawlers
+  app.get('/api/og-image', async (req, res) => {
+    const shortId = req.query.id as string;
+    if (!shortId) {
+      return res.redirect('/logo.png');
+    }
+    
+    try {
+      const projectId = "gen-lang-client-0686532282";
+      const databaseId = "ai-studio-remixjaintapasya-0fe58bd3-d32d-4c6e-a702-62dc5c7bca23";
+      const apiKey = "AIzaSyCxfCVDV4s5hF3R-Gro1Xv_q6sNcE5nt6I";
+      const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents/invitations/${shortId}?key=${apiKey}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+         return res.redirect('/logo.png');
+      }
+
+      const doc = await response.json();
+      const dataFields = doc.fields?.data?.mapValue?.fields;
+      
+      if (dataFields && dataFields.profileImage?.stringValue) {
+        const base64Data = dataFields.profileImage.stringValue;
+        const match = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
+        if (match) {
+          const contentType = match[1];
+          const buffer = Buffer.from(match[2], 'base64');
+          res.setHeader('Content-Type', contentType);
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.send(buffer);
+        }
+      }
+      
+      res.redirect('/logo.png');
+    } catch (err) {
+      console.error('Error serving og-image:', err);
+      res.redirect('/logo.png');
+    }
+  });
+
   // Dynamic Open Graph preview route (must come BEFORE vite.middlewares or express.static)
   app.get(['/', '/index.html'], async (req, res, next) => {
     const shortId = (req.query.id || req.query.i) as string;
@@ -123,18 +164,21 @@ async function startServer() {
       const dataFields = doc.fields?.data?.mapValue?.fields;
       let name = 'our Tapasvi';
       let tapasyaType = 'Jain Tapasya';
+      let profileImage = `https://${req.get('host')}/logo.png`; 
       
       if (dataFields) {
         name = dataFields.name?.stringValue || name;
         tapasyaType = dataFields.tapasyaType?.stringValue || tapasyaType;
+        
+        // If they uploaded a profile image, use the dynamic proxy to serve it to WhatsApp
+        if (dataFields.profileImage?.stringValue) {
+          profileImage = `https://${req.get('host')}/api/og-image?id=${shortId}`;
+        }
       }
 
       const title = `✨ Invitation: ${name}'s ${tapasyaType} Pārna`;
       const description = `You are warmly invited to the sacred Pārna Mahotsav of ${name}. Tap the link to view the complete invitation.`;
       
-      // Use the absolute URL for the logo so social media crawlers can load it
-      const fallbackImage = `https://${req.get('host')}/logo.png`; 
-
       let templateHtml = '';
       const fs = await import('fs/promises');
 
@@ -150,7 +194,7 @@ async function startServer() {
         .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?>/gi, `<meta name="description" content="${description}" />`)
         .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:title" content="${title}" />`)
         .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:description" content="${description}" />`)
-        .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:image" content="${fallbackImage}" />`);
+        .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:image" content="${profileImage}" />`);
 
       if (vite) {
         modifiedHtml = await vite.transformIndexHtml(req.originalUrl, modifiedHtml);
