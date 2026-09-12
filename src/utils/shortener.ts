@@ -90,7 +90,9 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
   const shortId = getOrCreateInvitationId(data);
   
   const origin = window.location.origin;
-  const directShortUrl = `${origin}/?id=${shortId}`;
+  // Use a cache-buster parameter (based on current time) so WhatsApp re-fetches the Open Graph image when users edit their invitation
+  const cacheBuster = Date.now().toString(36);
+  const directShortUrl = `${origin}/?id=${shortId}&v=${cacheBuster}`;
 
   // 1. Save or Update payload to Firestore
   try {

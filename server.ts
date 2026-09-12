@@ -102,7 +102,7 @@ async function startServer() {
   app.get('/api/og-image', async (req, res) => {
     const shortId = req.query.id as string;
     if (!shortId) {
-      return res.redirect('/logo.png');
+      return res.redirect(`https://${req.get('host')}/logo.png`);
     }
     
     try {
@@ -113,7 +113,7 @@ async function startServer() {
       
       const response = await fetch(url);
       if (!response.ok) {
-         return res.redirect('/logo.png');
+         return res.redirect(`https://${req.get('host')}/logo.png`);
       }
 
       const doc = await response.json();
@@ -131,10 +131,10 @@ async function startServer() {
         }
       }
       
-      res.redirect('/logo.png');
+      res.redirect(`https://${req.get('host')}/logo.png`);
     } catch (err) {
       console.error('Error serving og-image:', err);
-      res.redirect('/logo.png');
+      res.redirect(`https://${req.get('host')}/logo.png`);
     }
   });
 
@@ -142,43 +142,40 @@ async function startServer() {
   app.get(['/', '/index.html'], async (req, res, next) => {
     const shortId = (req.query.id || req.query.i) as string;
     
-    // If no ID, fallback to regular serving
-    if (!shortId) {
-      return next();
-    }
+    // Default Fallbacks
+    let title = 'Tattva — Paarna Invitations';
+    let description = 'A premium, responsive interactive invitation platform for Jain Tapasya Pārna celebrations by Tattva, featuring luxury templates, Bhagwan Mahavir Swami darshan, and live WhatsApp sharing.';
+    let ogImage = `https://${req.get('host')}/logo.png`;
 
     try {
-      // 1. Fetch document from Firestore REST API
-      const projectId = "gen-lang-client-0686532282";
-      const databaseId = "ai-studio-remixjaintapasya-0fe58bd3-d32d-4c6e-a702-62dc5c7bca23";
-      const apiKey = "AIzaSyCxfCVDV4s5hF3R-Gro1Xv_q6sNcE5nt6I";
-      const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents/invitations/${shortId}?key=${apiKey}`;
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        return next(); 
-      }
-
-      const doc = await response.json();
-      
-      const dataFields = doc.fields?.data?.mapValue?.fields;
-      let name = 'our Tapasvi';
-      let tapasyaType = 'Jain Tapasya';
-      let profileImage = `https://${req.get('host')}/logo.png`; 
-      
-      if (dataFields) {
-        name = dataFields.name?.stringValue || name;
-        tapasyaType = dataFields.tapasyaType?.stringValue || tapasyaType;
+      if (shortId) {
+        // 1. Fetch document from Firestore REST API
+        const projectId = "gen-lang-client-0686532282";
+        const databaseId = "ai-studio-remixjaintapasya-0fe58bd3-d32d-4c6e-a702-62dc5c7bca23";
+        const apiKey = "AIzaSyCxfCVDV4s5hF3R-Gro1Xv_q6sNcE5nt6I";
+        const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents/invitations/${shortId}?key=${apiKey}`;
         
-        // If they uploaded a profile image, use the dynamic proxy to serve it to WhatsApp
-        if (dataFields.profileImage?.stringValue) {
-          profileImage = `https://${req.get('host')}/api/og-image?id=${shortId}`;
+        const response = await fetch(url);
+        if (response.ok) {
+          const doc = await response.json();
+          
+          const dataFields = doc.fields?.data?.mapValue?.fields;
+          
+          if (dataFields) {
+            const name = dataFields.name?.stringValue || 'our Tapasvi';
+            const tapasyaType = dataFields.tapasyaType?.stringValue || 'Jain Tapasya';
+            
+            title = `✨ Invitation: ${name}'s ${tapasyaType} Pārna`;
+            description = `You are warmly invited to the sacred Pārna Mahotsav of ${name}. Tap the link to view the complete invitation.`;
+            
+            // If they uploaded a profile image, use the dynamic proxy to serve it to WhatsApp
+            if (dataFields.profileImage?.stringValue) {
+              ogImage = `https://${req.get('host')}/api/og-image?id=${shortId}`;
+            }
+          }
         }
       }
 
-      const title = `✨ Invitation: ${name}'s ${tapasyaType} Pārna`;
-      const description = `You are warmly invited to the sacred Pārna Mahotsav of ${name}. Tap the link to view the complete invitation.`;
-      
       let templateHtml = '';
       const fs = await import('fs/promises');
 
@@ -194,7 +191,7 @@ async function startServer() {
         .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?>/gi, `<meta name="description" content="${description}" />`)
         .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:title" content="${title}" />`)
         .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:description" content="${description}" />`)
-        .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:image" content="${profileImage}" />`);
+        .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:image" content="${ogImage}" />`);
 
       if (vite) {
         modifiedHtml = await vite.transformIndexHtml(req.originalUrl, modifiedHtml);
