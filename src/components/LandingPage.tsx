@@ -5,6 +5,7 @@ import { InviteODesigns } from './InviteODesigns';
 import { InviteOWhatsAppProof } from './InviteOWhatsAppProof';
 import { InviteOHowItWorks } from './InviteOHowItWorks';
 import { InviteOTestimonials } from './InviteOTestimonials';
+import { InviteOPricing } from './InviteOPricing';
 import { InviteOFaq } from './InviteOFaq';
 import { InviteOCtaBand } from './InviteOCtaBand';
 import { InviteOFooter } from './InviteOFooter';
@@ -89,6 +90,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* 5. SECTION: FAMILIES LOVE THEIR INVITE WEBSITES */}
         <InviteOTestimonials />
+
+        {/* 6. SECTION: PRICING (HONEST AND TRANSPARENT) */}
+        <InviteOPricing onCreateInvite={onExplore} />
 
         {/* 7. SECTION: FREQUENTLY ASKED QUESTIONS */}
         <InviteOFaq />

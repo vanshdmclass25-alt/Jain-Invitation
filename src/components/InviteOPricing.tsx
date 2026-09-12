@@ -1,5 +1,5 @@
 import React from 'react';
-import { Check, Sparkles, ShieldCheck, Zap, ArrowRight } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import { PriceTagBadge } from './PriceTagBadge';
 
 interface InviteOPricingProps {
@@ -8,114 +8,80 @@ interface InviteOPricingProps {
 
 export const InviteOPricing: React.FC<InviteOPricingProps> = ({ onCreateInvite }) => {
   const features = [
-    'Your own personal link (e.g. jain-invitation.vercel.app/#designs)',
-    'Sacred darshan with Bhagwan Mahavir Swami',
-    'Tapasvi portrait photo & sacred tapasya vow highlights',
-    'Sacred ambient audio stotra & bell chimes',
-    'Complete Pārna ceremony schedule & auspicious Muhurats',
-    'Interactive Google Maps venue location with 1-tap directions',
-    'Interactive Pushpanjali floral devotion & secret scratch card',
-    'Instant digital invitation card download (high-res image)',
-    '24-Hour Editing Pass (customize photos, music & details for 24h)',
-    'LIFETIME Live Website Access — your invitation website stays LIVE ALWAYS for all guests',
-    'Zero advertisements or third-party banners',
+    "Interactive 3D Door Opening Darshan",
+    "Choice of 3 Premium Luxury Templates",
+    "Family Photo Gallery & Milestone Memories",
+    "Event Schedule with Google Maps Integration",
+    "Custom Spiritual Background Audio",
+    "Multi-language (Gujarati, Hindi, English)",
+    "Interactive Scratch Reveal Darshan"
   ];
 
   return (
-    <section id="pricing" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF8EE] via-[#F4EEDD] to-[#FAF8EE] border-t border-[#E0A458]/20">
+    <section className="py-20 sm:py-28 bg-[#FAF8EE] relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-block px-3 py-1 rounded-full bg-white text-[#C98A3E] text-xs font-bold uppercase tracking-widest border border-[#E0A458]/40 mb-3">
-            Transparent Pricing
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="font-devanagari text-sm tracking-widest text-[#8C5D1F] uppercase font-bold mb-4 block">
+            ॥ Simple & Transparent ॥
           </span>
-
-          <h2 className="font-poppins text-2xl sm:text-4xl font-bold text-[#2A2018] tracking-tight mb-3">
-            One price. Unlimited guests.
+          <h2 className="font-poppins text-3xl sm:text-5xl font-extrabold tracking-tight text-[#2A2018] mb-6">
+            Everything you need for a divine invitation.
           </h2>
-
-          <p className="text-[#5C4E42] text-sm sm:text-base leading-relaxed">
-            Pay once. No subscriptions, no per-guest charges, no hidden fees.
+          <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+            One single flat price for complete access to the premium Tattva interactive Pārna invitation platform. No hidden fees, no subscriptions.
           </p>
         </div>
 
         {/* Pricing Card */}
-        <div className="max-w-xl mx-auto bg-white rounded-3xl p-6 sm:p-10 border-2 border-[#E0A458]/60 shadow-xl relative overflow-hidden">
-          {/* Top Gold Corner Glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/40 rounded-full blur-2xl pointer-events-none" />
+        <div className="max-w-lg mx-auto bg-white rounded-[32px] p-8 sm:p-10 shadow-2xl border border-stone-200 relative overflow-hidden">
+          {/* Subtle Background Accent */}
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-radial from-[#F3ECCE] via-[#FAF8EE]/20 to-transparent opacity-50 blur-2xl pointer-events-none" />
 
           {/* Pricing Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-stone-200 gap-4">
-            <div>
-              <span className="inline-block px-2.5 py-0.5 rounded-md bg-[#2A2018] text-[#E0A458] text-[10px] font-bold uppercase tracking-wider mb-2">
-                All-Inclusive Package
-              </span>
-              <h3 className="font-poppins text-xl font-bold text-[#2A2018]">
-                Personalised Pārna Invite Website
-              </h3>
-              <p className="text-xs text-stone-500 mt-0.5">
-                Fully personalized · Live in 2 minutes
-              </p>
+          <div className="relative z-10 flex flex-col items-center text-center border-b border-stone-100 pb-8 mb-8">
+            <h3 className="text-xl font-bold font-cinzel text-[#8B6E28] mb-2 uppercase tracking-wide">
+              Complete Package
+            </h3>
+            <div className="flex items-baseline gap-1 justify-center text-[#2A2018]">
+              <span className="text-3xl font-bold">₹</span>
+              <span className="text-6xl font-extrabold tracking-tighter">499</span>
             </div>
-
-            <div className="text-left sm:text-right">
-              <div className="flex items-baseline sm:justify-end gap-2">
-                <span className="text-sm text-stone-400 line-through">₹999</span>
-                <span className="text-3xl sm:text-4xl font-black font-poppins text-[#2A2018]">
-                  ₹499
-                </span>
-              </div>
-              <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-1">
-                Special Offer (Save ₹500)
-              </span>
-            </div>
+            <p className="text-stone-500 text-sm mt-3 font-medium">
+              One-time payment. Lifetime access.
+            </p>
           </div>
 
-          {/* Feature List */}
-          <div className="py-6 space-y-3.5">
-            {features.map((feat, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-amber-100 text-[#8C5D1F] flex items-center justify-center shrink-0 mt-0.5">
-                  <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+          {/* Features List */}
+          <div className="relative z-10 space-y-4 mb-10">
+            {features.map((feature, idx) => (
+              <div key={idx} className="flex items-start gap-3">
+                <div className="mt-1 w-5 h-5 rounded-full bg-[#FAF3DF] flex items-center justify-center shrink-0">
+                  <Check className="w-3.5 h-3.5 text-[#8C5D1F] stroke-[3]" />
                 </div>
-                <span className="text-xs sm:text-sm text-stone-700 leading-snug">
-                  {feat}
+                <span className="text-stone-700 text-sm sm:text-base leading-relaxed">
+                  {feature}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Action CTA */}
-          <div className="pt-6 border-t border-stone-100">
-            <div className="relative">
-              <div className="absolute -top-3.5 left-2 sm:left-4 z-20">
-                <PriceTagBadge price="₹499" period="ONE-TIME" />
-              </div>
-              <button
-                onClick={onCreateInvite}
-                className="w-full py-4 px-6 rounded-full bg-[#2A2018] hover:bg-[#160F0A] text-[#FBF8EE] font-poppins font-bold text-sm sm:text-base shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Create Your Invite Website — ₹499</span>
-                <ArrowRight className="w-4 h-4 text-[#E0A458]" />
-              </button>
+          {/* CTA Button */}
+          <div className="relative z-10 w-full text-center">
+            <div className="absolute -top-3.5 -left-2 z-20">
+              <PriceTagBadge price="₹499" period="ONE-TIME" />
             </div>
-
-            <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-stone-500">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>100% Secure UPI / Card</span>
-              </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span>Instant Activation</span>
-              </span>
-            </div>
+            <button
+              onClick={onCreateInvite}
+              className="w-full py-4 rounded-xl bg-[#2A2018] hover:bg-[#1A130E] text-[#FBF8EE] font-poppins font-bold text-base shadow-lg transition cursor-pointer flex items-center justify-center gap-2 group"
+            >
+              <span>Create Your Invite Now</span>
+              <Sparkles className="w-4 h-4 text-[#E0A458] group-hover:scale-110 transition-transform" />
+            </button>
           </div>
 
         </div>
-
       </div>
     </section>
   );
