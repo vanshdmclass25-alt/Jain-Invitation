@@ -11,6 +11,7 @@ import { CustomizationGate } from './components/CustomizationGate';
 import { AdminDashboard } from './components/AdminDashboard';
 import { InvitationData, TemplateId } from './types';
 import { TEMPLATES } from './config/templates';
+import { DEFAULT_INVITATION_DATA } from './config/templates';
 import { loadSavedInvitation, saveInvitation, generateShareableUrl } from './utils/storage';
 import { fetchInvitationById, getOrGenerateShortUrl, getOrCreateInvitationId } from './utils/shortener';
 import { downloadInvitationCard } from './utils/download';
@@ -462,7 +463,7 @@ export function App() {
       {currentView === 'landing' && (
         <main className="flex-1 flex flex-col">
           <LandingPage
-            data={data}
+            data={DEFAULT_INVITATION_DATA}
             template={currentTemplate}
             onExplore={() => setCurrentView('editor')}
             onSelectTemplate={(templateId) => {
