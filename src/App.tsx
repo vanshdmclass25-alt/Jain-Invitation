@@ -189,58 +189,49 @@ export function App() {
               if (recoveredData) {
                 // It's the creator! Auto-heal their massive images right now and sync to database.
                 let modified = false;
-                if (recoveredData.profileImage && recoveredData.profileImage.length > 100000) {
-                  recoveredData.profileImage = await compressDataUrl(recoveredData.profileImage, 400, 0.6);
-                  modified = true;
-                }
                 
-                if (recoveredData.mahavirSwamiImage && recoveredData.mahavirSwamiImage.length > 100000) {
-                  recoveredData.mahavirSwamiImage = await compressDataUrl(recoveredData.mahavirSwamiImage, 400, 0.6);
-                  modified = true;
-                }
+                // Helper to compress inline inside the async effect
+                const healImage = async (url) => {
+                  if (url && url.length > 100000) {
+                    modified = true;
+                    return await compressDataUrl(url, 800, 0.8);
+                  }
+                  return url;
+                };
 
-                if (recoveredData.familyPhoto && recoveredData.familyPhoto.length > 100000) {
-                  recoveredData.familyPhoto = await compressDataUrl(recoveredData.familyPhoto, 400, 0.6);
-                  modified = true;
-                }
-
-                if (recoveredData.familyPhotos && recoveredData.familyPhotos.length > 0) {
-                  recoveredData.familyPhotos = await Promise.all(recoveredData.familyPhotos.map(async (url: string) => {
-                    if (url && url.length > 100000) {
-                      modified = true;
-                      return await compressDataUrl(url, 400, 0.6);
-                    }
-                    return url;
-                  }));
-                }
-
-                if (recoveredData.yearlyPhotos && recoveredData.yearlyPhotos.length > 0) {
-                  recoveredData.yearlyPhotos = await Promise.all(recoveredData.yearlyPhotos.map(async (m: any) => {
-                    if (m.photoUrl && m.photoUrl.length > 100000) {
-                      modified = true;
-                      return { ...m, photoUrl: await compressDataUrl(m.photoUrl, 400, 0.6) };
-                    }
-                    return m;
-                  }));
-                }
-
-                // STRIP BASE64 AUDIO: Prevent legacy uploaded MP3s from crashing Firestore
-                if (recoveredData.customAudioUrl && recoveredData.customAudioUrl.startsWith('data:')) {
-                  recoveredData.customAudioUrl = '';
-                  modified = true;
-                }
-                if (recoveredData.songAudioUrls) {
-                  Object.keys(recoveredData.songAudioUrls).forEach((key) => {
-                    if (recoveredData.songAudioUrls![key]?.startsWith('data:')) {
-                      recoveredData.songAudioUrls![key] = '';
-                      modified = true;
-                    }
-                  });
-                }
+                const runHeal = async () => {
+                  if (recoveredData.profileImage) recoveredData.profileImage = await healImage(recoveredData.profileImage);
+                  if (recoveredData.mahavirSwamiImage) recoveredData.mahavirSwamiImage = await healImage(recoveredData.mahavirSwamiImage);
+                  if (recoveredData.familyPhoto) recoveredData.familyPhoto = await healImage(recoveredData.familyPhoto);
+                  
+                  if (recoveredData.familyPhotos) {
+                    recoveredData.familyPhotos = await Promise.all(recoveredData.familyPhotos.map(healImage));
+                  }
+                  if (recoveredData.yearlyPhotos) {
+                    recoveredData.yearlyPhotos = await Promise.all(recoveredData.yearlyPhotos.map(async (m) => ({
+                      ...m,
+                      photoUrl: await healImage(m.photoUrl)
+                    })));
+                  }
+                  
+                  // Strip base64 audio to auto-heal old massive payloads
+                  if (recoveredData.customAudioUrl && recoveredData.customAudioUrl.startsWith('data:')) {
+                    recoveredData.customAudioUrl = '';
+                  }
+                  if (recoveredData.songAudioUrls) {
+                    Object.keys(recoveredData.songAudioUrls).forEach(key => {
+                      if (recoveredData.songAudioUrls[key]?.startsWith('data:')) {
+                        recoveredData.songAudioUrls[key] = '';
+                      }
+                    });
+                  }
+                  
+                  setData(recoveredData);
+                  getOrGenerateShortUrl(recoveredData).catch(console.error);
+                };
                 
-                setData(recoveredData);
-                getOrGenerateShortUrl(recoveredData).catch(console.error);
-                
+                runHeal();
+
                 // Since they are the creator, let's treat them as the editor so they can make changes
                 setIsGuestView(false);
                 setIsLoadingShortLink(false);

@@ -443,11 +443,7 @@ export const LongInvitePreview: React.FC<LongInvitePreviewProps> = ({
           template={template}
           language={activeLang}
         textColor={canvasTextColor} />
-        <YearlyJourneyTimeline
-          milestones={data.yearlyPhotos}
-          template={template}
-          language={activeLang}
-        textColor={canvasTextColor} />
+        
 
         {/* SECTION 7: SCRATCHABLE BOX */}
         <div id="preview-scratch" className="py-5 px-3">

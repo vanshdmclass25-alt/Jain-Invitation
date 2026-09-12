@@ -448,12 +448,7 @@ export const InvitationCard: React.FC<InvitationCardProps> = React.memo(({
             template={currentTemplate}
             language={activeLang}
           />
-          <YearlyJourneyTimeline
-            milestones={data.yearlyPhotos}
-            template={currentTemplate}
-            language={activeLang}
-            onPreviewPhoto={onPreviewPhoto}
-          />
+          
 
           {/* Additional Information (No WhatsApp RSVP) */}
           {data.additionalInformation && (

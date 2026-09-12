@@ -110,32 +110,6 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
     updateField('googleMapsUrl', url);
   };
 
-  // Yearly Milestone handlers
-  const handleAddYearlyMilestone = () => {
-    const nextYear = String(new Date().getFullYear());
-    const newMilestone: YearlyPhotoMilestone = {
-      id: String(Date.now()),
-      year: nextYear,
-      photoUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-      caption: 'Tapasya Milestone',
-    };
-    const updated = [...(data.yearlyPhotos || []), newMilestone];
-    updateField('yearlyPhotos', updated);
-  };
-
-  const handleUpdateYearlyMilestone = (index: number, key: keyof YearlyPhotoMilestone, value: string) => {
-    const list = [...(data.yearlyPhotos || [])];
-    if (list[index]) {
-      list[index] = { ...list[index], [key]: value };
-      updateField('yearlyPhotos', list);
-    }
-  };
-
-  const handleRemoveYearlyMilestone = (index: number) => {
-    const list = (data.yearlyPhotos || []).filter((_, i) => i !== index);
-    updateField('yearlyPhotos', list);
-  };
-
   // Event Schedule handlers
   const handleAddEvent = (title = '', date = '', time = '') => {
     const newEvent: EventSchedule = {
@@ -363,36 +337,6 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
           }
         }}
       />
-
-      {/* SECTION C: BHAGWAN MAHAVIR SWAMI IMAGE */}
-      <div className="p-4 rounded-xl bg-[#FFFDF7] border border-[#E0A458]/40 space-y-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#C98A3E]" />
-            <label className="text-sm font-semibold text-stone-900">
-              Template Background / Bhagwan Mahavir Image
-            </label>
-          </div>
-          {data.mahavirSwamiImage && (
-            <button
-              type="button"
-              onClick={() => updateField('mahavirSwamiImage', '')}
-              className="text-xs text-[#C98A3E] hover:underline cursor-pointer"
-            >
-              Reset to Default
-            </button>
-          )}
-        </div>
-        <p className="text-xs text-stone-500">
-          Hyperrealistic Padmasana darshan with golden Chhatra and glowing halo. You can optionally upload your derasar's pratima.
-        </p>
-        <ImageUploader
-          label="Custom Background or Idol Photo (Optional)"
-          image={data.mahavirSwamiImage || ''}
-          onChange={(url) => updateField('mahavirSwamiImage', url)}
-          helperText="Leave empty to use the sacred hyperrealistic Mahavir Swami darshan"
-        />
-      </div>
 
       {/* SECTION D: TAPASYA TYPE */}
       <div className="space-y-2">
@@ -713,53 +657,6 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
       </div>
 
       {/* SECTION H: OPTIONAL PHOTOS PER YEAR (ONE LINE CHART TIMELINE) */}
-      <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#8B6E28]" />
-            <span className="text-sm font-semibold text-stone-900">
-              Yearly Journey Photos (One Line Chart Timeline)
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setShowYearlySection(!showYearlySection)}
-            className="text-xs text-[#8B6E28] font-medium hover:underline cursor-pointer"
-          >
-            {showYearlySection ? 'Collapse' : 'Show Section'}
-          </button>
-        </div>
-
-        <p className="text-xs text-stone-500">
-          Add milestone photos per year (e.g. 2020, 2022, 2024, 2026) displayed along a connected horizontal line chart.
-        </p>
-
-        {showYearlySection && (
-          <div className="space-y-3 pt-2">
-            {(data.yearlyPhotos || []).map((item, idx) => (
-              <YearlyMilestoneUploader
-                key={item.id || idx}
-                milestone={item}
-                index={idx}
-                onUpdate={(field, val) => handleUpdateYearlyMilestone(idx, field, val)}
-                onRemove={() => handleRemoveYearlyMilestone(idx)}
-                onPreviewPhoto={onPreviewPhoto}
-              />
-            ))}
-
-            <button
-              type="button"
-              onClick={handleAddYearlyMilestone}
-              className="w-full py-2.5 rounded-xl border-2 border-dashed border-stone-300 hover:border-[#8B6E28] text-xs font-semibold text-stone-600 hover:text-[#8B6E28] flex items-center justify-center gap-1.5 transition cursor-pointer bg-white"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Year Milestone</span>
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* SECTION I: SCRATCHABLE BOX (HIDDEN MESSAGE) */}
       <div className="p-4 rounded-xl bg-[#FFFDF7] border border-[#E0A458]/40 space-y-3">
         <div className="flex items-center gap-2">

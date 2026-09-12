@@ -13,7 +13,6 @@ const shortUrlCache = new Map<string, string>();
 export async function copyToClipboard(text: string): Promise<boolean> {
   if (!text) return false;
   
-  // 1. Modern Navigator Clipboard API
   try {
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
@@ -23,7 +22,6 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     console.warn('Navigator clipboard API failed, attempting fallback:', err);
   }
 
-  // 2. ExecCommand Fallback (works in iFrames & non-HTTPS HTTP environments)
   try {
     const textArea = document.createElement('textarea');
     textArea.value = text;
@@ -59,7 +57,6 @@ export function generateLegacyShortId(data: InvitationData): string {
 
 /**
  * Gets or creates a unique ID for this device's invitation.
- * This ensures the user's shared link stays the same, and they don't overwrite others.
  */
 export function getOrCreateInvitationId(data: InvitationData): string {
   if (typeof window === 'undefined') return 'preview_mode';
@@ -67,14 +64,10 @@ export function getOrCreateInvitationId(data: InvitationData): string {
   let existingId = localStorage.getItem('my_invitation_short_id');
   if (existingId) return existingId;
   
-  // Backward compatibility: If they are an existing user who already created an invite,
-  // we want to recover their old hash so they can update their existing link!
-  // If their name is already filled out, assume they are an existing user.
   let newId;
   if (data && data.name) {
     newId = generateLegacyShortId(data);
   } else {
-    // Brand new user, generate random
     newId = Math.random().toString(36).substring(2, 9);
   }
   
@@ -95,24 +88,25 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
   const directShortUrl = `${origin}/?id=${shortId}&v=${cacheBuster}`;
 
   // Aggressively compress images before pushing to Firestore to prevent 1MB limit errors
+  // Tuned to 800px / 0.8 quality to preserve clarity while ensuring small file size
   const compressedData = { ...data };
   if (compressedData.profileImage && compressedData.profileImage.length > 50000) {
-    compressedData.profileImage = await compressDataUrl(compressedData.profileImage, 400, 0.6);
+    compressedData.profileImage = await compressDataUrl(compressedData.profileImage, 800, 0.8);
   }
   if (compressedData.mahavirSwamiImage && compressedData.mahavirSwamiImage.length > 50000) {
-    compressedData.mahavirSwamiImage = await compressDataUrl(compressedData.mahavirSwamiImage, 400, 0.6);
+    compressedData.mahavirSwamiImage = await compressDataUrl(compressedData.mahavirSwamiImage, 800, 0.8);
   }
   if (compressedData.familyPhoto && compressedData.familyPhoto.length > 50000) {
-    compressedData.familyPhoto = await compressDataUrl(compressedData.familyPhoto, 400, 0.6);
+    compressedData.familyPhoto = await compressDataUrl(compressedData.familyPhoto, 800, 0.8);
   }
   if (compressedData.familyPhotos && compressedData.familyPhotos.length > 0) {
     compressedData.familyPhotos = await Promise.all(compressedData.familyPhotos.map(async (url) => {
-      return (url && url.length > 50000) ? await compressDataUrl(url, 400, 0.6) : url;
+      return (url && url.length > 50000) ? await compressDataUrl(url, 800, 0.8) : url;
     }));
   }
   if (compressedData.yearlyPhotos && compressedData.yearlyPhotos.length > 0) {
     compressedData.yearlyPhotos = await Promise.all(compressedData.yearlyPhotos.map(async (m) => {
-      return (m.photoUrl && m.photoUrl.length > 50000) ? { ...m, photoUrl: await compressDataUrl(m.photoUrl, 400, 0.6) } : m;
+      return (m.photoUrl && m.photoUrl.length > 50000) ? { ...m, photoUrl: await compressDataUrl(m.photoUrl, 800, 0.8) } : m;
     }));
   }
   
@@ -137,17 +131,9 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
     }, { merge: true });
   } catch (err) {
     console.warn('Firestore short document save notice:', err);
-    // CRITICAL: We MUST throw here! If Firestore fails (e.g. payload > 1MB even after compression),
-    // returning the directShortUrl will point to an empty document, breaking the link!
-    // By throwing, the share handler will automatically fall back to the long base64 URL which ALWAYS works.
     throw err;
   }
 
-  // Return our own branded short URL (e.g. https://domain.com/?id=abcde)
-  // We no longer use external shorteners (like is.gd/tinyurl) because:
-  // 1. Our ID is already very short (7 chars)
-  // 2. Using our own domain is more trustworthy for guests
-  // 3. Social media crawlers (WhatsApp) fetch Open Graph tags much more reliably without redirects
   return directShortUrl;
 }
 
@@ -170,4 +156,3 @@ export async function fetchInvitationById(id: string): Promise<InvitationData | 
   }
   return null;
 }
-
