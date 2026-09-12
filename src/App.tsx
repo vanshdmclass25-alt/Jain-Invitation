@@ -112,6 +112,20 @@ export function App() {
             modified = true;
           }
         }
+
+        // STRIP BASE64 AUDIO: Prevent legacy uploaded MP3s from crashing Firestore
+        if (healedData.customAudioUrl && healedData.customAudioUrl.startsWith('data:')) {
+          healedData.customAudioUrl = '';
+          modified = true;
+        }
+        if (healedData.songAudioUrls) {
+          Object.keys(healedData.songAudioUrls).forEach((key) => {
+            if (healedData.songAudioUrls![key]?.startsWith('data:')) {
+              healedData.songAudioUrls![key] = '';
+              modified = true;
+            }
+          });
+        }
         
         if (modified) {
           setData(healedData);
@@ -207,6 +221,20 @@ export function App() {
                     }
                     return m;
                   }));
+                }
+
+                // STRIP BASE64 AUDIO: Prevent legacy uploaded MP3s from crashing Firestore
+                if (recoveredData.customAudioUrl && recoveredData.customAudioUrl.startsWith('data:')) {
+                  recoveredData.customAudioUrl = '';
+                  modified = true;
+                }
+                if (recoveredData.songAudioUrls) {
+                  Object.keys(recoveredData.songAudioUrls).forEach((key) => {
+                    if (recoveredData.songAudioUrls![key]?.startsWith('data:')) {
+                      recoveredData.songAudioUrls![key] = '';
+                      modified = true;
+                    }
+                  });
                 }
                 
                 setData(recoveredData);

@@ -66,6 +66,15 @@ export function generateShareableUrl(data: InvitationData): string {
       url?.startsWith('data:') ? '' : url
     ).filter(Boolean) as string[];
 
+    const cleanSongAudioUrls = { ...data.songAudioUrls };
+    if (cleanSongAudioUrls) {
+      Object.keys(cleanSongAudioUrls).forEach((key) => {
+        if (cleanSongAudioUrls[key]?.startsWith('data:')) {
+          delete cleanSongAudioUrls[key];
+        }
+      });
+    }
+
     const shareableFields = {
       name: data.name,
       headline: data.headline,
@@ -86,6 +95,8 @@ export function generateShareableUrl(data: InvitationData): string {
       additionalInformation: data.additionalInformation,
       selectedTemplate: data.selectedTemplate,
       selectedSongId: data.selectedSongId,
+      customAudioUrl: data.customAudioUrl?.startsWith('data:') ? '' : data.customAudioUrl,
+      songAudioUrls: cleanSongAudioUrls,
       hostNames: data.hostNames,
       profileImage: data.profileImage?.startsWith('data:') ? '' : data.profileImage,
     };
