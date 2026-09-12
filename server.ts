@@ -83,52 +83,87 @@ async function startServer() {
 
   app.use(express.json());
 
-  // High-performance URL shortener proxy endpoint
-  app.post('/api/shorten-url', async (req, res) => {
-    const { url } = req.body || {};
-    if (!url) {
-      res.status(400).json({ error: 'URL is required' });
-      return;
-    }
-    try {
-      // 1. Try is.gd API (returns clean short JSON)
-      const isGdRes = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
-      if (isGdRes.ok) {
-        const data = (await isGdRes.json()) as { shorturl?: string };
-        if (data.shorturl) {
-          res.json({ shortUrl: data.shorturl });
-          return;
-        }
-      }
-
-      // 2. Fallback to TinyURL API
-      const tinyRes = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
-      if (tinyRes.ok) {
-        const shortUrl = await tinyRes.text();
-        if (shortUrl && shortUrl.startsWith('http')) {
-          res.json({ shortUrl: shortUrl.trim() });
-          return;
-        }
-      }
-
-      res.json({ shortUrl: url });
-    } catch (err) {
-      console.warn('URL shortener error:', err);
-      res.json({ shortUrl: url });
-    }
-  });
-
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
   });
 
-  // Vite middleware for development
+  // Vite and Static Serving with Dynamic Open Graph injection
+  let vite: any = null;
   if (process.env.NODE_ENV !== 'production') {
-    const vite = await createViteServer({
+    vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
+  }
+
+  // Dynamic Open Graph preview route (must come BEFORE vite.middlewares or express.static)
+  app.get(['/', '/index.html'], async (req, res, next) => {
+    const shortId = (req.query.id || req.query.i) as string;
+    
+    // If no ID, fallback to regular serving
+    if (!shortId) {
+      return next();
+    }
+
+    try {
+      // 1. Fetch document from Firestore REST API
+      const projectId = "gen-lang-client-0686532282";
+      const databaseId = "ai-studio-remixjaintapasya-0fe58bd3-d32d-4c6e-a702-62dc5c7bca23";
+      const apiKey = "AIzaSyCxfCVDV4s5hF3R-Gro1Xv_q6sNcE5nt6I";
+      const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/${databaseId}/documents/invitations/${shortId}?key=${apiKey}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        return next(); 
+      }
+
+      const doc = await response.json();
+      
+      const dataFields = doc.fields?.data?.mapValue?.fields;
+      let name = 'our Tapasvi';
+      let tapasyaType = 'Jain Tapasya';
+      
+      if (dataFields) {
+        name = dataFields.name?.stringValue || name;
+        tapasyaType = dataFields.tapasyaType?.stringValue || tapasyaType;
+      }
+
+      const title = `✨ Invitation: ${name}'s ${tapasyaType} Pārna`;
+      const description = `You are warmly invited to the sacred Pārna Mahotsav of ${name}. Tap the link to view the complete invitation.`;
+      
+      // Use the absolute URL for the logo so social media crawlers can load it
+      const fallbackImage = `https://${req.get('host')}/logo.png`; 
+
+      let templateHtml = '';
+      const fs = await import('fs/promises');
+
+      if (vite) {
+        templateHtml = await fs.readFile(path.join(process.cwd(), 'index.html'), 'utf-8');
+      } else {
+        templateHtml = await fs.readFile(path.join(process.cwd(), 'dist', 'index.html'), 'utf-8');
+      }
+
+      // Inject meta tags safely
+      let modifiedHtml = templateHtml
+        .replace(/<title>.*?<\/title>/gi, `<title>${title}</title>`)
+        .replace(/<meta\s+name="description"\s+content="[^"]*"\s*\/?>/gi, `<meta name="description" content="${description}" />`)
+        .replace(/<meta\s+property="og:title"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:title" content="${title}" />`)
+        .replace(/<meta\s+property="og:description"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:description" content="${description}" />`)
+        .replace(/<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/gi, `<meta property="og:image" content="${fallbackImage}" />`);
+
+      if (vite) {
+        modifiedHtml = await vite.transformIndexHtml(req.originalUrl, modifiedHtml);
+      }
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(modifiedHtml);
+    } catch (err) {
+      console.error('Error generating OG preview:', err);
+      next(); // fallback on error
+    }
+  });
+
+  if (vite) {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');

@@ -107,25 +107,12 @@ export async function getOrGenerateShortUrl(data: InvitationData): Promise<strin
     throw err;
   }
 
-  // 2. Shorten via backend API (is.gd / tinyurl)
-  let finalShortUrl = directShortUrl;
-  try {
-    const res = await fetch('/api/shorten-url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: directShortUrl }),
-    });
-    if (res.ok) {
-      const json = await res.json();
-      if (json.shortUrl && json.shortUrl.startsWith('http')) {
-        finalShortUrl = json.shortUrl;
-      }
-    }
-  } catch (err) {
-    console.warn('Shortener service fetch notice:', err);
-  }
-
-  return finalShortUrl;
+  // Return our own branded short URL (e.g. https://domain.com/?id=abcde)
+  // We no longer use external shorteners (like is.gd/tinyurl) because:
+  // 1. Our ID is already very short (7 chars)
+  // 2. Using our own domain is more trustworthy for guests
+  // 3. Social media crawlers (WhatsApp) fetch Open Graph tags much more reliably without redirects
+  return directShortUrl;
 }
 
 /**
