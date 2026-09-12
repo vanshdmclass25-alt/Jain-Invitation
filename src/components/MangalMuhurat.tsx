@@ -66,9 +66,11 @@ export const MangalMuhurat: React.FC<MangalMuhuratProps> = React.memo(({
             </h3>
             <p className="text-sm font-semibold mb-6">सुबह {time || '10:00'} बजे</p>
             
-            <p className="text-[11px] leading-relaxed opacity-90 text-center font-hindi max-w-[85%]">
-                {location}
-            </p>
+            {location && (
+              <p className="text-[11px] leading-relaxed opacity-90 text-center font-hindi max-w-[85%]">
+                  {location}
+              </p>
+            )}
         </div>
       </motion.div>
 
@@ -85,19 +87,21 @@ export const MangalMuhurat: React.FC<MangalMuhuratProps> = React.memo(({
             <CalendarDays className="w-4 h-4 text-rose-500" />
             {TRANSLATIONS[language]?.mangalMuhuratBtnCal || 'Add to Calendar'}
         </a>
-        <a 
-            href={mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-full text-sm font-bold shadow-md transition-transform hover:scale-105 active:scale-95 border bg-white/10 backdrop-blur-md"
-            style={{ 
-                color: appliedTextColor,
-                borderColor: `${colors.border}60`,
-            }}
-        >
-            <MapPin className="w-4 h-4 text-rose-500" />
-            {TRANSLATIONS[language]?.mangalMuhuratBtnDir || 'Get Directions'}
-        </a>
+        {mapsUrl && (
+          <a 
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-full text-sm font-bold shadow-md transition-transform hover:scale-105 active:scale-95 border bg-white/10 backdrop-blur-md"
+              style={{ 
+                  color: appliedTextColor,
+                  borderColor: `${colors.border}60`,
+              }}
+          >
+              <MapPin className="w-4 h-4 text-rose-500" />
+              {TRANSLATIONS[language]?.mangalMuhuratBtnDir || 'Get Directions'}
+          </a>
+        )}
       </div>
     </div>
   );

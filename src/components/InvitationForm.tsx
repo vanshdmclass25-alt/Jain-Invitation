@@ -54,6 +54,24 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
     Boolean(data.yearlyPhotos && data.yearlyPhotos.length > 0)
   );
 
+  const [showLocationSection, setShowLocationSection] = useState(
+    Boolean(data.location) || Boolean(data.googleMapsUrl)
+  );
+
+  const handleToggleLocation = () => {
+    if (showLocationSection) {
+      // Removing location
+      setShowLocationSection(false);
+      onChange({
+        ...data,
+        location: '',
+        googleMapsUrl: '',
+      });
+    } else {
+      setShowLocationSection(true);
+    }
+  };
+
   const updateField = <K extends keyof InvitationData>(field: K, value: InvitationData[K]) => {
     onChange({
       ...data,
@@ -458,58 +476,89 @@ export const InvitationForm: React.FC<InvitationFormProps> = ({
       </div>
 
       {/* SECTION G: LOCATION & GOOGLE MAPS */}
-      <div className="space-y-3">
-        <div className="space-y-1.5">
-          <label htmlFor="invitation-location-input" className="block text-sm font-semibold text-stone-800">
-            Location / Venue <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <input
-              id="invitation-location-input"
-              type="text"
-              value={data.location}
-              onChange={(e) => updateField('location', e.target.value)}
-              onBlur={handleGenerateMapsUrl}
-              placeholder="e.g. Shree Parshwanath Jain Derasar, Borivali West, Mumbai"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 focus:border-[#8B6E28] focus:ring-2 focus:ring-[#8B6E28]/15 text-stone-900 text-sm font-medium transition"
-            />
+      <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-[#8B6E28]" />
+            <span className="text-sm font-semibold text-stone-900">
+              Event Location / Venue (Optional)
+            </span>
           </div>
+
+          <button
+            type="button"
+            onClick={handleToggleLocation}
+            className="text-xs text-red-600 font-medium hover:underline cursor-pointer flex items-center gap-1"
+          >
+            {showLocationSection ? (
+              <>
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Remove</span>
+              </>
+            ) : (
+              <>
+                <Plus className="w-3.5 h-3.5 text-[#8B6E28]" />
+                <span className="text-[#8B6E28]">Add Location</span>
+              </>
+            )}
+          </button>
         </div>
 
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label htmlFor="invitation-maps-input" className="block text-sm font-semibold text-stone-800">
-              Google Maps Direct Link
-            </label>
-            {data.googleMapsUrl && (
-              <a
-                href={data.googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-[#8B6E28] hover:underline inline-flex items-center gap-1 font-medium"
-              >
-                <span>Test Link</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            )}
+        {showLocationSection && (
+          <div className="space-y-3 pt-2">
+            <div className="space-y-1.5">
+              <label htmlFor="invitation-location-input" className="block text-sm font-semibold text-stone-800">
+                Location / Venue <span className="text-stone-400 font-normal">(Required if section added)</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <input
+                  id="invitation-location-input"
+                  type="text"
+                  value={data.location}
+                  onChange={(e) => updateField('location', e.target.value)}
+                  onBlur={handleGenerateMapsUrl}
+                  placeholder="e.g. Shree Parshwanath Jain Derasar, Borivali West, Mumbai"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 focus:border-[#8B6E28] focus:ring-2 focus:ring-[#8B6E28]/15 text-stone-900 text-sm font-medium transition"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="invitation-maps-input" className="block text-sm font-semibold text-stone-800">
+                  Google Maps Direct Link
+                </label>
+                {data.googleMapsUrl && (
+                  <a
+                    href={data.googleMapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-[#8B6E28] hover:underline inline-flex items-center gap-1 font-medium"
+                  >
+                    <span>Test Link</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+              <div className="relative">
+                <input
+                  id="invitation-maps-input"
+                  type="url"
+                  value={data.googleMapsUrl}
+                  onChange={(e) => updateField('googleMapsUrl', e.target.value)}
+                  placeholder="https://maps.google.com/?q=..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-[#8B6E28] focus:ring-2 focus:ring-[#8B6E28]/15 text-stone-900 text-sm font-medium transition"
+                />
+              </div>
+              <p className="text-[11px] text-stone-400">
+                When reader taps the venue, direct Google Maps opens to that exact location.
+              </p>
+            </div>
           </div>
-          <div className="relative">
-            <input
-              id="invitation-maps-input"
-              type="url"
-              value={data.googleMapsUrl}
-              onChange={(e) => updateField('googleMapsUrl', e.target.value)}
-              placeholder="https://maps.google.com/?q=..."
-              className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-[#8B6E28] focus:ring-2 focus:ring-[#8B6E28]/15 text-stone-900 text-sm font-medium transition"
-            />
-          </div>
-          <p className="text-[11px] text-stone-400">
-            When reader taps the venue, direct Google Maps opens to that exact location.
-          </p>
-        </div>
+        )}
       </div>
 
       {/* SECTION: EVENT SCHEDULE TIMELINE (ઉત્સવનો મંગલ પ્રવાસ - 100% EDITABLE) */}
