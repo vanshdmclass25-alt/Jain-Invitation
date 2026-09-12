@@ -474,6 +474,19 @@ export const InvitationCard: React.FC<InvitationCardProps> = React.memo(({
             </div>
           )}
 
+          
+          {/* Scratchable Hidden Message */}
+          {(data.scratchTitle || data.scratchMessage) && (
+            <div className="relative z-10 w-full max-w-md my-4">
+              <ScratchCard
+                title={data.scratchTitle || t.scratchDefaultTitle}
+                hiddenMessage={data.scratchMessage || t.scratchDefaultMessage}
+                template={currentTemplate}
+                language={activeLang}
+              />
+            </div>
+          )}
+
           {/* 9. Parna Vidhi & Rituals Guide */}
           <div className="relative z-10 w-full max-w-md my-4">
             <ParnaVidhiGuide
