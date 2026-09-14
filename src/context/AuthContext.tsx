@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 export interface User {
   name: string;
   email: string;
+  phone: string;
   uid: string;
 }
 
@@ -11,7 +12,7 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   authError: string | null;
-  registerUser: (name: string, email: string) => void;
+  registerUser: (name: string, email: string, phone: string) => void;
   loginAdmin: (pin: string) => boolean;
   signOut: () => void;
 }
@@ -51,8 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const registerUser = (name: string, email: string) => {
-    const newUser = { name, email, uid: Math.random().toString(36).substring(2, 15) };
+  const registerUser = (name: string, email: string, phone: string) => {
+    const newUser = { name, email, phone, uid: Math.random().toString(36).substring(2, 15) };
     setUser(newUser);
     localStorage.setItem('tattva_user', JSON.stringify(newUser));
   };

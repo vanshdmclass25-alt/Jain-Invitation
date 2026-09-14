@@ -18,6 +18,7 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [pin, setPin] = useState('');
   const [mode, setMode] = useState<'user' | 'admin'>('user');
 
@@ -56,7 +57,7 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
           userId: user.uid,
           userName: user.name || 'Tapasvi Devotee',
           userEmail: user.email || 'No email',
-          whatsappNumber: '+91 88509 18792',
+          whatsappNumber: user.phone || '',
           templateId: templateId,
           status: 'pending',
           createdAt: serverTimestamp(),
@@ -98,7 +99,7 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
           userId: user.uid,
           userName: user.name || 'Tapasvi Devotee',
           userEmail: user.email || 'No email',
-          whatsappNumber: '+91 88509 18792',
+          whatsappNumber: user.phone || '',
           templateId: templateId,
           status: 'pending',
           createdAt: serverTimestamp(),
@@ -170,7 +171,7 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
         )}
         
         {mode === 'user' ? (
-          <form onSubmit={(e) => { e.preventDefault(); if (name && email) registerUser(name, email); }} className="space-y-4 text-left">
+          <form onSubmit={(e) => { e.preventDefault(); if (name && email && phone) registerUser(name, email, phone); }} className="space-y-4 text-left">
             <div>
               <label className="block text-xs font-semibold text-stone-600 uppercase mb-1">Full Name</label>
               <input type="text" required value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="e.g. Rahul Shah" />
@@ -178,6 +179,10 @@ export const CustomizationGate: React.FC<CustomizationGateProps> = ({ templateId
             <div>
               <label className="block text-xs font-semibold text-stone-600 uppercase mb-1">Email Address</label>
               <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="your@email.com" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-stone-600 uppercase mb-1">WhatsApp Number</label>
+              <input type="tel" pattern="[0-9]*" inputMode="numeric" required value={phone} onChange={e => { const val = e.target.value.replace(/[^0-9]/g, ''); setPhone(val); }} className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-amber-500" placeholder="Enter only numbers (e.g. 9876543210)" />
             </div>
             <button type="submit" className="bg-[#C08B46] hover:bg-[#A8793A] text-white px-6 py-3 rounded-xl font-semibold text-xs shadow-md transition w-full mt-2 cursor-pointer">
               Continue to Template Studio
